@@ -69,6 +69,12 @@ The actual steps of deploying it:
 # test the app
 11. java -cp java/bin:./stubs:../tool/lib/dataclayclient.jar application.HelloPeople XLAB Kogi 18
 ```
+***Remaining issues with Hello People:***
+* How to restart the deployment after stop without data loss. With ***docker-compose rm*** we reset the state to no data and users in dataClay but with only ***docker-compose up*** we want to create already existing environments, which causes the docker services to crash.
+* When trying the same with python, we get ***Error Code: NAMESPACE_NOT_EXIST*** for step 8. While for Java it is created at that time.
+* No documentation about ***global.properties***
+
+
 
 ### Installing and configuring COMPSs to the Edge and Cloud
 
