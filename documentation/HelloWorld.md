@@ -31,6 +31,45 @@ To show all mF2C functionality the minimal configuration of mF2C deployment uses
 
 ### Installing and configuring DataClay to the Edge and Cloud
 
+#### Single container deployment
+
+For now we tested the simple Hello World/People Java example mentioned in the [dataClay manual](https://github.com/mF2C/dataClay/blob/master/manual/dataClay-Manual.pdf). In it we have the model People->Person model with each person having a name and age, while people objects only have a name and the person objects inside it.
+
+The actual steps of deploying it:
+```
+0. clone dataClay + create a hellopeople file/folder structure inside the repo (cfgfiles, java, stubs)
+
+1. cd $GIT/dataClay/orchestration
+
+2. docker-compose rm
+
+3. docker-compose up # [wait till LANG_PYTHON msg logged]
+
+4. cd $GIT/dataClay/hellopeople
+
+# create user
+5. ../tool/dClayTool.sh NewAccount Kogi Password
+
+# as the created user allow yourself access to the dataset peopleDS and create it if needed
+6. ../tool/dClayTool.sh NewDataContract Kogi Password peopleDS Kogi
+
+# compile the model first
+# compile to other location than application latter on - no confusion between stub and original
+7. javac -d stubs java/src/model/*.java
+
+# create the namespace to be used and fill it with the generated models
+8. ../tool/dClayTool.sh NewModel Kogi Password peopleSpace ./stubs java
+
+# overwrite the simple models with their stubs - no confusion latter on
+9. ../tool/dClayTool.sh GetStubs Kogi Password peopleSpace ./stubs
+
+# compile the application with the client JAR and stubs!
+10. javac -d java/bin -cp ./stubs:../tool/lib/dataclayclient.jar java/src/application/HelloPeople.java
+
+# test the app
+11. java -cp java/bin:./stubs:../tool/lib/dataclayclient.jar application.HelloPeople XLAB Kogi 18
+```
+
 ### Installing and configuring COMPSs to the Edge and Cloud
 
 ### Deploying the application, configuration
