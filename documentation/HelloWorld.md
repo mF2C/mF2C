@@ -73,6 +73,7 @@ The actual steps of deploying it:
 * How to restart the deployment after stop without data loss. With ***docker-compose rm*** we reset the state to no data and users in dataClay but with only ***docker-compose up*** we want to create already existing environments, which causes the docker services to crash.
 * When trying the same with python, we get ***Error Code: NAMESPACE_NOT_EXIST*** for step 8. While for Java it is created at that time.
 * No documentation about ***global.properties***
+* We will need dataClay to be compatible with rPi (***ARM arhitecture***). Currently the avaible docker images are probably just for x86-64 arhitectures due to previous development needs. The docker-compose succeds only with postgress images on rPi (orchestration_ds1postgres_1 and orchestration_lmpostgres_1), while the remainder finishes with errors and exit 1 codes (, orchestration_ds1java_1, orchestration_logicmodule_1, orchestration_ds1pythonee_1)
 
 
 
