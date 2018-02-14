@@ -75,9 +75,95 @@ The actual steps of deploying it:
 * No documentation about ***global.properties***
 * We will need dataClay to be compatible with rPi (***ARM arhitecture***). Currently the avaible docker images are probably just for x86-64 arhitectures due to previous development needs. The docker-compose succeds only with postgress images on rPi (orchestration_ds1postgres_1 and orchestration_lmpostgres_1), while the remainder finishes with errors and exit 1 codes (, orchestration_ds1java_1, orchestration_logicmodule_1, orchestration_ds1pythonee_1)
 
+#### DataClay developer team answers and comments:
 
+Please note down the answers into the readme, not just into slack.
+
+* I think it was said, that all issuses are already documented and just not yet in focus 
 
 ### Installing and configuring COMPSs to the Edge and Cloud
+
+Testing COMPSs docker iamge was straightforward, since the [Readme](https://github.com/mF2C/COMPSs/blob/master/README.md) was quite clear. We also succeded deploying "new" code and creating custom image. For testing we used the Java [samples from BCS](http://compss.bsc.es/projects/bar/wiki/Applications)).
+
+#### Single container deployment
+
+This are the steps were we succeeded making a new image with minimal changes to the docker image. If there is a more elegant way to do it or if we are doing sthg wrong, please note it down.
+
+```
+0. Prepare 2 bash shells (1st for execution and 2nd for distribution of our files)
+
+1. Go to 1st  bash shell
+
+2. Donwload and run the COMPSs matmul image (has basic COMPSs installation and matrix multiplication example):
+    docker run -it -p 8888:8080 albertbsc/compss-matmul;
+
+3. Start the SSH server. COMPSs needs to ssh to a node to execute the tasks.
+    /etc/init.d/ssh start;
+
+4. We need to install some missing components (for admin activites)
+    apt update;
+    apt-get install sudo;
+
+5. Prepare java paths:
+    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/;
+
+6. Go to 2nd bash shell
+
+7. For simplification save running container id
+    export CONT_ID=$(sudo docker container ps -qf "ancestor=albertbsc/compss-matmul")
+
+8. Go to folder with prepared Java sourcecode (we used the [samples from BCS](http://compss.bsc.es/projects/bar/wiki/Applications))
+    cd $HOME/tutorial_apps/java;
+    mkdir jar;
+
+9. Copy the compatible compss-engine.jar from inside the running container + add it to classpath
+    docker cp $CONT_ID:/opt/COMPSs/Runtime/compss-engine.jar compss-engine.jar;
+    export CLASSPATH=$CLASSPATH:$PWD/compss-engine.jar
+
+10. If not yet - install same version of JDK as in container and set it as the default java version
+    sudo apt-get install openjdk-8-jdk;
+    sudo update-alternatives --config java;
+
+11. Compile source code to jar (each sample has a Readme for easier build). See HelloWorld example:
+    javac hello/src/main/java/hello/*.java;
+    cd hello/src/main/java/;
+    jar cf hello.jar hello/;
+    cd ../../../../;
+    mv hello/src/main/java/hello.jar jar/;
+
+12. Transfer the compiled JARs and any other files (e.q. test files) to the running container
+    docker cp jar/. $CONT_ID:/project_folder/;
+
+13. Return to 1st  bash shell (container TTY) and go to projet folder
+    cd project_folder;
+
+14. Start the COMPSs monitor for observation
+    /etc/init.d/compss-monitor start
+
+15. Execute the program using the runcompss command as a test
+    runcompss -m -d hello.Hello
+
+16. Go to 2nd bash shell after test finishes
+
+17. Save running docker state as new image
+    sudo docker commit $CONT_ID xlab/hellocompss
+
+18. Close container and test new image
+    docker container kill $CONT_ID
+    docker run -it -p 8888:8080 xlab/hellocompss
+    Repeat steps 3 and 5
+
+19. Monitor the execution of COMPSs in your browser:
+    http://localhost:8888/compss-monitor/
+```
+***Remaining issues with our approach:***
+* JARs have to be in separate folders or COMPSS crashes
+* Is there a way to do everthing in 1 bash shell - for making a script
+
+
+#### COMPSs developer team answers and comments:
+
+Please note down the answers into the readme, not just into slack.
 
 ### Deploying the application, configuration
 
