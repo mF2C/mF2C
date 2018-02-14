@@ -75,11 +75,16 @@ The actual steps of deploying it:
 * No documentation about ***global.properties***
 * We will need dataClay to be compatible with rPi (***ARM arhitecture***). Currently the avaible docker images are probably just for x86-64 arhitectures due to previous development needs. The docker-compose succeds only with postgress images on rPi (orchestration_ds1postgres_1 and orchestration_lmpostgres_1), while the remainder finishes with errors and exit 1 codes (, orchestration_ds1java_1, orchestration_logicmodule_1, orchestration_ds1pythonee_1)
 
+***Other issues:***
+* Is it possible to set up two dataclay dockers and configure sync between this? For example, one docker on agent and one in cloud.
+
 #### DataClay developer team answers and comments:
 
 Please note down the answers into the readme, not just into slack.
 
-* I think it was said, that all issuses are already documented and just not yet in focus 
+* I think it was said, that all issuses are already documented and just not yet in focus
+* 2 dockers issue: ATM to test that you will need to orchestrate as usual in one place, and then set up DS2 + its Postgres in another place, when you boot all those dockers, the LogicModule will track both DS (DataServices) and data could be accessed from clients either in the cloud or in the agent. We don't have documentation on deployments (yet).main idea is: docker-compose.yml has, right now, a deployment with: [logicmodule, lmpostgres, ds1postgres, ds1java, ds1pythonee]
+
 
 ### Installing and configuring COMPSs to the Edge and Cloud
 
