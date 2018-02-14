@@ -99,7 +99,7 @@ This are the steps were we succeeded making a new image with minimal changes to 
 
 1. Go to 1st  bash shell
 
-2. Donwload and run the COMPSs matmul image (has basic COMPSs installation and matrix multiplication example):
+2. Donwload and run the COMPSs matmul image (basic COMPSs installation + matrix multiplication example):
     docker run -it -p 8888:8080 albertbsc/compss-matmul;
 
 3. Start the SSH server. COMPSs needs to ssh to a node to execute the tasks.
