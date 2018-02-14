@@ -112,7 +112,7 @@ This are the steps were we succeeded making a new image with minimal changes to 
 7. For simplification save running container id
     export CONT_ID=$(sudo docker container ps -qf "ancestor=albertbsc/compss-matmul")
 
-8. Go to folder with prepared Java sourcecode (we used the [samples from BCS](http://compss.bsc.es/projects/bar/wiki/Applications))
+8. Go to folder with prepared Java sourcecode
     cd $HOME/tutorial_apps/java;
     mkdir jar;
 
