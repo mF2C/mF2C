@@ -29,6 +29,7 @@ mF2C is the Fog to Cloud platform that provide a specific set of tools to the de
 
 To show all mF2C functionality the minimal configuration of mF2C deployment uses one Edge device (for example rPI) and one Cloud instance. 
 
+<a name="dataclay"></a>
 ### Installing and configuring DataClay to the Edge and Cloud
 
 #### Single container deployment
@@ -85,7 +86,7 @@ Please note down the answers into the readme, not just into slack.
 * I think it was said, that all issuses are already documented and just not yet in focus
 * 2 dockers issue: ATM to test that you will need to orchestrate as usual in one place, and then set up DS2 + its Postgres in another place, when you boot all those dockers, the LogicModule will track both DS (DataServices) and data could be accessed from clients either in the cloud or in the agent. We don't have documentation on deployments (yet).main idea is: docker-compose.yml has, right now, a deployment with: [logicmodule, lmpostgres, ds1postgres, ds1java, ds1pythonee]
 
-
+<a name="compss"></a>
 ### Installing and configuring COMPSs to the Edge and Cloud
 
 Testing COMPSs docker iamge was straightforward, since the [Readme](https://github.com/mF2C/COMPSs/blob/master/README.md) was quite clear. We also succeded deploying "new" code and creating custom image. For testing we used the Java [samples from BCS](http://compss.bsc.es/projects/bar/wiki/Applications)).
