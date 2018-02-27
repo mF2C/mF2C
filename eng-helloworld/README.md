@@ -1,8 +1,8 @@
-#mF2C (another) hello world example
+# mF2C (another) hello world example
 This document will provide the documentation to set up the minimal set of tools to run mF2C.
 More details about mF2C project can be found [here](http://www.mf2c-project.eu/)
 
-###The goal of the hello world example
+### The goal of the hello world example
 The goal of this hello world demo application is to drive developers on how they can use COMPSs together with dataClay, which are the most basic tools of mF2C applications.
 Applications in mF2C can be deployed both on fog and/or cloud environments. 
 
@@ -30,7 +30,7 @@ The application steps are summarized as follows:
 3. invoke COMPSs tasks to perform computation 
 4. show the result (printed by COMPSs application)
 
-###Preliminary requirements
+### Preliminary requirements
 Some preliminary requirements for this hello world application:
 
 - docker installation, see instructions [here](https://docs.docker.com/install/)
@@ -41,7 +41,7 @@ Some preliminary requirements for this hello world application:
 
 All installation steps in the following assume root privileges
 
-###Installation and configuration of DataClay
+### Installation and configuration of DataClay
 The following steps will deploy dataClay (more details and useful info about dataClay installation are found [here](https://github.com/mF2C/dataClay/blob/master/README.md))
 
 1. clone dataClay repository with the command "git clone https://github.com/mF2C/dataClay.git"
@@ -51,7 +51,7 @@ The following steps will deploy dataClay (more details and useful info about dat
 
 At this point, the dataClay docker is running
 
-###Installation and configuration of COMPSs
+### Installation and configuration of COMPSs
 The following steps are required to install and run a COMPSs instance:
 
 0. open a new shell
@@ -65,7 +65,7 @@ The following steps are required to install and run a COMPSs instance:
   update-java-alternatives --set java-1.8.0-openjdk-amd64
 4. exit from docker shell
 
-###Deployment and configuration of the application
+### Deployment and configuration of the application
 Prepare dataClay model 
 
 1. in a new (host) shell, go to dataClay installation directory
@@ -108,7 +108,7 @@ Prepare dataClay model
    /etc/init.d/compss-monitor start	# to start monitor
    6. Monitor the execution of COMPSs in your browser:	http://localhost:8888/compss-monitor/
 
-###Launch demo application 
+### Launch demo application 
 1. move to helloworld directory
   cd /root/apps/helloworld 
 2. run the class to load and store the fixed points map into dataClay
