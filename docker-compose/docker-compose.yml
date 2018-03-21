@@ -1,0 +1,21 @@
+version: '3'
+services:
+  proxy:
+    image: traefik
+    restart: unless-stopped
+    command: --web --docker --docker.exposedByDefault=false --loglevel=info
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+     - ./traefik/traefik.toml:/traefik.toml
+     - ./traefik/cert:/ssl:ro
+    ports:
+     - "80:80"
+     - "443:443"
+  cimi:
+    image: mf2c/cimi-server:1.0.2-SNAPSHOT
+    expose:
+     - "8201"
+    labels:
+     - "traefik.enable=true"
+     - "traefik.backend=cimi"
+     - "traefik.frontend.rule=PathPrefix:/,/"
