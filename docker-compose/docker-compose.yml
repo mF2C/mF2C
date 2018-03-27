@@ -15,7 +15,13 @@ services:
     image: mf2c/cimi-server:1.0.2-SNAPSHOT
     expose:
      - "8201"
+    restart: always
     labels:
      - "traefik.enable=true"
      - "traefik.backend=cimi"
      - "traefik.frontend.rule=PathPrefix:/,/"
+  COMPSs:
+    image: mf2c/compss-mf2c:1.0
+    expose: 
+     - 8080
+    restart: always
