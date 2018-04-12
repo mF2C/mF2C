@@ -7,12 +7,11 @@ services:
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock:ro
      - ./traefik/traefik.toml:/traefik.toml
-     - ./traefik/cert:/ssl:ro
     ports:
      - "80:80"
      - "443:443"
   cimi:
-    image: mf2c/cimi-server:1.0.2-SNAPSHOT
+    image: mf2c/cimi-server:1.3-SNAPSHOT
     expose:
      - "8201"
     restart: always
