@@ -10,7 +10,7 @@ Windows or Linux systems. A single node Docker Swarm should also be running - `d
 Using the version 3 Compose file in this folder, users can deploy a service stack into the single node Swarm: 
 
 ```bash
-docker-compose -f docker-compose-core.yml up
+docker-compose -f docker-compose-core.yml -p mf2c up
 ```
 
 **Note** that this will only deploy the core services for mF2C (user registration, interface, and database). If you want to deploy the remaining services, make sure to add the proper credentials to `.env` and run:
