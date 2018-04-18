@@ -1,0 +1,34 @@
+version: '3'
+services:
+  proxy:
+    image: traefik
+    restart: unless-stopped
+    command: --web --docker --docker.exposedByDefault=false --loglevel=info
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+     - ./traefik/traefik.toml:/traefik.toml
+    ports:
+     - "80:80"
+     - "443:443"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.0
+    container_name: elasticsearch
+    restart: unless-stopped
+    expose:
+     - "9200"
+     - "9300"
+    environment:
+     - cluster.name=elasticsearch
+     - xpack.security.enabled=false
+     - discovery.type=single-node
+     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+  cimi:
+    image: mf2c/cimi-server:latest
+    expose:
+     - "8201"
+    restart: unless-stopped
+    labels:
+     - "traefik.enable=true"
+     - "traefik.backend=cimi"
+     - "traefik.frontend.rule=PathPrefix:/,/"
+
