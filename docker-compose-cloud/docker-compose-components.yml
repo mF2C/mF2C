@@ -1,0 +1,7 @@
+version: '3'
+services:
+  COMPSs:
+    image: mf2c/compss-mf2c:1.0
+    expose: 
+     - 8080
+    restart: unless-stopped
