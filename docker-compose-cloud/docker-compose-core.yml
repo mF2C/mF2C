@@ -24,5 +24,6 @@ services:
     labels:
      - "traefik.enable=true"
      - "traefik.backend=cimi"
+     - "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
      - "traefik.frontend.rule=PathPrefix:/,/"
 
