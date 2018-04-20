@@ -11,7 +11,7 @@ With `docker-compose`, users can orchestrate the installation of the
 mF2C system by doing:
 
 ```bash
-docker-compose up
+docker-compose -p mf2c up
 ```
 
 _The full installation might take a few minutes, depending on 

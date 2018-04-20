@@ -9,10 +9,10 @@ defaultEntryPoints = ["http", "https"]
             [entryPoints.https.tls]
 
 [acme]
-email = "$$"
+email = "mf2c-contact@lists.atosresearch.eu"
 storage = "acme.json"
 entryPoint = "https"
 [acme.httpChallenge]
    entryPoint = "http"
 [[acme.domains]]
-   main = "$$"
+   main = "dashboard.mf2c-project.eu"
