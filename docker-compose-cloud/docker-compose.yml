@@ -41,3 +41,11 @@ services:
       - "JAVA_OPTS="
     expose:
       - "46200"
+  discovery:
+    image: mf2c/discovery:latest
+    depends_on:
+      - cimi
+    expose: 
+      - 46040
+    cap_add:
+      - NET_ADMIN

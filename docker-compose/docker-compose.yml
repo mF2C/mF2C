@@ -19,7 +19,7 @@ services:
      - discovery.type=single-node
      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
   cimi:
-    image: mf2c/cimi-server:1.3-SNAPSHOT
+    image: mf2c/cimi-server:latest
     expose:
      - "8201"
     restart: unless-stopped
@@ -40,3 +40,11 @@ services:
       - "JAVA_OPTS="
     expose:
       - "46200"
+  discovery:
+    image: mf2c/discovery:latest
+    depends_on:
+      - cimi
+    expose: 
+      - 46040
+    cap_add:
+      - NET_ADMIN
