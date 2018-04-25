@@ -26,7 +26,7 @@ services:
     labels:
      - "traefik.enable=true"
      - "traefik.backend=cimi"
-     - "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
+     #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
      - "traefik.frontend.rule=PathPrefix:/,/"
   COMPSs:
     image: mf2c/compss-mf2c:1.0
