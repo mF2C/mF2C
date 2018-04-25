@@ -49,3 +49,16 @@ services:
       - 46040
     cap_add:
       - NET_ADMIN
+  policies:
+    image: mf2c/policies:latest
+    depends_on:
+      - discovery
+    container_name: policies
+    expose:
+      - 46050
+      - 46051
+      - 46052
+    environment:
+      - "MF2C=True"
+      - "WIFI_DEV="
+
