@@ -36,8 +36,6 @@ services:
     image: mf2c/service-manager
     depends_on:
       - cimi
-    environment:
-      - "JAVA_OPTS="
     expose:
       - "46200"
   discovery:
@@ -57,6 +55,12 @@ services:
       - 46050
       - 46051
       - 46052
-    environment:
-      - "MF2C=True"
-      - "WIFI_DEV="
+  identification:
+    image: mf2c/identification
+    volumes:
+      - mydata:/data
+    expose:
+      - 46060
+
+volumes:
+  mydata: {}
