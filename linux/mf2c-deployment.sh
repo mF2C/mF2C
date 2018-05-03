@@ -202,7 +202,7 @@ progress "40" "Deploying docker-compose services"
 
 write_compose_file
 #Deploy compose
-docker-compose -p $PROJECT up &
+docker-compose -p $PROJECT up -d
 
 progress "70" "Waiting for services to be up and running"
 
