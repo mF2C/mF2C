@@ -1,6 +1,8 @@
 #!/bin/bash -e
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
+PROJECT=mf2c
+
 progress() {
     # $1 is the current percentage, from 0 to 100
     # $2 onwards, is the text to appear in front of the progress bar
@@ -200,7 +202,7 @@ progress "40" "Deploying docker-compose services"
 
 write_compose_file
 #Deploy compose
-docker-compose up &
+docker-compose -p $PROJECT up &
 
 progress "70" "Waiting for services to be up and running"
 
@@ -210,7 +212,7 @@ sleep 20
 progress "90" "Binding wireless interface with discovery container"
 
 #Bind inet to discovery
-DOCKER_NAME_DISCOVERY="demo_discovery_1"
+DOCKER_NAME_DISCOVERY="${PROJECT}_discovery_1"
 pid=$(docker inspect -f '{{.State.Pid}}' $DOCKER_NAME_DISCOVERY)
 # Assign phy wireless interface to the container 
 mkdir -p /var/run/netns
