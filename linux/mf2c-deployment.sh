@@ -79,7 +79,6 @@ services:
       - mydata:/data
     expose:
       - 46060
-
 volumes:
   mydata: {}
 
@@ -204,22 +203,28 @@ write_compose_file
 #Deploy compose
 docker-compose -p $PROJECT up -d
 
-progress "70" "Waiting for services to be up and running"
+progress "70" "Waiting for discovery to be up and running"
 
-#give it some time to spin up the containers
-sleep 20
+#Monitor whether the discovery container has been created 
+DOCKER_NAME_DISCOVERY="${PROJECT}_discovery_1"
+while true
+do
+  if [[ $(docker ps -f "name=$DOCKER_NAME_DISCOVERY" --format '{{.Names}}') == $DOCKER_NAME_DISCOVERY ]] 
+  then break
+  fi
+done
 
 progress "90" "Binding wireless interface with discovery container"
 
 #Bind inet to discovery
-DOCKER_NAME_DISCOVERY="${PROJECT}_discovery_1"
+
 pid=$(docker inspect -f '{{.State.Pid}}' $DOCKER_NAME_DISCOVERY)
 # Assign phy wireless interface to the container 
 mkdir -p /var/run/netns
 ln -s /proc/"$pid"/ns/net /var/run/netns/"$pid"
 iw phy "$PHY" set netns "$pid"
 #Bring the wireless interface up
-ifconfig "$WIFI_DEV" up
+docker exec -d "$DOCKER_NAME_DISCOVERY" ifconfig "$WIFI_DEV" up
 
 progress "100" "Installation complete!"
 
