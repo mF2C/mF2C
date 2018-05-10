@@ -61,6 +61,24 @@ services:
       - mydata:/data
     expose:
       - 46060
-
+  user-management:
+    image: mf2c/user-management
+    expose:
+      - "46300"
+    environment:
+      - CIMI_URL=
+  lifecycle:
+    image: mf2c/lifecycle
+    expose:
+      - "46000"
+    environment:
+      - CIMI_URL=
+      - STANDALONE_MODE=False
+      - HOST_IP=
+      - WORKING_DIR_VOLUME=/tmp/compose_files
+    volumes:
+      - /tmp/compose_files:/tmp/compose_files
+      - /var/run/docker.sock:/var/run/docker.sock      
+      
 volumes:
   mydata: {}
