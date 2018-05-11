@@ -71,6 +71,13 @@ services:
     image: mf2c/lifecycle
     expose:
       - "46000"
+  resouce-categorization:
+    image: mf2c/resource-categorization:latest
+    depends_on:
+      - cimi
+    expose:
+    - 46070
+    privileged: true
     environment:
       - CIMI_URL=
       - STANDALONE_MODE=False
