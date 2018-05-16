@@ -55,6 +55,19 @@ services:
       - "46050"
       - "46051:46051"
       - "46052:46052"
+#  uncomment after integration test with UPC is OK
+#  cau-client:
+#    image: mf2c/cau-client:latest
+#    depends_on:
+##     check if this is the correct name
+#      - cau
+#    container_name: cau-client
+#    expose:
+#      - 46065
+##   please provide ip:port params for CAU and leader CAU
+#    environment:
+#      - CAU_URL=
+#      - LCAU_URL=
   identification:
     image: mf2c/identification
     volumes:
