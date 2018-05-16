@@ -91,7 +91,14 @@ services:
       - WORKING_DIR_VOLUME=/tmp/compose_files
     volumes:
       - /tmp/compose_files:/tmp/compose_files
-      - /var/run/docker.sock:/var/run/docker.sock      
+      - /var/run/docker.sock:/var/run/docker.sock  
+  resouce-categorization:
+    image: mf2c/resource-categorization:latest
+    depends_on:
+      - cimi
+    expose:
+      - 46070
+    privileged: true
       
 volumes:
   mydata: {}
