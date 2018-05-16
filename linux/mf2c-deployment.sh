@@ -1,6 +1,16 @@
 #!/bin/bash -e
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
+function cleanup {
+    echo "WARN: Shutting down this mF2C agent..."
+    docker-compose -p mf2c down -v || echo "ERR: failed to deprovision docker-compose" 
+    rm .env || echo "ERR: .env not found"
+    rm docker-compose.yml || echo "ERR: compose file not found"
+    echo "INFO: Shutdown finished"
+    exit 1
+}
+trap cleanup EXIT
+
 PROJECT=mf2c
 
 progress() {
@@ -113,12 +123,7 @@ done
 
 if [[ ! -z $DELETE_MODE ]]
 then
-  echo "WARN: Shutting down this mF2C agent..."
-  docker-compose -p mf2c down -v || echo "ERR: failed to deprovision docker-compose" 
-  rm .env || echo "ERR: .env not found"
-  rm docker-compose.yml || echo "ERR: compose file not found"
-  echo "INFO: Shutdown finished"
-  exit 1
+    cleanup
 fi
 
 echo '''
