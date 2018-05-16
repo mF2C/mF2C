@@ -54,10 +54,10 @@ services:
     depends_on:
       - discovery
     container_name: policies
-    expose:
-      - 46050
-      - 46051
-      - 46052
+    ports:
+      - "46050"
+      - "46051:46051"
+      - "46052:46052"
     environment:
       - "MF2C=True"
       - "WIFI_DEV="
