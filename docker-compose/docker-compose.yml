@@ -98,6 +98,30 @@ services:
     expose:
       - 46070
     privileged: true
+  snaptemp:
+    build: mf2c/snaptemp:latest
+    command: sh /download.sh
+    depends_on:
+      - snap
+  influxdb:
+    image: influxdb
+    ports:
+      - "8086:8086"
+    volumes: 
+      - influx:/var/lib/influxdb
+    env_file:
+      - influxdb.env
+  snap:
+    image: intelsdi/snap:precise
+    ports:
+      - "8181:8181"
+    volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
+    depends_on:
+      - influxdb
+    env_file:
+      - snap.env
       
 volumes:
   mydata: {}
+  influx: {}
+
