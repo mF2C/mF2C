@@ -56,7 +56,7 @@ services:
       - "46051:46051"
       - "46052:46052"
   cau-client:
-    image: mf2c/cau-client:latest
+    image: mf2c/cau-client:v1.01
     depends_on:
 #   assuming cau and leader cau are bootstrapped elsewhere
       - policies
