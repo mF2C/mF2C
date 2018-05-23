@@ -343,6 +343,7 @@ cp mF2C/docker-compose/docker-compose.yml . ||  write_compose_file
 cp mF2C/docker-compose/*.c* .
 
 #Deploy compose
+docker-compose pull
 docker-compose -p $PROJECT up -d
 
 progress "70" "Waiting for discovery to be up and running"
