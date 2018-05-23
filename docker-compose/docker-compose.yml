@@ -39,6 +39,8 @@ services:
       - cimi
     expose:
       - "46200"
+    ports:
+      - 46200:46200
   discovery:
     image: mf2c/discovery:latest
     depends_on:
@@ -84,6 +86,8 @@ services:
     image: mf2c/lifecycle
     expose:
       - "46000"
+    ports:
+      - "46000:46000"
     environment:
       - CIMI_URL=
       - STANDALONE_MODE=False
@@ -106,8 +110,8 @@ services:
       - snap
   influxdb:
     image: influxdb
-    ports:
-      - "8086:8086"
+    expose:
+      - "8086"
     volumes: 
       - influx:/var/lib/influxdb
     environment:
