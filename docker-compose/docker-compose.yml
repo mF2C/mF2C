@@ -110,6 +110,8 @@ services:
       - snap
   influxdb:
     image: influxdb
+    expose:
+      - "8086"
     volumes: 
       - influx:/var/lib/influxdb
     environment:
