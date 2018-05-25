@@ -38,7 +38,7 @@ services:
     depends_on:
       - cimi
     environment:
-      - JAVA_OPTS=
+      - JAVA_OPTS=-Xms32m -Xmx256m
     expose:
       - 46200
     ports:
