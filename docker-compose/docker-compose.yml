@@ -38,7 +38,7 @@ services:
     depends_on:
       - cimi
     expose:
-      - "46200"
+      - 46200
     ports:
       - 46200:46200
   discovery:

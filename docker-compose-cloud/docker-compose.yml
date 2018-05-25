@@ -38,9 +38,11 @@ services:
     depends_on:
       - cimi
     environment:
-      - "JAVA_OPTS="
+      - JAVA_OPTS=
     expose:
-      - "46200"
+      - 46200
+    ports:
+      - 46200:46200
   discovery:
     image: mf2c/discovery:latest
     depends_on:

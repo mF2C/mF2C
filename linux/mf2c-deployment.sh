@@ -6,10 +6,12 @@ function cleanup {
     docker-compose -p mf2c down -v || echo "ERR: failed to deprovision docker-compose" 
     rm .env || echo "ERR: .env not found"
     rm docker-compose.yml || echo "ERR: compose file not found"
+    rm -rf mF2C || echo "ERR: cloned mF2C repository not found"
+    rm *.cfg *.conf || echo "ERR: configuration files not found"
     echo "INFO: Shutdown finished"
     exit 1
 }
-trap cleanup EXIT
+trap cleanup ERR
 
 PROJECT=mf2c
 
@@ -61,15 +63,20 @@ services:
      - 8080
     restart: unless-stopped
   service-manager:
-    image: mf2c/service-manager
+    image: mf2c/service-manager:latest
+    restart: unless-stopped
     depends_on:
       - cimi
     expose:
-      - "46200"
+      - 46200
+    ports:
+      - 46200:46200
   discovery:
     image: mf2c/discovery:latest
     depends_on:
       - cimi
+    networks:
+      - host
     expose: 
       - 46040
     cap_add:
@@ -78,20 +85,137 @@ services:
     image: mf2c/policies:latest
     depends_on:
       - discovery
-    container_name: policies
+    # container_name: policies
+    ports:
+      - "46050"
+      - "46051:46051"
+      - "46052:46052"
+  cau-client:
+    image: mf2c/cau-client:latest
+    depends_on:
+#   assuming cau and leader cau are bootstrapped elsewhere
+      - policies
+    # container_name: cau-client
     expose:
-      - 46050
-      - 46051
-      - 46052
+      - 46065
+#   please provide ip:port params for CAU and leader CAU
+    environment:
+      - CAU_URL=127.0.0.1:46400
+      - LCAU_URL=127.0.0.1:46410
   identification:
-    image: mf2c/identification
+    image: mf2c/identification:latest
     volumes:
       - mydata:/data
     expose:
       - 46060
+  user-management:
+    image: mf2c/user-management:latest
+    expose:
+      - "46300"
+    environment:
+      - CIMI_URL=
+  lifecycle:
+    image: mf2c/lifecycle
+    expose:
+      - "46000"
+    ports:
+      - "46000:46000"
+    environment:
+      - CIMI_URL=
+      - STANDALONE_MODE=False
+      - HOST_IP=
+      - WORKING_DIR_VOLUME=/tmp/compose_files
+    volumes:
+      - /tmp/compose_files:/tmp/compose_files
+      - /var/run/docker.sock:/var/run/docker.sock  
+  resouce-categorization:
+    image: mf2c/resource-categorization:latest
+    depends_on:
+      - cimi
+    expose:
+      - 46070
+    privileged: true
+  snaptemp:
+    image: mf2c/snaptemp:latest
+    command: sh /download.sh
+    depends_on:
+      - snap
+  influxdb:
+    image: influxdb
+    volumes: 
+      - influx:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=snap
+      - INFLUXDB_USER=snap
+      - INFLUXDB_USER_PASSWORD=snap
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_USER_PASSWORD=admin
+  snap:
+    image: intelsdi/snap:precise
+    ports:
+      - "8181:8181"
+    volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
+    depends_on:
+      - influxdb
+    environment:
+      - SNAP_VERSION=2.0.0
+      - SNAP_LOG_LEVEL=2
+  influxdb-analytics:
+    image: influxdb:latest
+    environment:
+      - ADMIN_USER=analytics_engine
+      - INFLUX_INIT_PWD=analytics_engine
+      - PRE_CREATE_DB=analytics_engine_development
+    volumes:
+      # Data persistency
+      - influx-analytics:/var/lib/influxdb
+  analytics_engine:
+    image: mf2c/analytics-engine:latest
+    expose:
+      - "46020"
+    depends_on:
+      - influxdb-analytics
+    volumes:
+      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+  neo4j:
+    image: neo4j:2.3.12
+    volumes:
+    - neo4j:/data
+    ports:
+    - "7475:7474" # expose the port for the console ui
+    environment:
+    - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
+  landscaper:
+    image: mf2c/landscaper:latest
+    volumes:
+    - landscaper:/landscaper/data
+    - ./landscaper.cfg:/landscaper/landscaper.cfg
+    depends_on:
+      - "neo4j"
+    environment:
+      - OS_TENANT_NAME=
+      - OS_PROJECT_NAME=
+      - OS_TENANT_ID=
+      - OS_USERNAME=
+      - OS_PASSWORD=
+      - OS_AUTH_URL=
+    command: ["/start.sh", "http://neo4j:7474"]
+  web:
+    image: mf2c/landscaper-api:latest
+    volumes:
+      - ./landscaper.cfg:/landscaper/landscaper.cfg
+    ports:
+      - "9001:9001"
+    depends_on:
+      - neo4j
+      - landscaper
+
 volumes:
   mydata: {}
-
+  influx: {}
+  influx-analytics: {}
+  neo4j: {}
+  landscaper: {}
 EOF
 }
 
@@ -161,7 +285,12 @@ then
     WIFI_DEV=$(networksetup -listallhardwareports | grep -1 "Wi-Fi" | awk '$1=="Device:"{print $2}')
     IN_USE=$(route -n get default | awk '$1=="interface:"{print $2}')
     echo "ERR: compatibility for Mac is not fully supported yet. Exit..."
-    exit 1
+    read -p "Do you wish to continue? [y/n]" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
 elif [[ "$machine" == "Linux" ]]
 then
     WIFI_DEV=$(iw dev | awk '$1=="Interface"{print $2}')
@@ -172,6 +301,10 @@ else
     echo "ERR: the mF2C system is not compatible with your OS: $machine. Exit..."
     exit 1
 fi
+
+progress "10" "Cloning mF2C"
+
+git clone https://github.com/mF2C/mF2C.git
 
 progress "15" "Checking networking conflicts"
 
@@ -193,7 +326,7 @@ fi
 progress "25" "Setup environment"
 
 # Write env file to be used by docker-compose
-cat > .env <<EOF
+cp mF2C/docker-compose/.env .env || cat > .env <<EOF
 IDKey=
 MF2C=True
 WIFI_DEV=
@@ -204,8 +337,13 @@ EOF
 
 progress "40" "Deploying docker-compose services"
 
-write_compose_file
+cp mF2C/docker-compose/docker-compose.yml . ||  write_compose_file
+
+# Copy configuration files
+cp mF2C/docker-compose/*.c* .
+
 #Deploy compose
+docker-compose pull
 docker-compose -p $PROJECT up -d
 
 progress "70" "Waiting for discovery to be up and running"
@@ -225,11 +363,14 @@ progress "90" "Binding wireless interface with discovery container"
 
 pid=$(docker inspect -f '{{.State.Pid}}' $DOCKER_NAME_DISCOVERY)
 # Assign phy wireless interface to the container 
-mkdir -p /var/run/netns
-ln -s /proc/"$pid"/ns/net /var/run/netns/"$pid"
-iw phy "$PHY" set netns "$pid"
-#Bring the wireless interface up
-docker exec -d "$DOCKER_NAME_DISCOVERY" ifconfig "$WIFI_DEV" up
+if [[ "$machine" != "Mac" ]]
+then
+  mkdir -p /var/run/netns
+  ln -s /proc/"$pid"/ns/net /var/run/netns/"$pid"
+  iw phy "$PHY" set netns "$pid"
+  #Bring the wireless interface up
+  docker exec -d "$DOCKER_NAME_DISCOVERY" ifconfig "$WIFI_DEV" up
+fi
 
 progress "100" "Installation complete!"
 
