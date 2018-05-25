@@ -41,6 +41,8 @@ services:
       - 46200
     ports:
       - 46200:46200
+    environment:
+      - JAVA_OPTS=-Xms32m -Xmx256m
   discovery:
     image: mf2c/discovery:latest
     depends_on:
