@@ -41,7 +41,7 @@ services:
      - "80:80"
      - "443:443"
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
     restart: unless-stopped
     environment:
      - cluster.name=elasticsearch
