@@ -19,14 +19,25 @@ services:
      - discovery.type=single-node
      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
   cimi:
-    image: mf2c/cimi-server:latest
+    image: mf2c/cimi-server:1.10-SNAPSHOT
+    depends_on:
+      - elasticsearch
     expose:
      - "8201"
-    restart: unless-stopped
     labels:
      - "traefik.enable=true"
      - "traefik.backend=cimi"
      - "traefik.frontend.rule=PathPrefix:/,/"
+    volumes:
+     - ringcontainer:/opt/slipstream/ring-container
+     - ringcontainerexample:/opt/slipstream/ring-example
+  rc:
+    image: sixsq/ring-container:3.52-SNAPSHOT
+    expose:
+     - "5000"
+    volumes:
+     - ringcontainer:/opt/slipstream/ring-container
+     - ringcontainerexample:/opt/slipstream/ring-example
   COMPSs:
     image: mf2c/compss-mf2c:1.0
     expose: 
@@ -190,4 +201,6 @@ volumes:
   influx-analytics: {}
   neo4j: {}
   landscaper: {}
+  ringcontainer: {}
+  ringcontainerexample: {}
 
