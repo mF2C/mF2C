@@ -1,0 +1,7 @@
+# Needed both by LogicModule and DataService
+LOGICMODULE_PORT_TCP=3034
+
+# Not required by LogicModule per se, but EnvLoader prefers to have it
+LOGICMODULE_HOST=logicmodule_bk
+#LOGICMODULE_HOST=127.0.0.1
+

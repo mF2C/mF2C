@@ -10,34 +10,189 @@ services:
     ports:
      - "80:80"
      - "443:443"
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
-    restart: unless-stopped
-    environment:
-     - cluster.name=elasticsearch
-     - xpack.security.enabled=false
-     - discovery.type=single-node
-     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
-  cimi:
-    image: mf2c/cimi-server:1.10-SNAPSHOT
+  dcproxy:
+    image: mf2c/dataclay-proxy:latest
     depends_on:
-      - elasticsearch
+      - logicmodule1
+    expose:
+      - "6472"
+  cimi:
+    image: mf2c/cimi-server:2.1-SNAPSHOT
+    depends_on:
+      - logicmodule1
+      - dcproxy
+    environment:
+      - DC_HOST=dcproxy
+      - DC_PORT=6472
+      - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+      - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
     expose:
      - "8201"
     labels:
-     - "traefik.enable=true"
+     - "traefik.enable=true"     
+     #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
      - "traefik.backend=cimi"
      - "traefik.frontend.rule=PathPrefix:/,/"
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
   rc:
-    image: sixsq/ring-container:3.52-SNAPSHOT
+    image: sixsq/ring-container:3.53-SNAPSHOT
     expose:
      - "5000"
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
+  lmpostgres1:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  logicmodule1:
+    image: "bscdataclay/logicmodule"
+    ports:
+      - "11034:1034"
+    env_file:
+      - ./env/PG.environment
+      - ./env/LM.environment
+    environment:
+      - DATACLAY_ADMIN_USER=admin
+      - DATACLAY_ADMIN_PASSWORD=admin
+      - POSTGRES_HOST=lmpostgres1
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+  ds1postgres1:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  ds1java1:
+    image: "bscdataclay/dsjava"
+    ports:
+      - 2127
+    env_file:
+      - ./env/PG.environment
+      - ./env/DS.environment
+      - ./env/LM.environment
+    environment:
+      - DATASERVICE_NAME=DS1
+      - POSTGRES_HOST=ds1postgres1
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+
+  ds2postgres1:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  ds2java1:
+    image: "bscdataclay/dsjava"
+    ports:
+      - 2127
+    env_file:
+      - ./env/PG.environment
+      - ./env/DS.environment
+      - ./env/LM.environment
+    environment:
+      - DATASERVICE_NAME=DS2
+      - POSTGRES_HOST=ds2postgres1
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+      
+  ds1pythonee1:
+    image: "bscdataclay/dspython"
+    ports:
+      - 6867
+    env_file:
+      - ./env/DS.environment
+      - ./env/LM.environment
+    environment:
+      - DATASERVICE_NAME=DS1
+      - POSTGRES_HOST=ds1postgres1
+      - DEBUG=false
+      #- PYTHONVERBOSE=1
+
+  lmpostgres2:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  logicmodule2:
+    image: "bscdataclay/logicmodule"
+    ports:
+      - "12034:2034"
+    env_file:
+      - ./env/PG.environment
+      - ./env/LM2.environment
+    environment:
+      - DATACLAY_ADMIN_USER=admin
+      - DATACLAY_ADMIN_PASSWORD=admin
+      - POSTGRES_HOST=lmpostgres2
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+   
+  ds1postgres2:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  ds1java2:
+    image: "bscdataclay/dsjava"
+    ports:
+      - 2127
+    env_file:
+      - ./env/PG.environment
+      - ./env/DS.environment
+      - ./env/LM2.environment
+    environment:
+      - DATASERVICE_NAME=DS1
+      - POSTGRES_HOST=ds1postgres2
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+      
+  ds1pythonee2:
+    image: "bscdataclay/dspython"
+    ports:
+      - 6867
+    env_file:
+      - ./env/DS.environment
+      - ./env/LM2.environment
+    environment:
+      - DATASERVICE_NAME=DS1
+      - POSTGRES_HOST=ds1postgres2
+      - DEBUG=false
+      #- PYTHONVERBOSE=1
+
+  lmpostgres_bk:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  logicmodule_bk:
+    image: "bscdataclay/logicmodule"
+    ports:
+      - "13034:3034"
+    env_file:
+      - ./env/PG.environment
+      - ./env/LM_BK.environment
+    environment:
+      - DATACLAY_ADMIN_USER=admin
+      - DATACLAY_ADMIN_PASSWORD=admin
+      - POSTGRES_HOST=lmpostgres_bk
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
   COMPSs:
     image: mf2c/compss-mf2c:1.0
     expose: 
