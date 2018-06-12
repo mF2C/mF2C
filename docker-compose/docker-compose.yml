@@ -43,6 +43,10 @@ services:
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
+  slalite:
+    image: mf2c/sla-management:0.3.0
+    expose:
+     - "46030"
   lmpostgres1:
     image: postgres:9.5.12
     env_file:
