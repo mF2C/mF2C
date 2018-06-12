@@ -68,6 +68,10 @@ services:
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
+  slalite:
+    image: mf2c/sla-management:0.3.0
+    expose:
+     - "46030"
   COMPSs:
     image: mf2c/compss-mf2c:1.0
     expose: 
