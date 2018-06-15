@@ -350,8 +350,9 @@ WIFI_DEV=
 JAVA_OPTS=
 isLeader=$IS_LEADER
 PHY=$PHY
-TOPOLOGY=$ALLOWED_BACKUPS
 EOF
+
+echo "TOPOLOGY=$ALLOWED_BACKUPS" >> .env
 
 progress "40" "Deploying docker-compose services"
 
