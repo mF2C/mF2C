@@ -350,6 +350,7 @@ WIFI_DEV=
 JAVA_OPTS=
 isLeader=$IS_LEADER
 PHY=$PHY
+TOPOLOGY=$ALLOWED_BACKUPS
 EOF
 
 progress "40" "Deploying docker-compose services"
