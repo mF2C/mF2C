@@ -352,6 +352,8 @@ isLeader=$IS_LEADER
 PHY=$PHY
 EOF
 
+echo "TOPOLOGY=$ALLOWED_BACKUPS" >> .env
+
 progress "40" "Deploying docker-compose services"
 
 cp mF2C/docker-compose/docker-compose.yml . ||  write_compose_file
