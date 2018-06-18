@@ -252,8 +252,6 @@ services:
     image: mf2c/user-management:latest
     expose:
       - "46300"
-    environment:
-      - CIMI_URL=
   lifecycle:
     image: mf2c/lifecycle
     expose:
@@ -261,8 +259,6 @@ services:
     ports:
       - "46000:46000"
     environment:
-      - CIMI_URL=
-      - STANDALONE_MODE=False
       - HOST_IP=
       - WORKING_DIR_VOLUME=/tmp/compose_files
     volumes:
