@@ -260,6 +260,7 @@ services:
       - "46000:46000"
     environment:
       - HOST_IP=
+      - DATACLAY_EP=
       - WORKING_DIR_VOLUME=/tmp/compose_files
     volumes:
       - /tmp/compose_files:/tmp/compose_files
