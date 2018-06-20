@@ -48,6 +48,8 @@ services:
     image: mf2c/sla-management:0.3.0
     expose:
      - "46030"
+    environment:
+     - CIMI_URL=https://proxy:443/api     
   lmpostgres1:
     image: postgres:9.5.12
     env_file:
