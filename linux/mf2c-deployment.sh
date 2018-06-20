@@ -68,6 +68,7 @@ services:
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
+    command: sh
   slalite:
     image: mf2c/sla-management:0.3.0
     expose:
