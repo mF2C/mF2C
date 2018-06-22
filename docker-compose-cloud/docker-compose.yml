@@ -310,6 +310,19 @@ services:
     depends_on:
       - neo4j
       - landscaper
+  lifecycle:
+    image: mf2c/lifecycle:latest
+    expose:
+      - "46000"
+    ports:
+      - "46000:46000"
+    environment:
+      - HOST_IP=213.205.14.15
+      - DATACLAY_EP=
+      - WORKING_DIR_VOLUME=/tmp/compose_files
+    volumes:
+      - /tmp/compose_files:/tmp/compose_files
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   mydata: {}
