@@ -3,12 +3,12 @@
 
 function cleanup {
     echo "WARN: Shutting down this mF2C agent..."
-    docker-compose -p mf2c down -v || echo "ERR: failed to deprovision docker-compose" 
+    docker-compose -p mf2c down -v || echo "ERR: failed to deprovision docker-compose"
     rm .env || echo "ERR: .env not found"
     rm docker-compose.yml || echo "ERR: compose file not found"
     rm -rf mF2C || echo "ERR: cloned mF2C repository not found"
     rm *.cfg *.conf || echo "ERR: configuration files not found"
-    echo "INFO: Shutdown finished"
+    echo "INFO: Shutdown finigfshed"
     exit 1
 }
 trap cleanup ERR
@@ -20,10 +20,10 @@ progress() {
     # $2 onwards, is the text to appear in front of the progress bar
     char=""
     for i in $(seq 1 $(($1/2)))
-    do  
+    do
         char=$char'#'
     done
-    printf "\r\e[K|%-*s| %3d%% %s\n" "50" "$char" "$1" "${@:2}"; 
+    printf "\r\e[K|%-*s| %3d%% %s\n" "50" "$char" "$1" "${@:2}";
 }
 
 write_compose_file() {
@@ -40,29 +40,34 @@ services:
     ports:
      - "80:80"
      - "443:443"
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
-    restart: unless-stopped
-    environment:
-     - cluster.name=elasticsearch
-     - xpack.security.enabled=false
-     - discovery.type=single-node
-     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
-  cimi:
-    image: mf2c/cimi-server:1.10-SNAPSHOT
+  dcproxy:
+    image: mf2c/dataclay-proxy:latest
     depends_on:
-      - elasticsearch
+      - logicmodule1
+    expose:
+      - "6472"
+  cimi:
+    image: mf2c/cimi-server:2.1-SNAPSHOT
+    depends_on:
+      - logicmodule1
+      - dcproxy
+    environment:
+      - DC_HOST=dcproxy
+      - DC_PORT=6472
+      - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+      - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
     expose:
      - "8201"
     labels:
      - "traefik.enable=true"
+     #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
      - "traefik.backend=cimi"
      - "traefik.frontend.rule=PathPrefix:/,/"
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
   rc:
-    image: sixsq/ring-container:3.52-SNAPSHOT
+    image: sixsq/ring-container:3.53-SNAPSHOT
     expose:
      - "5000"
     volumes:
@@ -73,9 +78,53 @@ services:
     image: mf2c/sla-management:0.3.0
     expose:
      - "46030"
+    environment:
+     - CIMI_URL=https://proxy:443/api
+  lmpostgres1:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  logicmodule1:
+    image: "bscdataclay/logicmodule"
+    depends_on: ["lmpostgres1"]
+    ports:
+      - "11034:1034"
+    env_file:
+      - ./env/PG.environment
+      - ./env/LM.environment
+    environment:
+      - DATACLAY_ADMIN_USER=admin
+      - DATACLAY_ADMIN_PASSWORD=admin
+      - POSTGRES_HOST=lmpostgres1
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+  ds1postgres1:
+    image: postgres:9.5.12
+    env_file:
+      - ./env/PG.environment
+    command: -c fsync=off
+
+  ds1java1:
+    image: "bscdataclay/dsjava"
+    depends_on: ["ds1postgres1", "logicmodule1"]
+    ports:
+      - 2127
+    env_file:
+      - ./env/PG.environment
+      - ./env/DS.environment
+      - ./env/LM.environment
+    environment:
+      - DATASERVICE_NAME=DS1
+      - POSTGRES_HOST=ds1postgres1
+    volumes:
+      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
   COMPSs:
     image: mf2c/compss-mf2c:1.0
-    expose: 
+    expose:
      - 8080
     restart: unless-stopped
   service-manager:
@@ -93,7 +142,7 @@ services:
       - cimi
     networks:
       - host
-    expose: 
+    expose:
       - 46040
     cap_add:
       - NET_ADMIN
@@ -143,7 +192,7 @@ services:
       - WORKING_DIR_VOLUME=/tmp/compose_files
     volumes:
       - /tmp/compose_files:/tmp/compose_files
-      - /var/run/docker.sock:/var/run/docker.sock  
+      - /var/run/docker.sock:/var/run/docker.sock
   resouce-categorization:
     image: mf2c/resource-categorization:latest
     depends_on:
@@ -158,7 +207,7 @@ services:
       - snap
   influxdb:
     image: influxdb
-    volumes: 
+    volumes:
       - influx:/var/lib/influxdb
     environment:
       - INFLUXDB_DB=snap
@@ -279,7 +328,7 @@ echo '''
 | 88      88      88  88           a8P         Y8,           |
 | 88      88      88  88          d8"           Y8a.    .a8P |
 | 88      88      88  88          88888888888    `"Y8888Y"   |
-|                                                            |                                      
+|                                                            |
 ==============================================================
 
 '''
@@ -368,11 +417,11 @@ docker-compose -p $PROJECT up -d
 
 progress "70" "Waiting for discovery to be up and running"
 
-#Monitor whether the discovery container has been created 
+#Monitor whether the discovery container has been created
 DOCKER_NAME_DISCOVERY="${PROJECT}_discovery_1"
 while true
 do
-  if [[ $(docker ps -f "name=$DOCKER_NAME_DISCOVERY" --format '{{.Names}}') == $DOCKER_NAME_DISCOVERY ]] 
+  if [[ $(docker ps -f "name=$DOCKER_NAME_DISCOVERY" --format '{{.Names}}') == $DOCKER_NAME_DISCOVERY ]]
   then break
   fi
 done
@@ -382,7 +431,7 @@ progress "90" "Binding wireless interface with discovery container"
 #Bind inet to discovery
 
 pid=$(docker inspect -f '{{.State.Pid}}' $DOCKER_NAME_DISCOVERY)
-# Assign phy wireless interface to the container 
+# Assign phy wireless interface to the container
 if [[ "$machine" != "Mac" ]]
 then
   mkdir -p /var/run/netns
@@ -393,4 +442,3 @@ then
 fi
 
 progress "100" "Installation complete!"
-
