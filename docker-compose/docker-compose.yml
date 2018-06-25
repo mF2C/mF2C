@@ -29,7 +29,7 @@ services:
     expose:
      - "8201"
     labels:
-     - "traefik.enable=true"     
+     - "traefik.enable=true"
      #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
      - "traefik.backend=cimi"
      - "traefik.frontend.rule=PathPrefix:/,/"
@@ -49,7 +49,7 @@ services:
     expose:
      - "46030"
     environment:
-     - CIMI_URL=https://proxy:443/api     
+     - CIMI_URL=https://proxy:443/api
   lmpostgres1:
     image: postgres:9.5.12
     env_file:
@@ -58,6 +58,7 @@ services:
 
   logicmodule1:
     image: "bscdataclay/logicmodule"
+    depends_on: ["lmpostgres1"]
     ports:
       - "11034:1034"
     env_file:
@@ -78,6 +79,7 @@ services:
 
   ds1java1:
     image: "bscdataclay/dsjava"
+    depends_on: ["ds1postgres1", "logicmodule1"]
     ports:
       - 2127
     env_file:
@@ -91,118 +93,9 @@ services:
       - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
 
-  ds2postgres1:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
-
-  ds2java1:
-    image: "bscdataclay/dsjava"
-    ports:
-      - 2127
-    env_file:
-      - ./env/PG.environment
-      - ./env/DS.environment
-      - ./env/LM.environment
-    environment:
-      - DATASERVICE_NAME=DS2
-      - POSTGRES_HOST=ds2postgres1
-    volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
-      
-  ds1pythonee1:
-    image: "bscdataclay/dspython"
-    ports:
-      - 6867
-    env_file:
-      - ./env/DS.environment
-      - ./env/LM.environment
-    environment:
-      - DATASERVICE_NAME=DS1
-      - POSTGRES_HOST=ds1postgres1
-      - DEBUG=false
-      #- PYTHONVERBOSE=1
-
-  lmpostgres2:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
-
-  logicmodule2:
-    image: "bscdataclay/logicmodule"
-    ports:
-      - "12034:2034"
-    env_file:
-      - ./env/PG.environment
-      - ./env/LM2.environment
-    environment:
-      - DATACLAY_ADMIN_USER=admin
-      - DATACLAY_ADMIN_PASSWORD=admin
-      - POSTGRES_HOST=lmpostgres2
-    volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
-   
-  ds1postgres2:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
-
-  ds1java2:
-    image: "bscdataclay/dsjava"
-    ports:
-      - 2127
-    env_file:
-      - ./env/PG.environment
-      - ./env/DS.environment
-      - ./env/LM2.environment
-    environment:
-      - DATASERVICE_NAME=DS1
-      - POSTGRES_HOST=ds1postgres2
-    volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
-      
-  ds1pythonee2:
-    image: "bscdataclay/dspython"
-    ports:
-      - 6867
-    env_file:
-      - ./env/DS.environment
-      - ./env/LM2.environment
-    environment:
-      - DATASERVICE_NAME=DS1
-      - POSTGRES_HOST=ds1postgres2
-      - DEBUG=false
-      #- PYTHONVERBOSE=1
-
-  lmpostgres_bk:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
-
-  logicmodule_bk:
-    image: "bscdataclay/logicmodule"
-    ports:
-      - "13034:3034"
-    env_file:
-      - ./env/PG.environment
-      - ./env/LM_BK.environment
-    environment:
-      - DATACLAY_ADMIN_USER=admin
-      - DATACLAY_ADMIN_PASSWORD=admin
-      - POSTGRES_HOST=lmpostgres_bk
-    volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
   COMPSs:
     image: mf2c/compss-mf2c:1.0
-    expose: 
+    expose:
      - 8080
     restart: unless-stopped
   service-manager:
@@ -220,7 +113,7 @@ services:
     image: mf2c/discovery:latest
     depends_on:
       - cimi
-    expose: 
+    expose:
       - 46040
     cap_add:
       - NET_ADMIN
@@ -267,7 +160,7 @@ services:
       - WORKING_DIR_VOLUME=/tmp/compose_files
     volumes:
       - /tmp/compose_files:/tmp/compose_files
-      - /var/run/docker.sock:/var/run/docker.sock  
+      - /var/run/docker.sock:/var/run/docker.sock
   resouce-categorization:
     image: mf2c/resource-categorization:latest
     depends_on:
@@ -284,7 +177,7 @@ services:
     image: influxdb
     expose:
       - "8086"
-    volumes: 
+    volumes:
       - influx:/var/lib/influxdb
     environment:
       - INFLUXDB_DB=snap
@@ -362,4 +255,3 @@ volumes:
   landscaper: {}
   ringcontainer: {}
   ringcontainerexample: {}
-
