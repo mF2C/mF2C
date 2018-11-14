@@ -234,7 +234,7 @@ services:
       - OS_USERNAME=
       - OS_PASSWORD=
       - OS_AUTH_URL=
-    command: ["/start.sh", "http://neo4j:7474"]
+    command: ["./start.sh", "http://neo4j:7474"]
   web:
     image: mf2c/landscaper-api:latest
     volumes:
