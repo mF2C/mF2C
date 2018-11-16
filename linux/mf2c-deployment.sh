@@ -140,8 +140,6 @@ services:
     image: mf2c/discovery:latest
     depends_on:
       - cimi
-    networks:
-      - host
     expose:
       - 46040
     cap_add:
