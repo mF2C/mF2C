@@ -195,21 +195,12 @@ services:
     environment:
       - SNAP_VERSION=2.0.0
       - SNAP_LOG_LEVEL=2
-  influxdb-analytics:
-    image: influxdb:latest
-    environment:
-      - ADMIN_USER=analytics_engine
-      - INFLUX_INIT_PWD=analytics_engine
-      - PRE_CREATE_DB=analytics_engine_development
-    volumes:
-      # Data persistency
-      - influx-analytics:/var/lib/influxdb
   analytics_engine:
     image: mf2c/analytics-engine:latest
     expose:
       - "46020"
     depends_on:
-      - influxdb-analytics
+      - influxdb
     volumes:
       - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
   neo4j:
@@ -221,12 +212,11 @@ services:
     environment:
     - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
   landscaper:
-    image: mf2c/landscaper:latest
+    image: mf2c/landscaper:0.2
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
-    depends_on:
-      - "neo4j"
+    depends_on: ["cimi", "neo4j", "proxy"]
     environment:
       - OS_TENANT_NAME=
       - OS_PROJECT_NAME=
