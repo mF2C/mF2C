@@ -167,6 +167,9 @@ services:
       - cimi
     expose:
       - 46070
+    environment:
+      - "agentType=2"
+      - "targetDeviceActuator=A-AFST"  
     privileged: true
   snaptemp:
     image: mf2c/snaptemp:0.1
