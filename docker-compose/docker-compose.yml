@@ -162,7 +162,7 @@ services:
       - /tmp/compose_files:/tmp/compose_files
       - /var/run/docker.sock:/var/run/docker.sock
   resource-categorization:
-    image: mf2c/resource-categorization:latest
+    image: mf2c/resource-categorization:latest-V2.0.3
     depends_on:
       - cimi
     expose:
