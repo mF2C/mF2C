@@ -36,6 +36,13 @@ services:
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
+  eventService:
+    image: sixsq/cimi-sse:1.0
+    depends_on:
+     - cimi
+    ports:
+     - "8000:8000"
+    restart: unless-stopped
   rc:
     image: sixsq/ring-container:3.53-SNAPSHOT
     expose:
