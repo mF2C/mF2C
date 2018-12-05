@@ -11,11 +11,15 @@ services:
      - "80:80"
      - "443:443"
   dcproxy:
-    image: mf2c/dataclay-proxy:latest
+    image: mf2c/dataclay-proxy:trunk
     depends_on:
       - logicmodule1
+      - ds1java1
     expose:
       - "6472"
+    volumes:
+      - ./prop/global.properties:/root/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/root/dataclay/cfglog/log4j2.xml:ro
   cimi:
     image: mf2c/cimi-server:2.1-SNAPSHOT
     depends_on:
@@ -55,10 +59,12 @@ services:
     command: -c fsync=off
 
   logicmodule1:
-    image: "bscdataclay/logicmodule"
+    image: "bscdataclay/logicmodule:mf2c"
+    container_name: logicmodule1
+    hostname: logicmodule1
     depends_on: ["lmpostgres1"]
     ports:
-      - "11034:1034"
+      - "1034:1034"
     env_file:
       - ./env/PG.environment
       - ./env/LM.environment
@@ -67,19 +73,23 @@ services:
       - DATACLAY_ADMIN_PASSWORD=admin
       - POSTGRES_HOST=lmpostgres1
     volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
   ds1postgres1:
-    image: postgres:9.5.12
+    image: "bscdataclay/postgres:mf2c"
+    container_name: ds1postgres1
+    hostname: ds1postgres1
     env_file:
       - ./env/PG.environment
     command: -c fsync=off
 
   ds1java1:
-    image: "bscdataclay/dsjava"
+    image: "bscdataclay/dsjava:mf2c"
+    container_name: ds1java1
+    hostname: ds1java1
     depends_on: ["ds1postgres1", "logicmodule1"]
     ports:
-      - 2127
+      - "2127:2127"
     env_file:
       - ./env/PG.environment
       - ./env/DS.environment
@@ -88,8 +98,8 @@ services:
       - DATASERVICE_NAME=DS1
       - POSTGRES_HOST=ds1postgres1
     volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   COMPSs:
     image: mf2c/compss-mf2c:1.0
