@@ -1,0 +1,13 @@
+# Used for Postgres image and internally
+POSTGRES_USER=dataclay
+POSTGRES_PASSWORD=dataclay
+
+# Note that Postgres will (by default) create the table with the same name as 
+# the user, but in dataClay we expect them explicitly
+POSTGRES_DBNAME=dataclay
+
+# Sensible default port
+POSTGRES_PORT=5432
+# The host should be specified, as there are multiple postgres instances
+# POSTGRES_HOST=sql
+
