@@ -167,7 +167,11 @@ services:
        - "46052:46052"
 
   cau-client:
-    image: mf2c/cau-client:v1.03
+    #for IT2 UC1 demo use mf2c/cau-client-uc1:v1
+    #for IT2 UC2 demo use mf2c/cau-client-uc2:v1
+    #for IT2 UC3 demo use mf2c/cau-client-uc3:v1
+    #for IT2 Hello world use mf2c/cau-client-it2:v1
+    image: mf2c/cau-client-it2:v1    
     depends_on:
 #   assuming cau and leader cau are bootstrapped elsewhere
       - policies
