@@ -62,17 +62,11 @@ services:
      - "46030"
     environment:
      - CIMI_URL=https://proxy:443/api
-  lmpostgres1:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
 
- logicmodule1:
+  logicmodule1:
     image: "bscdataclay/logicmodule:mf2c"
     container_name: logicmodule1
     hostname: logicmodule1
-    depends_on: ["lmpostgres1"]
     ports:
       - "1034:1034"
     env_file:
@@ -81,23 +75,15 @@ services:
     environment:
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
-      - POSTGRES_HOST=lmpostgres1
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
-  ds1postgres1:
-    image: "bscdataclay/postgres:mf2c"
-    container_name: ds1postgres1
-    hostname: ds1postgres1
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
 
   ds1java1:
     image: "bscdataclay/dsjava:mf2c"
     container_name: ds1java1
     hostname: ds1java1
-    depends_on: ["ds1postgres1", "logicmodule1"]
+    depends_on: ["logicmodule1"]
     ports:
       - "2127:2127"
     env_file:
@@ -106,7 +92,6 @@ services:
       - ./env/LM.environment
     environment:
       - DATASERVICE_NAME=DS1
-      - POSTGRES_HOST=ds1postgres1
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
