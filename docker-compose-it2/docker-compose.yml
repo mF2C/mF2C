@@ -1,6 +1,6 @@
 version: '3'
 services:
-  proxy:
+  proxy: 
     image: traefik
     restart: unless-stopped
     command: --web --docker --docker.exposedByDefault=false --loglevel=info
@@ -11,40 +11,43 @@ services:
      - "80:80"
      - "443:443"
 
-#   dcproxy:
-#     image: mf2c/dataclay-proxy:2.0
-#     restart: on-failure
-#     depends_on:
-#       - logicmodule1
-#     expose:
-#       - "6472"
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
-    container_name: elasticsearch
+  dcproxy:
+    image: mf2c/dataclay-proxy:trunk
+    depends_on:
+      - logicmodule1
+      - ds1java1
     expose:
-     - "9200"
-     - "9300"
-    environment:
-     - cluster.name=elasticsearch
-     - xpack.security.enabled=false
-     - discovery.type=single-node
-     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+      - "6472"
+    volumes:
+      - ./prop/global.properties:/root/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/root/dataclay/cfglog/log4j2.xml:ro
+
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+  #   container_name: elasticsearch
+  #   expose:
+  #    - "9200"
+  #    - "9300"
+  #   environment:
+  #    - cluster.name=elasticsearch
+  #    - xpack.security.enabled=false
+  #    - discovery.type=single-node
+  #    - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
 
   cimi:
     image: mf2c/cimi-server:2.2-SNAPSHOT
     restart: on-failure
     depends_on:
-      - elasticsearch
-#      - logicmodule1
-#      - dcproxy
-#    environment:
-#       - DC_HOST=dcproxy
-#       - DC_PORT=6472
-#       - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
-#       - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+      # - elasticsearch
+     - logicmodule1
+     - dcproxy
+    environment:
+      - DC_HOST=dcproxy
+      - DC_PORT=6472
+      - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+      - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
     expose:
-     - "8201"
+      - "8201"
     labels:
      - "traefik.enable=true"
      #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
@@ -79,53 +82,38 @@ services:
     environment:
      - CIMI_URL=https://proxy:443/api
 
-# lmpostgres1:
-#   image: postgres:9.5.12
-#   restart: on-failure
-#   env_file:
-#     - ./env/PG.environment
-#   command: -c fsync=off
-#
-# logicmodule1:
-#   image: "bscdataclay/logicmodule"
-#   restart: on-failure
-#   depends_on: ["lmpostgres1"]
-#   ports:
-#     - "11034:1034"
-#   env_file:
-#     - ./env/PG.environment
-#     - ./env/LM.environment
-#   environment:
-#     - DATACLAY_ADMIN_USER=admin
-#     - DATACLAY_ADMIN_PASSWORD=admin
-#     - POSTGRES_HOST=lmpostgres1
-#   volumes:
-#     - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-#     - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
-#
-# ds1postgres1:
-#   image: postgres:9.5.12
-#   restart: on-failure
-#   env_file:
-#     - ./env/PG.environment
-#   command: -c fsync=off
-#
-# ds1java1:
-#   image: "bscdataclay/dsjava"
-#   restart: on-failure
-#   depends_on: ["ds1postgres1", "logicmodule1"]
-#   ports:
-#     - 2127
-#   env_file:
-#     - ./env/PG.environment
-#     - ./env/DS.environment
-#     - ./env/LM.environment
-#   environment:
-#     - DATASERVICE_NAME=DS1
-#     - POSTGRES_HOST=ds1postgres1
-#   volumes:
-#     - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-#     - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+  logicmodule1:
+    image: "bscdataclay/logicmodule:mf2c"
+    container_name: logicmodule1
+    hostname: logicmodule1
+    ports:
+      - "1034:1034"
+    env_file:
+      - ./env/PG.environment
+      - ./env/LM.environment
+    environment:
+      - DATACLAY_ADMIN_USER=admin
+      - DATACLAY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+
+  ds1java1:
+    image: "bscdataclay/dsjava:mf2c"
+    container_name: ds1java1
+    hostname: ds1java1
+    depends_on: ["logicmodule1"]
+    ports:
+      - "2127:2127"
+    env_file:
+      - ./env/PG.environment
+      - ./env/DS.environment
+      - ./env/LM.environment
+    environment:
+      - DATASERVICE_NAME=DS1
+    volumes:
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   COMPSs:
     image: mf2c/compss-mf2c:1.0
@@ -134,7 +122,7 @@ services:
     restart: unless-stopped
 
   service-manager:
-    image: mf2c/service-manager:1.5.1
+    image: mf2c/service-manager:1.5.2
     restart: unless-stopped
     depends_on:
       - cimi
@@ -167,11 +155,7 @@ services:
        - "46052:46052"
 
   cau-client:
-    #for IT2 UC1 demo use mf2c/cau-client-uc1:v1
-    #for IT2 UC2 demo use mf2c/cau-client-uc2:v1
-    #for IT2 UC3 demo use mf2c/cau-client-uc3:v1
-    #for IT2 Hello world use mf2c/cau-client-it2:v1
-    image: mf2c/cau-client-it2:v1    
+    image: mf2c/cau-client:v1.03
     depends_on:
 #   assuming cau and leader cau are bootstrapped elsewhere
       - policies
