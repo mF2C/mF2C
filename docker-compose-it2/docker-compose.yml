@@ -15,17 +15,17 @@ services:
 
 ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.3-SNAPSHOT
+    image: mf2c/cimi-server:2.3
     restart: on-failure
     depends_on:
-      # - elasticsearch
-     - logicmodule1
-     - dcproxy
-    environment:
-      - DC_HOST=dcproxy
-      - DC_PORT=6472
-      - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
-      - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+      - elasticsearch
+      # - logicmodule1
+      # - dcproxy
+    # environment:
+    #   - DC_HOST=dcproxy
+    #   - DC_PORT=6472
+    #   - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+    #   - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
     expose:
       - "8201"
     labels:
@@ -45,6 +45,18 @@ services:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
     command: sh
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    container_name: elasticsearch
+    expose:
+     - "9200"
+     - "9300"
+    environment:
+     - cluster.name=elasticsearch
+     - xpack.security.enabled=false
+     - discovery.type=single-node
+     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
 ######################################################
 
 ################## Event Service  ####################
@@ -58,57 +70,49 @@ services:
 ######################################################
 
 #################### Dataclay  #######################
-  dcproxy:
-    image: mf2c/dataclay-proxy:trunk
-    depends_on:
-      - logicmodule1
-      - ds1java1
-    expose:
-      - "6472"
-    volumes:
-      - ./prop/global.properties:/root/dataclay/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/root/dataclay/cfglog/log4j2.xml:ro
-
-  logicmodule1:
-    image: "bscdataclay/logicmodule:mf2c"
-    container_name: logicmodule1
-    hostname: logicmodule1
-    ports:
-      - "1034:1034"
-    env_file:
-      - ./env/PG.environment
-      - ./env/LM.environment
-    environment:
-      - DATACLAY_ADMIN_USER=admin
-      - DATACLAY_ADMIN_PASSWORD=admin
-    volumes:
-      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
-
-  ds1java1:
-    image: "bscdataclay/dsjava:mf2c"
-    container_name: ds1java1
-    hostname: ds1java1
-    depends_on: ["logicmodule1"]
-    ports:
-      - "2127:2127"
-    env_file:
-      - ./env/PG.environment
-      - ./env/DS.environment
-      - ./env/LM.environment
-    environment:
-      - DATASERVICE_NAME=DS1
-    volumes:
-      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+  # dcproxy:
+  #   image: mf2c/dataclay-proxy:trunk
+  #   depends_on:
+  #     - logicmodule1
+  #     - ds1java1
+  #   expose:
+  #     - "6472"
+  #   volumes:
+  #     - ./prop/global.properties:/root/dataclay/cfgfiles/global.properties:ro
+  #     - ./prop/log4j2.xml:/root/dataclay/cfglog/log4j2.xml:ro
+  #
+  # logicmodule1:
+  #   image: "bscdataclay/logicmodule:mf2c"
+  #   ports:
+  #     - "1034:1034"
+  #   env_file:
+  #     - ./env/LM.environment
+  #   environment:
+  #     - DATACLAY_ADMIN_USER=admin
+  #     - DATACLAY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+  #     - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+  #
+  # ds1java1:
+  #   image: "bscdataclay/dsjava:mf2c"
+  #   depends_on: ["logicmodule1"]
+  #   env_file:
+  #     - ./env/DS.environment
+  #     - ./env/LM.environment
+  #   environment:
+  #     - DATASERVICE_NAME=DS1
+  #   volumes:
+  #     - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+  #     - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 ######################################################
 
 ###################### COMPSs  #######################
-  # COMPSs:
-  #   image: mf2c/compss-mf2c:1.0
-  #   expose:
-  #    - 8080
-  #   restart: unless-stopped
+  COMPSs:
+    image: mf2c/compss-agent:it2
+    expose:
+     - 8080
+    restart: unless-stopped
 ######################################################
 
 ################## Service Manager ###################
