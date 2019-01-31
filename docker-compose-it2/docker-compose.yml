@@ -8,6 +8,7 @@ services:
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock:ro
      - ./traefik/traefik.toml:/traefik.toml
+     - ./traefik/cert:/ssl:ro
     ports:
      - "80:80"
      - "443:443"
@@ -15,22 +16,21 @@ services:
 
 ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.3
+    image: mf2c/cimi-server:2.4-SNAPSHOT
     restart: on-failure
     depends_on:
-      - elasticsearch
-      # - logicmodule1
-      # - dcproxy
-    # environment:
-    #   - DC_HOST=dcproxy
-    #   - DC_PORT=6472
-    #   - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
-    #   - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+      # - elasticsearch
+      - logicmodule1
+      - dcproxy
+    environment:
+      - DC_HOST=dcproxy
+      - DC_PORT=6472
+      - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
+      - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
     expose:
       - "8201"
     labels:
      - "traefik.enable=true"
-     #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
      - "traefik.backend=cimi"
      - "traefik.frontend.rule=PathPrefix:/,/"
     volumes:
@@ -46,17 +46,17 @@ services:
      - ringcontainerexample:/opt/slipstream/ring-example
     command: sh
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
-    container_name: elasticsearch
-    expose:
-     - "9200"
-     - "9300"
-    environment:
-     - cluster.name=elasticsearch
-     - xpack.security.enabled=false
-     - discovery.type=single-node
-     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+  #   container_name: elasticsearch
+  #   expose:
+  #    - "9200"
+  #    - "9300"
+  #   environment:
+  #    - cluster.name=elasticsearch
+  #    - xpack.security.enabled=false
+  #    - discovery.type=single-node
+  #    - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
 ######################################################
 
 ################## Event Service  ####################
@@ -70,41 +70,39 @@ services:
 ######################################################
 
 #################### Dataclay  #######################
-  # dcproxy:
-  #   image: mf2c/dataclay-proxy:trunk
-  #   depends_on:
-  #     - logicmodule1
-  #     - ds1java1
-  #   expose:
-  #     - "6472"
-  #   volumes:
-  #     - ./prop/global.properties:/root/dataclay/cfgfiles/global.properties:ro
-  #     - ./prop/log4j2.xml:/root/dataclay/cfglog/log4j2.xml:ro
-  #
-  # logicmodule1:
-  #   image: "bscdataclay/logicmodule:mf2c"
-  #   ports:
-  #     - "1034:1034"
-  #   env_file:
-  #     - ./env/LM.environment
-  #   environment:
-  #     - DATACLAY_ADMIN_USER=admin
-  #     - DATACLAY_ADMIN_PASSWORD=admin
-  #   volumes:
-  #     - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
-  #     - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
-  #
-  # ds1java1:
-  #   image: "bscdataclay/dsjava:mf2c"
-  #   depends_on: ["logicmodule1"]
-  #   env_file:
-  #     - ./env/DS.environment
-  #     - ./env/LM.environment
-  #   environment:
-  #     - DATASERVICE_NAME=DS1
-  #   volumes:
-  #     - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
-  #     - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+  dcproxy:
+    image: mf2c/dataclay-proxy:2.4
+    depends_on:
+      - logicmodule1
+      - ds1java1
+    expose:
+      - "6472"
+
+  logicmodule1:
+    image: "bscdataclay/logicmodule:mf2c"
+    ports:
+      - "1034:1034"
+    env_file:
+      - ./env/LM.environment
+    environment:
+      - DATACLAY_ADMIN_USER=admin
+      - DATACLAY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+
+  ds1java1:
+    image: "bscdataclay/dsjava:mf2c"
+    depends_on:
+      - logicmodule1
+    env_file:
+      - ./env/DS.environment
+      - ./env/LM.environment
+    environment:
+      - DATASERVICE_NAME=DS1
+    volumes:
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 ######################################################
 
 ###################### COMPSs  #######################
