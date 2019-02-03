@@ -71,7 +71,7 @@ services:
 
 #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.4
+    image: mf2c/dataclay-proxy:2.5
     depends_on:
       - logicmodule1
       - ds1java1
@@ -129,7 +129,7 @@ services:
 
 ########## Lifecycle Manager + User Manager ##########
   lm-um:
-    image: mf2c/lifecycle-usermngt:0.3.2
+    image: mf2c/lifecycle-usermngt:1.0.1
     restart: on-failure
     expose:
       - "46300"
