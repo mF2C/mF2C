@@ -4,7 +4,7 @@ services:
   proxy:
     image: traefik
     restart: unless-stopped
-    command: --web --docker --docker.exposedByDefault=false --loglevel=info
+    command:  --docker --docker.exposedByDefault=false --loglevel=info
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock:ro
      - ./traefik/traefik.toml:/traefik.toml
@@ -12,6 +12,9 @@ services:
     ports:
      - "80:80"
      - "443:443"
+    expose:
+     - 443
+    network_mode: "host"
 ######################################################
 
 ######################## CIMI  #######################
@@ -217,23 +220,31 @@ services:
        - "46020"
      depends_on:
        - influxdb
+       - web
      volumes:
        - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+     network_mode: "host"
 
   landscaper:
      image: mf2c/landscaper:0.2
      volumes:
      - landscaper:/landscaper/data
      - ./landscaper.cfg:/landscaper/landscaper.cfg
-     depends_on: ["cimi", "neo4j", "proxy"]
+     depends_on:
+       - cimi
+       - neo4j
+       - proxy
      environment:
+       - PYTHONPATH=/landscaper
        - OS_TENANT_NAME=
        - OS_PROJECT_NAME=
        - OS_TENANT_ID=
        - OS_USERNAME=
        - OS_PASSWORD=
        - OS_AUTH_URL=
-     command: ["./start.sh", "http://neo4j:7474"]
+     network_mode: "host"
+     working_dir: /landscaper
+     command: ["./start.sh", "http://localhost:7474"]
 
   snaptemp:
      image: mf2c/snaptemp:0.1
@@ -271,6 +282,11 @@ services:
      - neo4j:/data
      ports:
      - "7475:7474" # expose the port for the console ui
+     expose:
+       - "7474"
+     hostname:
+       neo4j
+     network_mode: "host"
      environment:
      - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
 
@@ -278,11 +294,18 @@ services:
      image: mf2c/landscaper-api:0.1
      volumes:
        - ./landscaper.cfg:/landscaper/landscaper.cfg
+     environment:
+       - PYTHONPATH=/landscaper
      ports:
        - "9001:9001"
+     expose:
+       - "9001"
      depends_on:
        - neo4j
        - landscaper
+     network_mode: "host"
+     working_dir: /landscaper/landscaper/web
+     command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "application:APP"]
 ######################################################
 
 volumes:
