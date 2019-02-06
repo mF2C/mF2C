@@ -30,7 +30,8 @@ service_json = {
 }
 headers = {'Content-type': 'application/json', 'Accept': 'text/json'}
 # data=json.dumps(payload)
-url = 'http://localhost:46020/mf2c/optimal'
+#url = 'http://localhost:46020/mf2c/optimal'
+url = 'http://localhost:8080/mf2c/optimal'
 print time.time()
 res = requests.post(url, json=service_json, headers=headers)
 if res.ok:
@@ -38,3 +39,5 @@ if res.ok:
     print 'Optimal hosts'
     json_data = json.loads(res.text)
     print json_data
+else:
+    print 'nuoooooh: {}'.format(res)

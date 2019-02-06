@@ -4,7 +4,7 @@ services:
   proxy:
     image: traefik
     restart: unless-stopped
-    command:  --docker --docker.exposedByDefault=false --loglevel=info
+    command: --web  --docker --docker.exposedByDefault=false --loglevel=info
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock:ro
      - ./traefik/traefik.toml:/traefik.toml
@@ -224,6 +224,13 @@ services:
      volumes:
        - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
      network_mode: "host"
+     labels:
+     - "traefik.enable=true"
+     - "traefik.backend=analytics_engine"
+     - "traefik.frontend.rule=PathPrefix:/mf2c/optimal"
+     #- "traefik.frontend.rule=Host:mf2c/optimal"
+     - "traefik.port=46020"     
+
 
   landscaper:
      image: mf2c/landscaper:0.2
