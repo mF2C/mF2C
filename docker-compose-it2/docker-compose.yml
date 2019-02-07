@@ -213,14 +213,18 @@ services:
 ######################################################
 
 ##### Analytics Engine + Recomender + Landscaper #####
-  # analytics_engine:
-  #   image: mf2c/analytics-engine:0.1
-  #   expose:
-  #     - "46020"
-  #   depends_on:
-  #     - influxdb
-  #   volumes:
-  #     - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+  analytics_engine:
+    image: mf2c/analytics-engine:0.1
+    expose:
+      - "46020"
+    depends_on:
+      - influxdb
+    volumes:
+      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=46020"
+      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
   #
   # landscaper:
   #   image: mf2c/landscaper:0.2
@@ -243,12 +247,12 @@ services:
   #   depends_on:
   #     - snap
   #
-  # influxdb:
-  #   image: influxdb
-  #   expose:
-  #     - "8086"
-  #   volumes:
-  #     - influx:/var/lib/influxdb
+  influxdb:
+    image: influxdb
+    expose:
+      - "8086"
+    volumes:
+      - influx:/var/lib/influxdb
   #   environment:
   #     - INFLUXDB_DB=snap
   #     - INFLUXDB_USER=snap
