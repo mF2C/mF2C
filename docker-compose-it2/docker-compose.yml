@@ -32,7 +32,7 @@ services:
     labels:
      - "traefik.enable=true"
      - "traefik.backend=cimi"
-     - "traefik.frontend.rule=PathPrefix:/,/"
+     - "traefik.frontend.rule=PathPrefix:/api"
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
@@ -121,6 +121,10 @@ services:
       - cimi
     expose:
       - 46200
+    labels:
+     - "traefik.enable=true"
+     - "traefik.frontend.rule=PathPrefixStrip:/sm"
+     - "traefik.port=46200"
     ports:
       - 46200:46200
     environment:
