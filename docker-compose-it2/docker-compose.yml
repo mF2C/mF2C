@@ -71,7 +71,7 @@ services:
 
 #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.5
+    image: mf2c/dataclay-proxy:2.6
     depends_on:
       - logicmodule1
       - ds1java1
