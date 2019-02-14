@@ -115,7 +115,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.6.0
+    image: mf2c/service-manager:1.6.1
     restart: unless-stopped
     depends_on:
       - cimi
@@ -125,8 +125,6 @@ services:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefixStrip:/sm"
       - "traefik.port=46200"
-    ports:
-      - 46200:46200
     environment:
       - JAVA_OPTS=-Xms32m -Xmx256m
   ######################################################
