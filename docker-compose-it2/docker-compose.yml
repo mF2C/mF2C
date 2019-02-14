@@ -1,22 +1,22 @@
 version: '3'
 services:
-####################### Proxy  ######################
+  ####################### Proxy  ######################
   proxy:
     image: traefik
     restart: unless-stopped
     command: --web --docker --docker.exposedByDefault=false --loglevel=info
     volumes:
-     - /var/run/docker.sock:/var/run/docker.sock:ro
-     - ./traefik/traefik.toml:/traefik.toml
-     - ./traefik/cert:/ssl:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.toml:/traefik.toml
+      - ./traefik/cert:/ssl:ro
     ports:
-     - "80:80"
-     - "443:443"
-######################################################
+      - "80:80"
+      - "443:443"
+  ######################################################
 
-######################## CIMI  #######################
+  ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.4-SNAPSHOT
+    image: mf2c/cimi-server:2.5-SNAPSHOT
     restart: on-failure
     depends_on:
       # - elasticsearch
@@ -30,20 +30,20 @@ services:
     expose:
       - "8201"
     labels:
-     - "traefik.enable=true"
-     - "traefik.backend=cimi"
-     - "traefik.frontend.rule=PathPrefix:/api"
+      - "traefik.enable=true"
+      - "traefik.backend=cimi"
+      - "traefik.frontend.rule=PathPrefix:/api"
     volumes:
-     - ringcontainer:/opt/slipstream/ring-container
-     - ringcontainerexample:/opt/slipstream/ring-example
+      - ringcontainer:/opt/slipstream/ring-container
+      - ringcontainerexample:/opt/slipstream/ring-example
 
   rc:
     image: sixsq/ring-container:3.53-SNAPSHOT
     expose:
-     - "5000"
+      - "5000"
     volumes:
-     - ringcontainer:/opt/slipstream/ring-container
-     - ringcontainerexample:/opt/slipstream/ring-example
+      - ringcontainer:/opt/slipstream/ring-container
+      - ringcontainerexample:/opt/slipstream/ring-example
     command: sh
 
   # elasticsearch:
@@ -57,9 +57,9 @@ services:
   #    - xpack.security.enabled=false
   #    - discovery.type=single-node
   #    - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
-######################################################
+  ######################################################
 
-################## Event Service  ####################
+  ################## Event Service  ####################
   # eventService:
   #   image: sixsq/cimi-sse:1.0
   #   depends_on:
@@ -67,9 +67,9 @@ services:
   #   ports:
   #    - "8000:8000"
   #   restart: unless-stopped
-######################################################
+  ######################################################
 
-#################### Dataclay  #######################
+  #################### Dataclay  #######################
   dcproxy:
     image: mf2c/dataclay-proxy:2.6
     depends_on:
@@ -103,17 +103,17 @@ services:
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
-######################################################
+  ######################################################
 
-###################### COMPSs  #######################
+  ###################### COMPSs  #######################
   COMPSs:
     image: mf2c/compss-agent:it2
     expose:
-     - 8080
+      - 8080
     restart: unless-stopped
-######################################################
+  ######################################################
 
-################## Service Manager ###################
+  ################## Service Manager ###################
   service-manager:
     image: mf2c/service-manager:1.6.0
     restart: unless-stopped
@@ -122,16 +122,16 @@ services:
     expose:
       - 46200
     labels:
-     - "traefik.enable=true"
-     - "traefik.frontend.rule=PathPrefixStrip:/sm"
-     - "traefik.port=46200"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=PathPrefixStrip:/sm"
+      - "traefik.port=46200"
     ports:
       - 46200:46200
     environment:
       - JAVA_OPTS=-Xms32m -Xmx256m
-######################################################
+  ######################################################
 
-########## Lifecycle Manager + User Manager ##########
+  ########## Lifecycle Manager + User Manager ##########
   lm-um:
     image: mf2c/lifecycle-usermngt:1.0.1
     restart: on-failure
@@ -150,19 +150,19 @@ services:
     volumes:
       - /tmp/compose_files:/tmp/compose_files
       - /var/run/docker.sock:/var/run/docker.sock
-######################################################
+  ######################################################
 
-#################### SLA Manager #####################
+  #################### SLA Manager #####################
   slalite:
     image: mf2c/sla-management:0.3.0
     restart: on-failure
     expose:
-     - "46030"
+      - "46030"
     environment:
-     - CIMI_URL=https://proxy:443/api
-######################################################
+      - CIMI_URL=https://proxy:443/api
+  ######################################################
 
-################## Resource Manager ##################
+  ################## Resource Manager ##################
   # policies:
   #    image: mf2c/policies:0.1.7
   #    restart: on-failure
@@ -210,21 +210,21 @@ services:
   #   expose:
   #     - 46070
   #   privileged: true
-######################################################
+  ######################################################
 
-##### Analytics Engine + Recomender + Landscaper #####
-  analytics_engine:
-    image: mf2c/analytics-engine:0.1
-    expose:
-      - "46020"
-    depends_on:
-      - influxdb
-    volumes:
-      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
-    labels:
-      - "traefik.enable=true"
-      - "traefik.port=46020"
-      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
+  ##### Analytics Engine + Recomender + Landscaper #####
+  #  analytics_engine:
+  #    image: mf2c/analytics-engine:0.1
+  #    expose:
+  #      - "46020"
+  #    depends_on:
+  #      - influxdb
+  #    volumes:
+  #      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+  #    labels:
+  #      - "traefik.enable=true"
+  #      - "traefik.port=46020"
+  #      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
   #
   # landscaper:
   #   image: mf2c/landscaper:0.2
@@ -247,12 +247,12 @@ services:
   #   depends_on:
   #     - snap
   #
-  influxdb:
-    image: influxdb
-    expose:
-      - "8086"
-    volumes:
-      - influx:/var/lib/influxdb
+  #  influxdb:
+  #    image: influxdb
+  #    expose:
+  #      - "8086"
+  #    volumes:
+  #      - influx:/var/lib/influxdb
   #   environment:
   #     - INFLUXDB_DB=snap
   #     - INFLUXDB_USER=snap
