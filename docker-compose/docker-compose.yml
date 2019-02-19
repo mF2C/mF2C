@@ -122,7 +122,10 @@ services:
       - "46051:46051"
       - "46052:46052"
   cau-client:
-    image: mf2c/cau-client:latest
+    #version that writes agent credentials to a shared volume
+    image: mf2c/cau-client:v1.02
+    volumes:
+      - pkidata:/pkidata
     depends_on:
 #   assuming cau and leader cau are bootstrapped elsewhere
       - policies
@@ -241,3 +244,4 @@ volumes:
   landscaper: {}
   ringcontainer: {}
   ringcontainerexample: {}
+  pkidata: {}
