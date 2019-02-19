@@ -191,7 +191,10 @@ services:
   #     - 46060
   #
   # cau-client:
-  #   image: mf2c/cau-client:v1.03
+  #   #v1.02 has changes for writing credentials to shared data volume
+  #   image: mf2c/cau-client:v1.02
+  #   volumes:
+  #     - pkidata:/pkidata
   #   depends_on:
   #     - policies
   #   expose:
@@ -297,3 +300,4 @@ volumes:
   landscaper: {}
   ringcontainer: {}
   ringcontainerexample: {}
+  pkidata: {}
