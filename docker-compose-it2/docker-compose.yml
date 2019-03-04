@@ -162,7 +162,7 @@ services:
 
   ################## Resource Manager ##################
   policies:
-     image: mf2c/policies:0.1.7b
+     image: mf2c/policies:0.1.7c
      restart: on-failure
      depends_on:
        - cimi
