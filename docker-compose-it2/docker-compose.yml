@@ -162,7 +162,7 @@ services:
 
   ################## Resource Manager ##################
   policies:
-     image: mf2c/policies:0.1.7b
+     image: mf2c/policies:0.1.7c
      restart: on-failure
      depends_on:
        - cimi
@@ -197,15 +197,15 @@ services:
      environment:
        - "IDKey=35F319CA1DFC9689F5A33631C8F93ED7C3120EE7AFA05B1672C7DF7B71F63A6753DEF5FD3AC9DB2EAF90CCAB6BFF31A486B51C7095FF958D228102B84EFD7736"
   
-#  cau-client:
-#     image: mf2c/cau-client:latest
-#     depends_on:
-#       - policies
-#     expose:
-#       - 46065
-#     environment:
-#       - CAU_URL=213.205.14.13:46400
-#       - LCAU_URL=213.205.14.13:46410
+  cau-client:
+     image: mf2c/cau-client:v1.02
+     depends_on:
+       - policies
+     expose:
+       - 46065
+     environment:
+       - CAU_URL=213.205.14.13:46400
+       - LCAU_URL=213.205.14.13:46401
   
   resource-categorization:
      image: mf2c/resource-categorization:latest-V2.0.7
