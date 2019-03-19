@@ -16,7 +16,7 @@ services:
 
   ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.5-SNAPSHOT
+    image: mf2c/cimi-server:2.6-SNAPSHOT
     restart: on-failure
     depends_on:
       # - elasticsearch
@@ -71,7 +71,7 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.8
+    image: mf2c/dataclay-proxy:2.9
     depends_on:
       - logicmodule1
       - ds1java1
@@ -79,7 +79,7 @@ services:
       - "6472"
 
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.8
+    image: mf2c/dataclay-logicmodule:2.9
     ports:
       - "1034:1034"
     env_file:
@@ -92,7 +92,7 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.8
+    image: mf2c/dataclay-dsjava:2.9
     depends_on:
       - logicmodule1
     env_file:
@@ -100,6 +100,7 @@ services:
       - ./env/LM.environment
     environment:
       - DATASERVICE_NAME=DS1
+      - DATASERVICE_HOST=ds1java1
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
