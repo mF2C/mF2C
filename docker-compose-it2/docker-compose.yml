@@ -116,7 +116,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.6.1
+    image: mf2c/service-manager:1.6.3
     restart: unless-stopped
     depends_on:
       - cimi
@@ -127,12 +127,12 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/sm"
       - "traefik.port=46200"
     environment:
-      - JAVA_OPTS=-Xms32m -Xmx256m
+      - JAVA_OPTS=-Xms32m -Xmx128m
   ######################################################
 
   ########## Lifecycle Manager + User Manager ##########
   lm-um:
-    image: mf2c/lifecycle-usermngt:1.0.1
+    image: mf2c/lifecycle-usermngt:1.0.6
     restart: on-failure
     expose:
       - "46300"
