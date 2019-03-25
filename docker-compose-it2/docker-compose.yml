@@ -219,82 +219,82 @@ services:
   ######################################################
 
   ##### Analytics Engine + Recomender + Landscaper #####
-  #  analytics_engine:
-  #    image: mf2c/analytics-engine:0.1
-  #    expose:
-  #      - "46020"
-  #    depends_on:
-  #      - influxdb
-  #    volumes:
-  #      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
-  #    labels:
-  #      - "traefik.enable=true"
-  #      - "traefik.port=46020"
-  #      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
-  #
-  # landscaper:
-  #   image: mf2c/landscaper:0.2
-  #   volumes:
-  #   - landscaper:/landscaper/data
-  #   - ./landscaper.cfg:/landscaper/landscaper.cfg
-  #   depends_on: ["cimi", "neo4j", "proxy"]
-  #   environment:
-  #     - OS_TENANT_NAME=
-  #     - OS_PROJECT_NAME=
-  #     - OS_TENANT_ID=
-  #     - OS_USERNAME=
-  #     - OS_PASSWORD=
-  #     - OS_AUTH_URL=
-  #   command: ["./start.sh", "http://neo4j:7474"]
-  #
-  # snaptemp:
-  #   image: mf2c/snaptemp:0.1
-  #   command: sh /download.sh
-  #   depends_on:
-  #     - snap
-  #
-  #  influxdb:
-  #    image: influxdb
-  #    expose:
-  #      - "8086"
-  #    volumes:
-  #      - influx:/var/lib/influxdb
-  #   environment:
-  #     - INFLUXDB_DB=snap
-  #     - INFLUXDB_USER=snap
-  #     - INFLUXDB_USER_PASSWORD=snap
-  #     - INFLUXDB_ADMIN_USER=admin
-  #     - INFLUXDB_ADMIN_USER_PASSWORD=admin
-  #     - INFLUXDB_HTTP_LOG_ENABLED=false
-  # snap:
-  #   image: intelsdi/snap:xenial
-  #   ports:
-  #     - "8181:8181"
-  #   volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
-  #   depends_on:
-  #     - influxdb
-  #   environment:
-  #     - SNAP_VERSION=2.0.0
-  #     - SNAP_LOG_LEVEL=2
-  #
-  # neo4j:
-  #   image: neo4j:2.3.12
-  #   volumes:
-  #   - neo4j:/data
-  #   ports:
-  #   - "7475:7474" # expose the port for the console ui
-  #   environment:
-  #   - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
-  #
-  # web:
-  #   image: mf2c/landscaper-api:0.1
-  #   volumes:
-  #     - ./landscaper.cfg:/landscaper/landscaper.cfg
-  #   ports:
-  #     - "9001:9001"
-  #   depends_on:
-  #     - neo4j
-  #     - landscaper
+  analytics_engine:
+    image: mf2c/analytics-engine:latest
+    expose:
+      - "46020"
+    depends_on:
+      - influxdb
+    volumes:
+      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=46020"
+      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
+  
+  landscaper:
+    image: mf2c/landscaper:0.4
+    volumes:
+    - landscaper:/landscaper/data
+    - ./landscaper.cfg:/landscaper/landscaper.cfg
+    depends_on: ["cimi", "neo4j", "proxy"]
+    environment:
+      - OS_TENANT_NAME=
+      - OS_PROJECT_NAME=
+      - OS_TENANT_ID=
+      - OS_USERNAME=
+      - OS_PASSWORD=
+      - OS_AUTH_URL=
+    command: ["./start.sh", "http://neo4j:7474"]
+  
+  snaptemp:
+    image: mf2c/snaptemp:0.1
+    command: sh /download.sh
+    depends_on:
+      - snap
+  
+  influxdb:
+    image: influxdb
+    expose:
+      - "8086"
+    volumes:
+      - influx:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=snap
+      - INFLUXDB_USER=snap
+      - INFLUXDB_USER_PASSWORD=snap
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_USER_PASSWORD=admin
+      - INFLUXDB_HTTP_LOG_ENABLED=false
+  snap:
+    image: intelsdi/snap:xenial
+    ports:
+      - "8181:8181"
+    volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
+    depends_on:
+      - influxdb
+    environment:
+      - SNAP_VERSION=2.0.0
+      - SNAP_LOG_LEVEL=2
+  
+  neo4j:
+    image: neo4j:2.3.12
+    volumes:
+    - neo4j:/data
+    ports:
+    - "7475:7474" # expose the port for the console ui
+    environment:
+    - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
+  
+  web:
+    image: mf2c/landscaper-api:0.3
+    volumes:
+      - ./landscaper.cfg:/landscaper/landscaper.cfg
+    ports:
+      - "9001:9001"
+    depends_on:
+      - neo4j
+      - landscaper
 ######################################################
 
 volumes:
