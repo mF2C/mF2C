@@ -16,10 +16,9 @@ services:
 
   ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.6-SNAPSHOT
+    image: mf2c/cimi-server:2.8
     restart: on-failure
     depends_on:
-      # - elasticsearch
       - logicmodule1
       - dcproxy
     environment:
@@ -45,29 +44,6 @@ services:
       - ringcontainer:/opt/slipstream/ring-container
       - ringcontainerexample:/opt/slipstream/ring-example
     command: sh
-
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
-  #   container_name: elasticsearch
-  #   expose:
-  #    - "9200"
-  #    - "9300"
-  #   environment:
-  #    - cluster.name=elasticsearch
-  #    - xpack.security.enabled=false
-  #    - discovery.type=single-node
-  #    - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
-  ######################################################
-
-  ################## Event Service  ####################
-  # eventService:
-  #   image: sixsq/cimi-sse:1.0
-  #   depends_on:
-  #    - cimi
-  #   ports:
-  #    - "8000:8000"
-  #   restart: unless-stopped
-  ######################################################
 
   #################### Dataclay  #######################
   dcproxy:
@@ -116,7 +92,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.6.3
+    image: mf2c/service-manager:1.6.5
     restart: unless-stopped
     depends_on:
       - cimi
