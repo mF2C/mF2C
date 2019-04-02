@@ -9,6 +9,9 @@ display_usage() {
   echo
   echo " -h, --help                              Display usage instructions"
   echo " --ovpn=<base64 ovpn client conf>        Use VPN instead of Wireless discovery"
+  echo " --cloud-agent=<url>                     Cloud agent endpoint. Default is ${CLOUD_URL}"
+  echo " --user=<username>                       mF2C username"
+  echo " --password=<password>                   mF2C password"
   echo
 }
 
@@ -44,30 +47,59 @@ done
 
 API="${CLOUD_URL}/api"
 
-docker run -rm -d --device=/dev/net/tun --cap-add=NET_ADMIN --net host -e OVPN=$OVPN \
-           --name cris mjenz/rpi-openvpn bash -c 'bash -c echo $OVPN | base64 -d > /tmp/client1.ovpn; openvpn /tmp/client1.ovpn'
+openvpn_container_id=`docker run -rm -d --device=/dev/net/tun --cap-add=NET_ADMIN --net host -e OVPN=$OVPN \
+           --name cris mjenz/rpi-openvpn bash -c 'bash -c echo $OVPN | base64 -d > /tmp/client1.ovpn; openvpn /tmp/client1.ovpn'`
 
+function cleanup {
+    # re-start service
+    docker rm -f $openvpn_container_id
+}
+trap cleanup EXIT
 
 VPN_IP=`docker run --rm --net host mjenz/rpi-openvpn ifconfig tun0 | grep 'inet addr:' | cut -d: -f2| cut -d' ' -f1`
 
-if [ -z $USER ] || [ -z $PASSWORD ]
+logical_cores=`grep -c proc /proc/cpuinfo`
+clock_speed=`lshw -c cpu | grep capacity | tail -1 | awk -F' ' '{print $2}'`
+mem=`free -m | grep Mem  | awk -F' ' '{print $2}'`.0
+storage=`df -h / | grep "/" | awk -F' ' '{print $2}' | tr -d 'G'`
+
+device='{
+        "deviceID": "placeholder",
+        "isLeader": true,
+        "os": "raspbian",
+        "arch": "arm",
+        "cpuManufacturer": "Broadcom",
+        "physicalCores": 1,
+        "logicalCores": '$logical_cores',
+        "cpuClockSpeed": "'$clock_speed'",
+        "memory": '$mem',
+        "storage": '$storage',
+        "powerPlugged": true,
+        "agentType": "micro",
+        "actuatorInfo": "nan",
+        "networkingStandards": "nan",
+        "ethernetAddress": "'$VPN_IP'",
+        "wifiAddress": "'$VPN_IP'"
+}'
+
+headers=" -H content-type:application/json"
+cookies=""
+
+if [ ! -z $USER ] && [ ! -z $PASSWORD ]
 then
-    device='{
-            "deviceID": "placeholder",
-            "isLeader": true,
-            "os": "raspbian",
-            "arch": "arm",
-            "cpuManufacturer": "nan",
-            "physicalCores": 1,
-            "logicalCores": 1,
-            "cpuClockSpeed": "nan",
-            "memory": 512.0,
-            "storage": 16.0,
-            "powerPlugged": true,
-            "agentType": "micro",
-            "actuatorInfo": "nan",
-            "networkingStandards": "nan",
-            "ethernetAddress": "'$VPN_IP'",
-            "wifiAddress": "'$VPN_IP'"
-            }'
+    data='{
+    "sessionTemplate": {
+		"href": "session-template/internal",
+		"username": "'$USER'",
+		"password": "'$PASSWORD'"
+	}
+}'
+    cookies=' -b cookies -c cookies '
+    curl -XPOST -k $headers $cookies ${API}/session -d $data
+else
+    headers="${headers} -H 'slipstream-authn-info: internal ADMIN' "
 fi
+
+curl -XPOST -k $headers $cookies ${API}/device -d $device
+
+docker run -p 46000:46000 mf2c/lifecycle:1.0.6-arm
