@@ -1,6 +1,5 @@
 #!/bin/sh
 set -e
-set -x
 
 CLOUD_URL="https://dashboard.mf2c-project.eu"
 
@@ -54,10 +53,11 @@ openvpn_container_id=`docker run --rm -d --device=/dev/net/tun --cap-add=NET_ADM
 function cleanup {
     # re-start service
     docker rm -f $openvpn_container_id
+    exit 0
 }
 trap cleanup EXIT
 
-VPN_IP=`docker run --rm --net host mjenz/rpi-openvpn bash -c \
+VPN_IP=`timeout -t 30 docker run --rm --net host mjenz/rpi-openvpn bash -c \
         'while ! ifconfig tun0 > /dev/null 2>&1; do sleep 1; done; ifconfig tun0' | grep 'inet addr:' | cut -d: -f2| cut -d' ' -f1`
 
 logical_cores=`grep -c proc /proc/cpuinfo`
