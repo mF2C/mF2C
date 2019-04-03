@@ -102,7 +102,7 @@ else
     headers_auth=' -H "slipstream-authn-info: internal ADMIN" '
 fi
 
-curl -XPOST -k ${headers} ${headers_auth} ${cookies} ${API}/device -d "${device}"
+curl -XPOST -k ${headers} "${headers_auth}" ${cookies} ${API}/device -d "${device}"
 
 lm_id=`docker run --rm -d -p 46000:46000 mf2c/lifecycle:1.0.6-arm`
 
