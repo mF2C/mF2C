@@ -97,11 +97,11 @@ then
 	}
 }'
     cookies=' -b cookies -c cookies '
-    curl -XPOST -k $headers $cookies ${API}/session -d $data
+    curl -XPOST -k $headers $cookies ${API}/session -d "${data}"
 else
-    headers="${headers} -H 'slipstream-authn-info: internal ADMIN' "
+    headers=${headers}' -H "slipstream-authn-info: internal ADMIN"'
 fi
 
-curl -XPOST -k $headers $cookies ${API}/device -d $device
+curl -XPOST -k $headers $cookies ${API}/device -d "${device}"
 
 docker run -p 46000:46000 mf2c/lifecycle:1.0.6-arm
