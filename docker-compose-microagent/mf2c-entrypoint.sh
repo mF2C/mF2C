@@ -108,7 +108,7 @@ storage_free=`df -h / | grep "/" | awk -F' ' '{print $4}' | tr -d 'G'`
 storage_free_percent=$(echo "$storage_free * 100 / $storage" | bc)
 
 device_dynamic='{
-        "device": {"href: "'$device_id'"},
+        "device": {"href": "'$device_id'"},
         "ramFree": '$mem_free'.0,
         "ramFreePercent": '$mem_free_percent'.0,
         "storageFree": '$storage_free',
