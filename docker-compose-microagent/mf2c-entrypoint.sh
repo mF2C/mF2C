@@ -123,7 +123,7 @@ device_dynamic='{
         "sensorType": [],
         "sensorModel": [],
         "sensorConnection": [],
-        "myLeaderID": {"href: "'$CLOUD_URL'"}
+        "myLeaderID": {"href": "'$CLOUD_URL'"}
 }'
 
 if [ ! -z $USER ] && [ ! -z $PASSWORD ]
