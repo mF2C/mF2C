@@ -58,7 +58,7 @@ function cleanup {
 trap cleanup EXIT
 
 VPN_IP=`docker run --rm --net host mjenz/rpi-openvpn bash -c \
-        'while ! ifconfig tun1 > /dev/null 2>&1; do sleep 1; done; ifconfig tun0' | grep 'inet addr:' | cut -d: -f2| cut -d' ' -f1`
+        'while ! ifconfig tun0 > /dev/null 2>&1; do sleep 1; done; ifconfig tun0' | grep 'inet addr:' | cut -d: -f2| cut -d' ' -f1`
 
 logical_cores=`grep -c proc /proc/cpuinfo`
 clock_speed=`lshw -c cpu | grep capacity | tail -1 | awk -F' ' '{print $2}'`
