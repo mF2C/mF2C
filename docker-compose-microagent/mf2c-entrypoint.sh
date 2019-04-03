@@ -112,7 +112,7 @@ device_dynamic='{
         "ramFree": '$mem_free'.0,
         "ramFreePercent": '$mem_free_percent'.0,
         "storageFree": '$storage_free',
-        "storageFreePercent": '$storage_free_percent',
+        "storageFreePercent": '$storage_free_percent'.0,
         "cpuFreePercent": 50.0,
         "powerRemainingStatus": "100%",
         "powerRemainingStatusSeconds": "99999999",
