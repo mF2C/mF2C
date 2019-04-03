@@ -113,4 +113,4 @@ function shutdown {
 trap shutdown INT
 trap shutdown EXIT
 
-sleep infinity
+while true; do :; done
