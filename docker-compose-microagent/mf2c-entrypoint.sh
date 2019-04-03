@@ -99,7 +99,7 @@ then
     cookies=' -b cookies -c cookies '
     curl -XPOST -k $headers $cookies ${API}/session -d "${data}"
 else
-    headers_auth=${headers}' -H "slipstream-authn-info: internal ADMIN"'
+    headers=${headers}' -H "slipstream-authn-info: internal ADMIN"'
 fi
 
 curl -XPOST -k "${headers}" "${cookies}" ${API}/device -d "${device}"
