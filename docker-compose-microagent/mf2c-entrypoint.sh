@@ -98,11 +98,10 @@ then
 }'
     cookies=' -b cookies -c cookies '
     curl -XPOST -k $headers $cookies ${API}/session -d "${data}"
+    curl -XPOST -k ${headers} ${cookies} ${API}/device -d "${device}"
 else
-    headers_auth=' -H "slipstream-authn-info: internal ADMIN" '
+    curl -XPOST -k ${headers} -H "slipstream-authn-info: internal ADMIN" ${API}/device -d "${device}"
 fi
-
-curl -XPOST -k ${headers} "${headers_auth}" ${cookies} ${API}/device -d "${device}"
 
 lm_id=`docker run --rm -d -p 46000:46000 mf2c/lifecycle:1.0.6-arm`
 
@@ -112,6 +111,6 @@ function shutdown {
     cleanup
 }
 trap shutdown INT
-
+trap shutdown EXIT
 
 sleep infinity
