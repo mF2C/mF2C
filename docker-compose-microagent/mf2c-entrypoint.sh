@@ -49,7 +49,7 @@ done
 API="${CLOUD_URL}/api"
 
 openvpn_container_id=`docker run --rm -d --device=/dev/net/tun --cap-add=NET_ADMIN --net host -e OVPN=$OVPN \
-           --name cris mjenz/rpi-openvpn bash -c 'bash -c echo $OVPN | base64 -d > /tmp/client1.ovpn; openvpn /tmp/client1.ovpn'`
+           --name cris mjenz/rpi-openvpn bash -c 'echo $OVPN | base64 -d > /tmp/client1.ovpn; openvpn /tmp/client1.ovpn'`
 
 function cleanup {
     # re-start service
