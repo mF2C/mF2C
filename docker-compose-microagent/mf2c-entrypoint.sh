@@ -62,7 +62,7 @@ VPN_IP=`timeout -t 30 docker run --rm --net host mjenz/rpi-openvpn bash -c \
 
 logical_cores=`grep -c proc /proc/cpuinfo`
 clock_speed=`lshw -c cpu | grep capacity | tail -1 | awk -F' ' '{print $2}'`
-mem=`free -m | grep Mem  | awk -F' ' '{print $2}'`.0
+mem=`free -m | grep Mem  | awk -F' ' '{print $2}'`
 storage=`df -h / | grep "/" | awk -F' ' '{print $2}' | tr -d 'G'`
 
 device='{
@@ -74,7 +74,7 @@ device='{
         "physicalCores": 1,
         "logicalCores": '$logical_cores',
         "cpuClockSpeed": "'$clock_speed'",
-        "memory": '$mem',
+        "memory": '$mem'.0,
         "storage": '$storage',
         "powerPlugged": true,
         "agentType": "micro",
@@ -85,7 +85,6 @@ device='{
 }'
 
 headers=" -H content-type:application/json"
-cookies=""
 
 if [ ! -z $USER ] && [ ! -z $PASSWORD ]
 then
@@ -98,9 +97,41 @@ then
 }'
     cookies=' -b cookies -c cookies '
     curl -XPOST -k $headers $cookies ${API}/session -d "${data}"
-    curl -XPOST -k ${headers} ${cookies} ${API}/device -d "${device}"
+    device_id=$(curl -XPOST -k ${headers} ${cookies} ${API}/device -d "${device}" | jq --raw-output '.["resource-id"]')
 else
-    curl -XPOST -k ${headers} -H "slipstream-authn-info: internal ADMIN" ${API}/device -d "${device}"
+    device_id=$(curl -XPOST -k ${headers} -H "slipstream-authn-info: internal ADMIN" ${API}/device -d "${device}" | jq --raw-output '.["resource-id"]')
+fi
+
+mem_free=`free -m | grep Mem  | awk -F' ' '{print $4}'`
+mem_free_percent=$((mem_free*100 / mem))
+storage_free=`df -h / | grep "/" | awk -F' ' '{print $4}' | tr -d 'G'`
+storage_free_percent=$((storage_free*100 / storage))
+
+device_dynamic='{
+        "device": {"href: "'$device_id'"},
+        "ramFree": '$mem_free'.0,
+        "ramFreePercent": '$mem_free_percent'.0,
+        "storageFree": '$storage_free',
+        "storageFreePercent": '$storage_free_percent',
+        "cpuFreePercent": 50.0,
+        "powerRemainingStatus": "100%",
+        "powerRemainingStatusSeconds": "99999999",
+        "ethernetAddress": "'$VPN_IP'",
+        "wifiAddress": "'$VPN_IP'",
+        "ethernetThroughputInfo": [],
+        "wifiThroughputInfo": [],
+        "sensorType": [],
+        "sensorModel": [],
+        "sensorConnection": [],
+        "myLeaderID": {"href: "'$CLOUD_URL'"}
+}'
+
+if [ ! -z $USER ] && [ ! -z $PASSWORD ]
+then
+    cookies=' -b cookies -c cookies '
+    curl -XPOST -k ${headers} ${cookies} ${API}/device-dynamic -d "${device_dynamic}"
+else
+    curl -XPOST -k ${headers} -H "slipstream-authn-info: internal ADMIN" ${API}/device-dynamic -d "${device_dynamic}"
 fi
 
 lm_id=`docker run --rm -d -p 46000:46000 mf2c/lifecycle:1.0.6-arm`
