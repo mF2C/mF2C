@@ -105,7 +105,7 @@ fi
 mem_free=`free -m | grep Mem  | awk -F' ' '{print $4}'`
 mem_free_percent=$((mem_free*100 / mem))
 storage_free=`df -h / | grep "/" | awk -F' ' '{print $4}' | tr -d 'G'`
-storage_free_percent=$((storage_free*100 / storage))
+storage_free_percent=$(echo "$storage_free * 100 / $storage" | bc)
 
 device_dynamic='{
         "device": {"href: "'$device_id'"},
