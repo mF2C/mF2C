@@ -9,17 +9,17 @@ display_usage() {
   echo "Usage: $0"
   echo
   echo " -h, --help                              Display usage instructions"
-  echo " --ovpn <base64 ovpn client conf>        Use VPN instead of Wireless discovery"
-  echo " --cloud-agent <url>                     Cloud agent endpoint. Default is ${CLOUD_URL}"
-  echo " --user <username>                       mF2C username"
-  echo " --password <password>                   mF2C password"
+  echo " --ovpn=<base64 ovpn client conf>        Use VPN instead of Wireless discovery"
+  echo " --cloud-agent=<url>                     Cloud agent endpoint. Default is ${CLOUD_URL}"
+  echo " --user=<username>                       mF2C username"
+  echo " --password=<password>                   mF2C password"
   echo
 }
 
 
 while [ "$1" != "" ]; do
-    PARAM=`echo $1 | awk -F' ' '{print $1}'`
-    VALUE=`echo $1 | awk -F' ' '{print $2}'`
+    PARAM=`echo $1 | cut -d '=' -f 1`
+    VALUE=`echo $1 | cut -d '=' -f 2-`
     case $PARAM in
         -h | --help)
             display_usage
