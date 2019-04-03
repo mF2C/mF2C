@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -x
 
 CLOUD_URL="https://dashboard.mf2c-project.eu"
 
@@ -24,7 +25,7 @@ while [ "$1" != "" ]; do
             display_usage
             exit
             ;;
-        --vpn)
+        --ovpn)
             OVPN=$VALUE
             ;;
         --cloud-agent)
@@ -47,7 +48,7 @@ done
 
 API="${CLOUD_URL}/api"
 
-openvpn_container_id=`docker run -rm -d --device=/dev/net/tun --cap-add=NET_ADMIN --net host -e OVPN=$OVPN \
+openvpn_container_id=`docker run --rm -d --device=/dev/net/tun --cap-add=NET_ADMIN --net host -e OVPN=$OVPN \
            --name cris mjenz/rpi-openvpn bash -c 'bash -c echo $OVPN | base64 -d > /tmp/client1.ovpn; openvpn /tmp/client1.ovpn'`
 
 function cleanup {
