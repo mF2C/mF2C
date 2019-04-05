@@ -196,13 +196,13 @@ services:
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics_engine:
-    image: mf2c/analytics-engine:latest
+    image: mf2c/analytics-engine:0.3
     expose:
       - "46020"
     depends_on:
       - influxdb
     volumes:
-      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+      - ./analytics_engine.conf:/root/analytics_engine/analytics_engine.conf
     labels:
       - "traefik.enable=true"
       - "traefik.port=46020"
