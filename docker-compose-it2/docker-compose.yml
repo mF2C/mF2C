@@ -199,6 +199,8 @@ services:
     image: mf2c/analytics-engine:0.3
     expose:
       - "46020"
+    ports:
+      - "46020:46020"
     depends_on:
       - influxdb
     volumes:
@@ -221,7 +223,7 @@ services:
       - OS_USERNAME=
       - OS_PASSWORD=
       - OS_AUTH_URL=
-    command: ["./start.sh", "http://neo4j:7474"]
+    command: ["./start.sh", "http://mf2c_neo4j_1:7474"]
   
   snaptemp:
     image: mf2c/snaptemp:0.1
@@ -244,6 +246,7 @@ services:
       - INFLUXDB_HTTP_LOG_ENABLED=false
   snap:
     image: intelsdi/snap:xenial
+    hostname: snap
     ports:
       - "8181:8181"
     volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
