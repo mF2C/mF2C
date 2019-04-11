@@ -83,11 +83,11 @@ services:
   ######################################################
 
   ###################### COMPSs  #######################
-  COMPSs:
-    image: mf2c/compss-agent:it2
-    expose:
-      - 8080
-    restart: unless-stopped
+  #COMPSs:
+  #  image: mf2c/compss-agent:it2
+  #  expose:
+  #    - 8080
+  #  restart: unless-stopped
   ######################################################
 
   ################## Service Manager ###################
