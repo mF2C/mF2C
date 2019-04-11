@@ -47,7 +47,7 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.11
+    image: mf2c/dataclay-proxy:2.13
     depends_on:
       - logicmodule1
       - ds1java1
@@ -55,7 +55,7 @@ services:
       - "6472"
 
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.11
+    image: mf2c/dataclay-logicmodule:2.13
     ports:
       - "1034:1034"
     env_file:
@@ -68,7 +68,7 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.11
+    image: mf2c/dataclay-dsjava:2.13
     depends_on:
       - logicmodule1
     env_file:
@@ -83,16 +83,16 @@ services:
   ######################################################
 
   ###################### COMPSs  #######################
-  COMPSs:
-    image: mf2c/compss-agent:it2
-    expose:
-      - 8080
-    restart: unless-stopped
+  #COMPSs:
+  #  image: mf2c/compss-agent:it2
+  #  expose:
+  #    - 8080
+  #  restart: unless-stopped
   ######################################################
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.6.5
+    image: mf2c/service-manager:1.6.6
     restart: unless-stopped
     depends_on:
       - cimi
@@ -103,7 +103,7 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/sm"
       - "traefik.port=46200"
     environment:
-      - JAVA_OPTS=-Xms32m -Xmx128m
+      - JAVA_OPTS=-Xms32m -Xmx256m
   ######################################################
 
   ########## Lifecycle Manager + User Manager ##########
@@ -129,7 +129,7 @@ services:
 
   #################### SLA Manager #####################
   slalite:
-    image: mf2c/sla-management:0.3.0
+    image: mf2c/sla-management:0.5.0
     restart: on-failure
     expose:
       - "46030"
@@ -153,7 +153,7 @@ services:
        - "traefik.port=46050"
      environment:
        - "DEBUG=True"
-  
+
   discovery:
      image: mf2c/discovery:1.0
      restart: on-failure
@@ -163,7 +163,7 @@ services:
        - 46040
      cap_add:
        - NET_ADMIN
-  
+
   identification:
      image: mf2c/identification:1.0
      restart: on-failure
@@ -173,7 +173,7 @@ services:
        - 46060
      environment:
        - "IDKey=35F319CA1DFC9689F5A33631C8F93ED7C3120EE7AFA05B1672C7DF7B71F63A6753DEF5FD3AC9DB2EAF90CCAB6BFF31A486B51C7095FF958D228102B84EFD7736"
-  
+
   cau-client:
      image: mf2c/cau-client:v1.02
      depends_on:
@@ -183,7 +183,7 @@ services:
      environment:
        - CAU_URL=213.205.14.13:46400
        - LCAU_URL=213.205.14.13:46401
-  
+
   resource-categorization:
      image: mf2c/resource-categorization:latest-V2.0.8
      restart: on-failure
@@ -199,6 +199,8 @@ services:
     image: mf2c/analytics-engine:0.3
     expose:
       - "46020"
+    ports:
+      - "46020:46020"
     depends_on:
       - influxdb
     volumes:
@@ -207,7 +209,7 @@ services:
       - "traefik.enable=true"
       - "traefik.port=46020"
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
-  
+
   landscaper:
     image: mf2c/landscaper:0.4
     volumes:
@@ -221,14 +223,14 @@ services:
       - OS_USERNAME=
       - OS_PASSWORD=
       - OS_AUTH_URL=
-    command: ["./start.sh", "http://neo4j:7474"]
-  
+    command: ["./start.sh", "http://mf2c_neo4j_1:7474"]
+
   snaptemp:
     image: mf2c/snaptemp:0.1
     command: sh /download.sh
     depends_on:
       - snap
-  
+
   influxdb:
     image: influxdb
     expose:
@@ -244,6 +246,7 @@ services:
       - INFLUXDB_HTTP_LOG_ENABLED=false
   snap:
     image: intelsdi/snap:xenial
+    hostname: snap
     ports:
       - "8181:8181"
     volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
