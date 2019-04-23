@@ -139,20 +139,20 @@ services:
 
   ################## Resource Manager ##################
   policies:
-     image: mf2c/policies:0.1.7c
+     image: mf2c/policies:2.0.0
      restart: on-failure
      depends_on:
        - cimi
      ports:
-       - "46050" # To get component status information - traefik
-       - "46051:46051" # LPP
-       - "46052:46052" # LPP
+       - "46050"
      labels:
        - "traefik.enable=true"
        - "traefik.frontend.rule=PathPrefix:/rm"
        - "traefik.port=46050"
      environment:
        - "DEBUG=True"
+       - "MF2C=True"
+       - "isLeader=False"
   
   discovery:
      image: mf2c/discovery:1.0

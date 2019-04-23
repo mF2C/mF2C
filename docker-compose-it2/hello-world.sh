@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+if [[ "$1" == "--include-tests" ]]
+then
+	tests_folder="./tests/"
+	tests=`ls $tests_folder`
+	for tester in $tests
+	do
+		eval $tests_folder$tests
+	done
+else
+	echo -e "\n    Use --include-tests to run all scripts in the 'tests' folder    \n"
+fi
+
+
 user_id=$(curl \
 --insecure \
 --header "Content-type: application/json" \
@@ -68,5 +81,4 @@ http://localhost:46000/api/v2/lm/service | jq -r .message)
 echo "User submitted: $user_id"
 echo "SLA template submitted: $sla_template_id"
 echo "Service submitted: $service_id"
-
 echo "$service_instance"
