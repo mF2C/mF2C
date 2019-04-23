@@ -1,29 +1,19 @@
-curl \
---insecure \
---header "Content-type: application/json" \
---header "slipstream-authn-info: super ADMIN" \
---request POST \
---data '{
-    "deviceID": "id2",
-    "isLeader": false,
-    "os": "Linux-4.13.0-38-generic-x86_64-with-debian-8.10",
-    "arch": "x86_64",
-    "cpuManufacturer": "Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz",
-    "physicalCores": 4,
-    "logicalCores": 8,
-    "cpuClockSpeed": "1.8000 GHz",
-    "memory": 7874.2109375,
-    "storage": 234549.5078125,
-    "powerPlugged": true,
-    "networkingStandards": "['eth0', 'lo']",
-    "ethernetAddress": "[snic(family=<AddressFamily.AF_INET: 2>, address='127.0.0.1', netmask='255.255.255.0', broadcast='192.168.1.255', ptp=None), snic(family=<AddressFamily.AF_PACKET: 17>, address='02:42:ac:11:00:03', netmask=None, broadcast='ff:ff:ff:ff:ff:ff', ptp=None)]",
-    "wifiAddress": "Empty",
-    "agentType": "normal",
-    "actuatorInfo": "test"
-}' \
-https://localhost/api/device
+#!/usr/bin/env bash
 
-curl \
+if [[ "$1" == "--include-tests" ]]
+then
+	tests_folder="./tests/"
+	tests=`ls $tests_folder`
+	for tester in $tests
+	do
+		eval $tests_folder$tests
+	done
+else
+	echo -e "\n    Use --include-tests to run all scripts in the 'tests' folder    \n"
+fi
+
+
+user_id=$(curl \
 --insecure \
 --header "Content-type: application/json" \
 --header "slipstream-authn-info: super ADMIN" \
@@ -37,22 +27,9 @@ curl \
         "username": "carpio"
     }
 }' \
-https://localhost/api/user
+https://localhost/api/user | jq -r '.["resource-id"]')
 
-curl \
---insecure \
---header "Content-type: application/json" \
---header "slipstream-authn-info: super ADMIN" \
---request POST \
---data '{
-    "name": "compss-hello-world",
-    "exec": "mf2c/compss-test:it2",
-    "exec_type": "compss",
-    "agent_type": "normal"
-}' \
-https://localhost/api/service
-
-curl \
+sla_template_id=$(curl \
 --insecure \
 --header "Content-type: application/json" \
 --header "slipstream-authn-info: super ADMIN" \
@@ -61,8 +38,7 @@ curl \
     "name": "compss-hello-world",
     "state": "started",
     "details":{
-        "id": "a02",
-        "type": "agreement",
+        "type": "template",
         "name": "compss-hello-world",
         "provider": { "id": "mf2c", "name": "mF2C Platform" },
         "client": { "id": "c02", "name": "A client" },
@@ -76,6 +52,33 @@ curl \
         ]
     }
 }' \
-https://localhost/api/agreement
+https://localhost/api/sla-template | jq -r '.["resource-id"]')
 
+service_id=$(curl \
+--insecure \
+--header "Content-type: application/json" \
+--header "slipstream-authn-info: super ADMIN" \
+--request POST \
+--data '{
+    "name": "compss-hello-world",
+    "exec": "mf2c/compss-test:it2",
+    "exec_type": "compss",
+    "agent_type": "normal",
+    "sla_templates": ["'"$sla_template_id"'"]
+}' \
+https://localhost/api/service | jq -r '.["resource-id"]')
 
+service_instance=$(curl \
+--insecure \
+--header "Content-type: application/json" \
+--request POST \
+--data '{
+    "service_id": "'"$service_id"'",
+    "user_id": "'"$user_id"'"
+}' \
+http://localhost:46000/api/v2/lm/service | jq -r .message)
+
+echo "User submitted: $user_id"
+echo "SLA template submitted: $sla_template_id"
+echo "Service submitted: $service_id"
+echo "$service_instance"
