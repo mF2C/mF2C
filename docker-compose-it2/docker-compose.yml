@@ -47,7 +47,7 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.13
+    image: mf2c/dataclay-proxy:2.14
     depends_on:
       - logicmodule1
       - ds1java1
@@ -55,7 +55,7 @@ services:
       - "6472"
 
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.13
+    image: mf2c/dataclay-logicmodule:2.14
     ports:
       - "1034:1034"
     env_file:
@@ -68,7 +68,7 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.13
+    image: mf2c/dataclay-dsjava:2.14
     depends_on:
       - logicmodule1
     env_file:
