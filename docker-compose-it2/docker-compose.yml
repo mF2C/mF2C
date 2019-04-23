@@ -16,7 +16,7 @@ services:
 
   ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.13
+    image: mf2c/cimi-server:latest
     restart: on-failure
     depends_on:
       - logicmodule1
@@ -225,9 +225,11 @@ services:
       - OS_AUTH_URL=
     command: ["./start.sh", "http://mf2c_neo4j_1:7474"]
   
-  snaptemp:
-    image: mf2c/snaptemp:0.1
+  telem_start:
+    image: mf2c/telem_start:0.1
     command: sh /download.sh
+    environment:
+      - HOSTNAME
     depends_on:
       - snap
   
@@ -235,6 +237,8 @@ services:
     image: influxdb
     expose:
       - "8086"
+    ports:
+      - "8086:8086"
     volumes:
       - influx:/var/lib/influxdb
     environment:
@@ -284,3 +288,4 @@ volumes:
   landscaper: {}
   ringcontainer: {}
   ringcontainerexample: {}
+
