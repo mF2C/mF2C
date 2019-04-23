@@ -191,9 +191,12 @@ services:
   #     - 46060
   #
   # cau-client:
-  #   image: mf2c/cau-client:v1.03
+  #   #v1.02 has volume pkidata defined
+  #   image: mf2c/cau-client:v1.02
   #   depends_on:
   #     - policies
+  #   volumes:
+  #	 - pkidata:/pkidata
   #   expose:
   #     - 46065
   #   environment:
@@ -297,3 +300,4 @@ volumes:
   landscaper: {}
   ringcontainer: {}
   ringcontainerexample: {}
+  pkidata: {}
