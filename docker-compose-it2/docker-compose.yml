@@ -178,6 +178,8 @@ services:
      image: mf2c/cau-client:v1.02
      depends_on:
        - policies
+     volumes:
+  	 - pkidata:/pkidata
      expose:
        - 46065
      environment:
@@ -192,7 +194,6 @@ services:
      expose:
        - 46070
      privileged: true
-  ######################################################
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics_engine:
@@ -288,4 +289,4 @@ volumes:
   landscaper: {}
   ringcontainer: {}
   ringcontainerexample: {}
-
+  pkidata: {}
