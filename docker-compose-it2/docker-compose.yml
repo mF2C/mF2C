@@ -92,7 +92,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.6.6
+    image: mf2c/service-manager:1.7.0
     restart: unless-stopped
     depends_on:
       - cimi
@@ -108,7 +108,7 @@ services:
 
   ########## Lifecycle Manager + User Manager ##########
   lm-um:
-    image: mf2c/lifecycle-usermngt:1.0.6
+    image: mf2c/lifecycle-usermngt:1.0.6b
     restart: on-failure
     expose:
       - "46300"
