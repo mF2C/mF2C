@@ -92,7 +92,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.6.6
+    image: mf2c/service-manager:1.7.0
     restart: unless-stopped
     depends_on:
       - cimi
@@ -108,7 +108,7 @@ services:
 
   ########## Lifecycle Manager + User Manager ##########
   lm-um:
-    image: mf2c/lifecycle-usermngt:1.0.6
+    image: mf2c/lifecycle-usermngt:1.0.6b
     restart: on-failure
     expose:
       - "46300"
@@ -139,21 +139,21 @@ services:
 
   ################## Resource Manager ##################
   policies:
-     image: mf2c/policies:0.1.7c
+     image: mf2c/policies:2.0.0
      restart: on-failure
      depends_on:
        - cimi
      ports:
-       - "46050" # To get component status information - traefik
-       - "46051:46051" # LPP
-       - "46052:46052" # LPP
+       - "46050"
      labels:
        - "traefik.enable=true"
        - "traefik.frontend.rule=PathPrefix:/rm"
        - "traefik.port=46050"
      environment:
        - "DEBUG=True"
-
+       - "MF2C=True"
+       - "isLeader=False"
+  
   discovery:
      image: mf2c/discovery:1.0
      restart: on-failure
@@ -163,7 +163,7 @@ services:
        - 46040
      cap_add:
        - NET_ADMIN
-
+  
   identification:
      image: mf2c/identification:1.0
      restart: on-failure
@@ -173,7 +173,7 @@ services:
        - 46060
      environment:
        - "IDKey=35F319CA1DFC9689F5A33631C8F93ED7C3120EE7AFA05B1672C7DF7B71F63A6753DEF5FD3AC9DB2EAF90CCAB6BFF31A486B51C7095FF958D228102B84EFD7736"
-
+  
   cau-client:
      image: mf2c/cau-client:v1.02
      depends_on:
@@ -183,9 +183,9 @@ services:
      environment:
        - CAU_URL=213.205.14.13:46400
        - LCAU_URL=213.205.14.13:46401
-
+  
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.9
+     image: mf2c/resource-categorization:latest-V2.0.8
      restart: on-failure
      depends_on:
        - policies
@@ -209,7 +209,7 @@ services:
       - "traefik.enable=true"
       - "traefik.port=46020"
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
-
+  
   landscaper:
     image: mf2c/landscaper:0.4
     volumes:
@@ -224,13 +224,13 @@ services:
       - OS_PASSWORD=
       - OS_AUTH_URL=
     command: ["./start.sh", "http://mf2c_neo4j_1:7474"]
-
+  
   snaptemp:
     image: mf2c/snaptemp:0.1
     command: sh /download.sh
     depends_on:
       - snap
-
+  
   influxdb:
     image: influxdb
     expose:
