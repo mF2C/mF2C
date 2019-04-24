@@ -80,19 +80,11 @@ services:
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
-  ######################################################
-
-  ###################### COMPSs  #######################
-  #COMPSs:
-  #  image: mf2c/compss-agent:it2
-  #  expose:
-  #    - 8080
-  #  restart: unless-stopped
-  ######################################################
+  #####################################################
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.7.0
+    image: mf2c/service-manager:latest
     restart: unless-stopped
     depends_on:
       - cimi
@@ -179,7 +171,7 @@ services:
      depends_on:
        - policies
      volumes:
-  	 - pkidata:/pkidata
+       - pkidata:/pkidata
      expose:
        - 46065
      environment:
