@@ -100,7 +100,7 @@ services:
 
   ########## Lifecycle Manager + User Manager ##########
   lm-um:
-    image: mf2c/lifecycle-usermngt:1.0.6b
+    image: mf2c/lifecycle-usermngt:1.0.6c
     restart: on-failure
     expose:
       - "46300"

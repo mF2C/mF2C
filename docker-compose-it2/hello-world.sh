@@ -12,23 +12,6 @@ else
 	echo -e "\n    Use --include-tests to run all scripts in the 'tests' folder    \n"
 fi
 
-
-user_id=$(curl \
---insecure \
---header "Content-type: application/json" \
---header "slipstream-authn-info: super ADMIN" \
---request POST \
---data '{
-    "userTemplate": {
-        "href": "user-template/self-registration",
-        "password": "testpassword",
-        "passwordRepeat" : "testpassword",
-        "emailAddress": "test@gmail.com",
-        "username": "carpio"
-    }
-}' \
-https://localhost/api/user | jq -r '.["resource-id"]')
-
 sla_template_id=$(curl \
 --insecure \
 --header "Content-type: application/json" \
@@ -73,12 +56,10 @@ service_instance=$(curl \
 --header "Content-type: application/json" \
 --request POST \
 --data '{
-    "service_id": "'"$service_id"'",
-    "user_id": "'"$user_id"'"
+    "service_id": "'"$service_id"'"
 }' \
 http://localhost:46000/api/v2/lm/service | jq -r .message)
 
-echo "User submitted: $user_id"
-echo "SLA template submitted: $sla_template_id"
-echo "Service submitted: $service_id"
-echo "$service_instance"
+echo "SLA template: $sla_template_id"
+echo "Service: $service_id"
+echo "Service instance: $service_instance"
