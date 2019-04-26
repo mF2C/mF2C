@@ -67,8 +67,6 @@ ID=`curl -XPOST "${BASE_API_URL}/user-profile" -ksS -H 'slipstream-authn-info: i
     "service_consumer": true,
     "resource_contributor": false,
     "device_id": "some-device",
-    "max_apps": 100,
-    "user_id": "some-user-id"
 }' | jq -e -r '.["resource-id"]'` && \
     log "OK" "created new resource $ID successfully" || \
         log "NO" "failed to create new resource"
@@ -88,8 +86,6 @@ ID=`curl -XPOST "${BASE_API_URL}/user-profile" -ksS -H 'slipstream-authn-info: i
     "service_consumer": false,
     "resource_contributor": true,
     "device_id": "some-device",
-    "max_apps": 100,
-    "user_id": "some-user-id"
 }' --fail > /dev/null 2>&1 && \
     log "OK" "resource $ID update successfully") || \
         log "NO" "failed to update resource"
