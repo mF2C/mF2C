@@ -204,7 +204,7 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
   
   landscaper:
-    image: mf2c/landscaper:0.4
+    image: mf2c/landscaper:0.5
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
@@ -216,7 +216,7 @@ services:
       - OS_USERNAME=
       - OS_PASSWORD=
       - OS_AUTH_URL=
-    command: ["./start.sh", "http://mf2c_neo4j_1:7474"]
+    command: ["./start.sh", "http://neo4j:7474"]
   
   telem_start:
     image: mf2c/telem_start:0.1
@@ -263,7 +263,9 @@ services:
     - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
   
   web:
-    image: mf2c/landscaper-api:0.3
+    image: mf2c/landscaper:0.5
+    environment:
+    - PYTHONPATH=/landscaper
     volumes:
       - ./landscaper.cfg:/landscaper/landscaper.cfg
     ports:
@@ -271,6 +273,7 @@ services:
     depends_on:
       - neo4j
       - landscaper
+    command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
 ######################################################
 
 volumes:
