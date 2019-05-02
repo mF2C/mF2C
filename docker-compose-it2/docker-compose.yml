@@ -180,6 +180,7 @@ services:
   
   resource-categorization:
      image: mf2c/resource-categorization:latest-V2.0.9
+     hostname: IRILD039
      restart: on-failure
      depends_on:
        - policies
@@ -204,10 +205,11 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
   
   landscaper:
-    image: mf2c/landscaper:0.5
+    image: mf2c/landscaper:0.6
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
+    - ~/ls_log:/landscaper/logs
     depends_on: ["cimi", "neo4j", "proxy"]
     environment:
       - OS_TENANT_NAME=
@@ -263,11 +265,12 @@ services:
     - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
   
   web:
-    image: mf2c/landscaper:0.5
+    image: mf2c/landscaper:0.6
     environment:
     - PYTHONPATH=/landscaper
     volumes:
       - ./landscaper.cfg:/landscaper/landscaper.cfg
+      - ~/ls_log:/collector_log
     ports:
       - "9001:9001"
     depends_on:
