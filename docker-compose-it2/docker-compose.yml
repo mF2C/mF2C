@@ -189,8 +189,8 @@ services:
      privileged: true
 
   ##### Analytics Engine + Recomender + Landscaper #####
-  analytics_engine:
-    image: mf2c/analytics-engine:0.3
+  analytics-engine:
+    image: mf2c/analytics-engine:0.3.5
     expose:
       - "46020"
     ports:
