@@ -1,43 +1,53 @@
-# MY COMPONENT NAME
+# ANALYTICS ENGINE (RECOMMENDER)
 
-small description about the component
+Analytics Engine provides an analysis of telemetry data and resource utlilization data
 
 ## Usage
 
 ### API
 
-describe all endpoint available in the component API
+API description provided here : [Web API Readme](https://github.com/mF2C/analytics_engine/blob/master/analytics_engine/heuristics/sinks/mf2c/README.md)
 
 #### Examples
 
-provide some examples in the form of:
-
-    "GET /api/my-call"
-
-    "POST /api/my-other-call
-
-    DATA:
-        {}"
+Please see above referred document for examples 
 
 ### Troubleshooting
 
-if there are any known issues or caveats that should be know by a user
-or developer, put them here. Otherwise leave empty
-
+If incorrect telemetry data is returned or errors, please check and make sure the host name is exported as HOSTNAME environment variable.
 
 ## CHANGELOG
 
-### X.Y.Z (date day/month/year)
+### 10.05.2019 (date day/month/year)
 
 #### Added
 
- - list all the added things to this release
+ - None
 
 #### Changed
 
- - list all the changed things on this release
+ - Bugfix : /mf2c/optimal endpoint output modified to remove NaN values. Issue reported by SLA Manager
+ - Change : service name in docker-compose.yml changed from analytics_engine to analytics-engine. Issue reported by SLA Manager
 
+#### Tests done
 
+  - Curl command as below : 
+  
+		curl -H "Content-Type: application/json" -d '{"name":"test"}' -X POST http://localhost:46020/mf2c/optimal
 
-
-
+  - Output expected in the below format : 
+  
+        [
+            {"type": "machine", 
+             "network saturation": 0.0, 
+             "node_name": "IRILD039", 
+             "network utilization": 0.0, 
+             "disk utilization": 0.0009194394604156363, 
+             "compute utilization": 0.07513952833753562, 
+             "memory saturation": 0.0, 
+             "compute saturation": 0.0, 
+             "memory utilization": 0.0925959453062668, 
+             "ipaddress": "172.22.0.20", 
+             "disk saturation": 0.0}
+         ]
+        
