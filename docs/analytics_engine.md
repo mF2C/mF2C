@@ -18,6 +18,8 @@ If incorrect telemetry data is returned or errors, please check and make sure th
 
 ## CHANGELOG
 
+### Version 0.3.5
+
 ### 10.05.2019 (date day/month/year)
 
 #### Added
