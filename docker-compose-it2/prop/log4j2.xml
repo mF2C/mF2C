@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="60" status="off">
+  <Appenders>
+    <Console name="ConsoleAppender" target="SYSTEM_ERR">
+    	<PatternLayout pattern="%d{ISO8601} %p [%c] [%t] [%C{1}:%L] %m%n"></PatternLayout>
+    </Console>
+  </Appenders>
+
+ <Loggers>
+        <!--  Runtime -->
+        <Logger name="ClientRuntime" level="off" />
+        <Logger name="ClientManagementLib" level="off"/>
+        <Logger name="DataClayRuntime" level="off"/>
+        <Logger name="DataServiceRuntime" level="off"/>
+        
+        <Logger name="DataClayObjectLoader" level="off"/>
+        <Logger name="DataClayObject" level="off" /> <!--  This is very verbose! -->
+        
+        <!--  Data service -->
+        <Logger name="DataService" level="off"/>
+        <Logger name="ExecutionEnvironmentSrv" level="off"/>
+        
+        <!--  Lockers -->
+        <Logger name="dataclay.util.classloaders.SyncClass" level="off"/>
+        <Logger name="dataclay.heap.LockerPool" level="off"/>
+        <Logger name="LockerPool" level="off"/>
+        <Logger name="dataclay.util.classloaders.ClassLockers" level="off"/> 
+        
+        <!--  Garbage collection -->
+        <Logger name="GlobalGC" level="off"/>
+        <Logger name="heap.HeapManager" level="off"/>
+        <Logger name="ReferenceCounting" level="off"/>
+        <Logger name="StorageLocation" level="off"/>
+        
+        <!--  Logic module -->
+        <Logger name="LogicModule" level="off"/>
+        <Logger name="LMDB" level="off"/>
+        <Logger name="managers" level="off" />
+        <Logger name="MetaDataService.db" level="off" />
+        <Logger name="MetaDataService" level="off" />
+        
+        <!--  Communication -->
+        <Logger name="io.grpc" level="off"/>
+        <Logger name="io.netty" level="off"/>
+        <Logger name="NettyClientHandler" level="off"/>
+        <Logger name="grpc.client" level="off"/>
+        <Logger name="communication.LogicModule.service" level="off"/>
+        <Logger name="grpc.client.logicmodule" level="off"/>
+        
+        <!--  Databases -->
+        <Logger name="dataclay.dbhandler" level="off"/>
+        <Logger name="dbhandler.PostgresConnection" level="off" />
+        <Logger name="org.apache.commons.dbcp2" level="off"/>
+        <Logger name="PostgresHandler" level="off"/>
+        <Logger name="SQLHandler" level="off"/>
+         
+        <!--  Tests -->
+        <Logger name="mock.MockDataClay" level="off"/>
+        
+        <!--  Misc -->
+        <Logger name="util" level="off" />
+        <Logger name="exceptions" level="off"/>
+        <Logger name="Paraver" level="off"/>        
+        
+        <!--  ROOT LOGGER -->
+    <Root level="off">
+      <AppenderRef ref="ConsoleAppender" />
+    </Root>
+  </Loggers>
+</Configuration>

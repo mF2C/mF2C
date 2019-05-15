@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 services:
   proxy:
     image: traefik
@@ -11,11 +11,16 @@ services:
      - "80:80"
      - "443:443"
   dcproxy:
-    image: mf2c/dataclay-proxy:latest
+    image: mf2c/dataclay-proxy:trunk
     depends_on:
       - logicmodule1
+      - ds1java1
     expose:
       - "6472"
+    volumes:
+      - ./prop/global.properties:/root/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/root/dataclay/cfglog/log4j2.xml:ro
+
   cimi:
     image: mf2c/cimi-server:2.1-SNAPSHOT
     depends_on:
@@ -36,6 +41,13 @@ services:
     volumes:
      - ringcontainer:/opt/slipstream/ring-container
      - ringcontainerexample:/opt/slipstream/ring-example
+  eventService:
+    image: sixsq/cimi-sse:1.0
+    depends_on:
+     - cimi
+    ports:
+     - "8000:8000"
+    restart: unless-stopped
   rc:
     image: sixsq/ring-container:3.53-SNAPSHOT
     expose:
@@ -50,48 +62,31 @@ services:
      - "46030"
     environment:
      - CIMI_URL=https://proxy:443/api
-  lmpostgres1:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
 
   logicmodule1:
-    image: "bscdataclay/logicmodule"
-    depends_on: ["lmpostgres1"]
+    image: "bscdataclay/logicmodule:mf2c"
     ports:
-      - "11034:1034"
+      - "1034:1034"
     env_file:
-      - ./env/PG.environment
       - ./env/LM.environment
     environment:
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
-      - POSTGRES_HOST=lmpostgres1
     volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
-  ds1postgres1:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: "bscdataclay/dsjava"
-    depends_on: ["ds1postgres1", "logicmodule1"]
-    ports:
-      - 2127
+    image: "bscdataclay/dsjava:mf2c"
+    depends_on: ["logicmodule1"]
     env_file:
-      - ./env/PG.environment
       - ./env/DS.environment
       - ./env/LM.environment
     environment:
       - DATASERVICE_NAME=DS1
-      - POSTGRES_HOST=ds1postgres1
     volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
+      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   COMPSs:
     image: mf2c/compss-mf2c:1.0
@@ -127,7 +122,10 @@ services:
       - "46051:46051"
       - "46052:46052"
   cau-client:
-    image: mf2c/cau-client:latest
+    #version that writes agent credentials to a shared volume
+    image: mf2c/cau-client:v1.02
+    volumes:
+      - pkidata:/pkidata
     depends_on:
 #   assuming cau and leader cau are bootstrapped elsewhere
       - policies
@@ -249,3 +247,4 @@ volumes:
   landscaper: {}
   ringcontainer: {}
   ringcontainerexample: {}
+  pkidata: {}
