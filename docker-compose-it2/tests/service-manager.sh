@@ -46,7 +46,7 @@ SERVICE_INSTANCE=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -
 
 # Check QoS
 SERVICE_INSTANCE_ID=$( jq -r '.id'<<< "${SERVICE_INSTANCE}")
-(curl -XGET "https://localhost/sm/api/service-management/${SERVICE_INSTANCE_ID}" -ksS \
+(curl -XGET "https://localhost/sm/api/${SERVICE_INSTANCE_ID}" -ksS \
  | jq -e 'select(.status == 200)') > /dev/null 2>&1 && \
     log "OK" "QoS for service instance $SERVICE_INSTANCE_ID checked successfully" || \
         log "NO" "failed to check QoS for service instance $SERVICE_INSTANCE_ID"

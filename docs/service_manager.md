@@ -7,10 +7,10 @@ Responsible of categorizing services into the system and improving QoS before an
 ### API
 
 - Endpoint `http://localhost:46200`
-- GET `/api/sm` -> returns the list of all services
-- GET `/api/sm/<service_id>` -> returns the specified service
-- POST `/api/sm`, DATA `service` -> submit new service
-- GET `/api/sm/{service_instance_id}` -> check QoS and returns the specified service instance
+- GET `/api` -> returns the list of all services
+- GET `/api/<service_id>` -> returns the specified service
+- POST `/api`, DATA `service` -> submit new service
+- GET `/api/{service_instance_id}` -> check QoS and returns the specified service instance
 
 The rest of actions can be performed through the GUI `https://localhost/sm/index.html`
 
@@ -18,7 +18,7 @@ The rest of actions can be performed through the GUI `https://localhost/sm/index
 
 submitting a new service:
 
-    POST /api/sm
+    POST /api
     DATA:
         {
              "name": "compss-hello-world",
