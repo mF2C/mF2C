@@ -82,9 +82,19 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
   #####################################################
 
+  ################### Event Manager ###################
+  event-manager:
+    image: mf2c/cimi-server-events
+    depends_on:
+      - cimi
+    expose:
+      - 8000
+    restart: unless-stopped
+  ######################################################
+
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:latest
+    image: mf2c/service-manager:1.7.2
     restart: unless-stopped
     depends_on:
       - cimi
