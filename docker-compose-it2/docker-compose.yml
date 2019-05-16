@@ -179,7 +179,7 @@ services:
        - LCAU_URL=213.205.14.13:46401
   
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.10
+     image: mf2c/resource-categorization:latest
      restart: on-failure
      depends_on:
        - policies
