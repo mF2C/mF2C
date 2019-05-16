@@ -87,8 +87,8 @@ services:
     image: mf2c/cimi-server-events
     depends_on:
       - cimi
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
     restart: unless-stopped
   ######################################################
 
