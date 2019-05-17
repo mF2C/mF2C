@@ -95,6 +95,15 @@ DELETE /api/event/<uuid>
 
 ## CHANGELOG
 
+### 2.18 (17/05/2019)
+
+#### Added
+
+#### Changed
+
+ - added status to device resource
+
+
 ### 2.16 (17/05/2019)
 
 #### Added
