@@ -16,7 +16,7 @@ services:
 
   ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:latest
+    image: mf2c/cimi-server:2.17-SNAPSHOT
     restart: on-failure
     depends_on:
       - logicmodule1
