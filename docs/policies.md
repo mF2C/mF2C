@@ -184,6 +184,16 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ## CHANGELOG
 
+### 2.0.2 (20/05/2019)
+
+#### Added
+
+    + LeaderIP environment variable added.
+
+#### Changed
+
+    * Agent resource include Leader IP if specified in env. variable.
+
 ### 2.0.1 (15/05/2019)
 
 #### Added
