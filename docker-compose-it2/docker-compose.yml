@@ -189,14 +189,19 @@ services:
        - LCAU_URL=213.205.14.13:46401
   
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.9
-     hostname: IRILD039
+     image: mf2c/resource-categorization:latest
      restart: on-failure
      depends_on:
        - policies
      expose:
        - 46070
      privileged: true
+     environment:
+       - agentType=2
+       - targetDeviceSensor=B
+       - targetDeviceActuator=A-T
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
