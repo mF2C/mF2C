@@ -141,7 +141,7 @@ services:
 
   ################## Resource Manager ##################
   policies:
-     image: mf2c/policies:2.0.0
+     image: mf2c/policies:2.0.2
      restart: on-failure
      depends_on:
        - cimi
@@ -155,6 +155,7 @@ services:
        - "DEBUG=True"
        - "MF2C=True"
        - "isLeader=False"
+       - "leaderIP="
   
   discovery:
      image: mf2c/discovery:1.0
