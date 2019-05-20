@@ -116,7 +116,7 @@ services:
     image: mf2c/policies:latest
     depends_on:
       - discovery
-    # container_name: policies
+      - resource-categorization
     ports:
       - "46050"
       - "46051:46051"
@@ -159,12 +159,15 @@ services:
     volumes:
       - /tmp/compose_files:/tmp/compose_files
       - /var/run/docker.sock:/var/run/docker.sock
-  resouce-categorization:
-    image: mf2c/resource-categorization:latest
+  resource-categorization:
+    image: mf2c/resource-categorization:latest-V2.0.3
     depends_on:
       - cimi
     expose:
       - 46070
+    environment:
+      - "agentType=2"
+      - "targetDeviceActuator=A-AFST"  
     privileged: true
   snaptemp:
     image: mf2c/snaptemp:0.1

@@ -47,7 +47,7 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.15
+    image: mf2c/dataclay-proxy:2.17
     depends_on:
       - logicmodule1
       - ds1java1
@@ -55,7 +55,7 @@ services:
       - "6472"
 
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.15
+    image: mf2c/dataclay-logicmodule:2.17
     ports:
       - "1034:1034"
     env_file:
@@ -68,7 +68,7 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.15
+    image: mf2c/dataclay-dsjava:2.17
     depends_on:
       - logicmodule1
     env_file:
@@ -82,9 +82,19 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
   #####################################################
 
+  ################### Event Manager ###################
+  event-manager:
+    image: mf2c/cimi-server-events
+    depends_on:
+      - cimi
+    expose:
+      - 8000
+    restart: unless-stopped
+  ######################################################
+
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:latest
+    image: mf2c/service-manager:1.7.2
     restart: unless-stopped
     depends_on:
       - cimi
@@ -179,18 +189,23 @@ services:
        - LCAU_URL=213.205.14.13:46401
   
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.9
-     hostname: IRILD039
+     image: mf2c/resource-categorization:latest
      restart: on-failure
      depends_on:
        - policies
      expose:
        - 46070
      privileged: true
+     environment:
+       - agentType=2
+       - targetDeviceSensor=B
+       - targetDeviceActuator=A-T
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
 
   ##### Analytics Engine + Recomender + Landscaper #####
-  analytics_engine:
-    image: mf2c/analytics-engine:0.3
+  analytics-engine:
+    image: mf2c/analytics-engine:0.4.0
     expose:
       - "46020"
     ports:
