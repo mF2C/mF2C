@@ -1,28 +1,23 @@
-version: '2'
+version: '3'
 services:
+  ####################### Proxy  ######################
   proxy:
     image: traefik
     restart: unless-stopped
     command: --web --docker --docker.exposedByDefault=false --loglevel=info
     volumes:
-     - /var/run/docker.sock:/var/run/docker.sock:ro
-     - ./traefik/traefik.toml:/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.toml:/traefik.toml
+      - ./traefik/cert:/ssl:ro
     ports:
-     - "80:80"
-     - "443:443"
-  dcproxy:
-    image: mf2c/dataclay-proxy:trunk
-    depends_on:
-      - logicmodule1
-      - ds1java1
-    expose:
-      - "6472"
-    volumes:
-      - ./prop/global.properties:/root/dataclay/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/root/dataclay/cfglog/log4j2.xml:ro
+      - "80:80"
+      - "443:443"
+  ######################################################
 
+  ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.1-SNAPSHOT
+    image: mf2c/cimi-server:latest
+    restart: on-failure
     depends_on:
       - logicmodule1
       - dcproxy
@@ -32,39 +27,35 @@ services:
       - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
       - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
     expose:
-     - "8201"
+      - "8201"
     labels:
-     - "traefik.enable=true"
-     #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
-     - "traefik.backend=cimi"
-     - "traefik.frontend.rule=PathPrefix:/,/"
+      - "traefik.enable=true"
+      - "traefik.backend=cimi"
+      - "traefik.frontend.rule=PathPrefix:/api"
     volumes:
-     - ringcontainer:/opt/slipstream/ring-container
-     - ringcontainerexample:/opt/slipstream/ring-example
-  eventService:
-    image: sixsq/cimi-sse:1.0
-    depends_on:
-     - cimi
-    ports:
-     - "8000:8000"
-    restart: unless-stopped
+      - ringcontainer:/opt/slipstream/ring-container
+      - ringcontainerexample:/opt/slipstream/ring-example
+
   rc:
     image: sixsq/ring-container:3.53-SNAPSHOT
     expose:
-     - "5000"
+      - "5000"
     volumes:
-     - ringcontainer:/opt/slipstream/ring-container
-     - ringcontainerexample:/opt/slipstream/ring-example
+      - ringcontainer:/opt/slipstream/ring-container
+      - ringcontainerexample:/opt/slipstream/ring-example
     command: sh
-  slalite:
-    image: mf2c/sla-management:0.3.0
+
+  #################### Dataclay  #######################
+  dcproxy:
+    image: mf2c/dataclay-proxy:2.17
+    depends_on:
+      - logicmodule1
+      - ds1java1
     expose:
-     - "46030"
-    environment:
-     - CIMI_URL=https://proxy:443/api
+      - "6472"
 
   logicmodule1:
-    image: "bscdataclay/logicmodule:mf2c"
+    image: mf2c/dataclay-logicmodule:2.17
     ports:
       - "1034:1034"
     env_file:
@@ -77,107 +68,188 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: "bscdataclay/dsjava:mf2c"
-    depends_on: ["logicmodule1"]
+    image: mf2c/dataclay-dsjava:2.17
+    depends_on:
+      - logicmodule1
     env_file:
       - ./env/DS.environment
       - ./env/LM.environment
     environment:
       - DATASERVICE_NAME=DS1
+      - DATASERVICE_HOST=ds1java1
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+  #####################################################
 
-  COMPSs:
-    image: mf2c/compss-mf2c:1.0
+  ################### Event Manager ###################
+  event-manager:
+    image: mf2c/cimi-server-events
+    depends_on:
+      - cimi
     expose:
-     - 8080
+      - 8000
     restart: unless-stopped
+  ######################################################
+
+  ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:latest
+    image: mf2c/service-manager:1.7.2
     restart: unless-stopped
     depends_on:
       - cimi
     expose:
       - 46200
-    ports:
-      - 46200:46200
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=PathPrefixStrip:/sm"
+      - "traefik.port=46200"
     environment:
       - JAVA_OPTS=-Xms32m -Xmx256m
-  discovery:
-    image: mf2c/discovery:latest
-    depends_on:
-      - cimi
-    expose:
-      - 46040
-    cap_add:
-      - NET_ADMIN
-  policies:
-    image: mf2c/policies:latest
-    depends_on:
-      - discovery
-      - resource-categorization
-    ports:
-      - "46050"
-      - "46051:46051"
-      - "46052:46052"
-  cau-client:
-    #version that writes agent credentials to a shared volume
-    image: mf2c/cau-client:v1.02
-    volumes:
-      - pkidata:/pkidata
-    depends_on:
-#   assuming cau and leader cau are bootstrapped elsewhere
-      - policies
-    # container_name: cau-client
-    expose:
-      - 46065
-#   please provide ip:port params for CAU and leader CAU
-    environment:
-      - CAU_URL=127.0.0.1:46400
-      - LCAU_URL=127.0.0.1:46410
-  identification:
-    image: mf2c/identification:latest
-    volumes:
-      - mydata:/data
-    expose:
-      - 46060
-  user-management:
-    image: mf2c/user-management:latest
+  ######################################################
+
+  ########## Lifecycle Manager + User Manager ##########
+  lm-um:
+    image: mf2c/lifecycle-usermngt:1.0.6c
+    restart: on-failure
     expose:
       - "46300"
-  lifecycle:
-    image: mf2c/lifecycle
-    expose:
       - "46000"
     ports:
       - "46000:46000"
+      - "46300:46300"
     environment:
-      - HOST_IP=
+      - DOCKER_SWARM=True
+      - K8S_MASTER=False
+      - HOST_IP=192.168.252.41
       - DATACLAY_EP=
       - WORKING_DIR_VOLUME=/tmp/compose_files
     volumes:
       - /tmp/compose_files:/tmp/compose_files
       - /var/run/docker.sock:/var/run/docker.sock
-  resource-categorization:
-    image: mf2c/resource-categorization:latest-V2.0.3
-    depends_on:
-      - cimi
+  ######################################################
+
+  #################### SLA Manager #####################
+  slalite:
+    image: mf2c/sla-management:0.6.0
+    restart: on-failure
     expose:
-      - 46070
+      - "46030"
     environment:
-      - "agentType=2"
-      - "targetDeviceActuator=A-AFST"  
-    privileged: true
-  snaptemp:
-    image: mf2c/snaptemp:0.1
+      - CIMI_URL=https://proxy:443/api
+  ######################################################
+
+  ################## Resource Manager ##################
+  policies:
+     image: mf2c/policies:2.0.2
+     restart: on-failure
+     depends_on:
+       - cimi
+     ports:
+       - "46050"
+     labels:
+       - "traefik.enable=true"
+       - "traefik.frontend.rule=PathPrefix:/rm"
+       - "traefik.port=46050"
+     environment:
+       - "DEBUG=True"
+       - "MF2C=True"
+       - "isLeader=False"
+       - "leaderIP="
+  
+  discovery:
+     image: mf2c/discovery:1.0
+     restart: on-failure
+     depends_on:
+       - cimi
+     expose:
+       - 46040
+     cap_add:
+       - NET_ADMIN
+  
+  identification:
+     image: mf2c/identification:1.0
+     restart: on-failure
+     volumes:
+       - mydata:/data
+     expose:
+       - 46060
+     environment:
+       - "IDKey=35F319CA1DFC9689F5A33631C8F93ED7C3120EE7AFA05B1672C7DF7B71F63A6753DEF5FD3AC9DB2EAF90CCAB6BFF31A486B51C7095FF958D228102B84EFD7736"
+  
+  cau-client:
+     image: mf2c/cau-client:v1.02
+     depends_on:
+       - policies
+     volumes:
+       - pkidata:/pkidata
+     expose:
+       - 46065
+     environment:
+       - CAU_URL=213.205.14.13:46400
+       - LCAU_URL=213.205.14.13:46401
+  
+  resource-categorization:
+     image: mf2c/resource-categorization:latest-V2.0.12
+     restart: on-failure
+     depends_on:
+       - policies
+     expose:
+       - 46070
+     privileged: true
+     environment:
+       - agentType=2
+       - targetDeviceSensor=B
+       - targetDeviceActuator=A-T
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
+
+  ##### Analytics Engine + Recomender + Landscaper #####
+  analytics-engine:
+    image: mf2c/analytics-engine:0.4.0
+    expose:
+      - "46020"
+    ports:
+      - "46020:46020"
+    depends_on:
+      - influxdb
+    volumes:
+      - ./analytics_engine.conf:/root/analytics_engine/analytics_engine.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=46020"
+      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
+  
+  landscaper:
+    image: mf2c/landscaper:0.6
+    volumes:
+    - landscaper:/landscaper/data
+    - ./landscaper.cfg:/landscaper/landscaper.cfg
+    - ~/ls_log:/landscaper/logs
+    depends_on: ["cimi", "neo4j", "proxy"]
+    environment:
+      - OS_TENANT_NAME=
+      - OS_PROJECT_NAME=
+      - OS_TENANT_ID=
+      - OS_USERNAME=
+      - OS_PASSWORD=
+      - OS_AUTH_URL=
+    command: ["./start.sh", "http://neo4j:7474"]
+  
+  telem_start:
+    image: mf2c/telem_start:0.1
     command: sh /download.sh
+    environment:
+      - HOSTNAME
     depends_on:
       - snap
+  
   influxdb:
     image: influxdb
     expose:
       - "8086"
+    ports:
+      - "8086:8086"
     volumes:
       - influx:/var/lib/influxdb
     environment:
@@ -189,6 +261,7 @@ services:
       - INFLUXDB_HTTP_LOG_ENABLED=false
   snap:
     image: intelsdi/snap:xenial
+    hostname: snap
     ports:
       - "8181:8181"
     volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
@@ -197,47 +270,31 @@ services:
     environment:
       - SNAP_VERSION=2.0.0
       - SNAP_LOG_LEVEL=2
-  analytics_engine:
-    image: mf2c/analytics-engine:latest
-    expose:
-      - "46020"
-    depends_on:
-      - influxdb
-    volumes:
-      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
+  
   neo4j:
     image: neo4j:2.3.12
+    privileged: true
     volumes:
-    - neo4j:/data
+      - neo4j:/data
     ports:
-    - "7475:7474" # expose the port for the console ui
+      - "7475:7474" # expose the port for the console ui
     environment:
-    - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
-  landscaper:
-    image: mf2c/landscaper:0.2
-    volumes:
-    - landscaper:/landscaper/data
-    - ./landscaper.cfg:/landscaper/landscaper.cfg
-    depends_on: ["cimi", "neo4j", "proxy"]
-    environment:
-      - OS_TENANT_NAME=
-      - OS_PROJECT_NAME=
-      - OS_TENANT_ID=
-      - OS_USERNAME=
-      - OS_PASSWORD=
-      - OS_AUTH_URL=
-    command: ["./start.sh", "http://neo4j:7474"]
+      - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
+  
   web:
-    image: mf2c/landscaper-api:latest
+    image: mf2c/landscaper:0.6
+    environment:
+    - PYTHONPATH=/landscaper
     volumes:
       - ./landscaper.cfg:/landscaper/landscaper.cfg
+      - ~/ls_log:/collector_log
     ports:
       - "9001:9001"
     depends_on:
       - neo4j
       - landscaper
-
-
+    command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
+######################################################
 
 volumes:
   mydata: {}
