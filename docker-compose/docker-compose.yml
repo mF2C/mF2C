@@ -190,6 +190,7 @@ services:
        - LCAU_URL=213.205.14.13:46401
   
   resource-categorization:
+     #build: /home/souvik/PycharmProjects/res-cat-mF2C-it2
      image: mf2c/resource-categorization:latest-V2.0.12
      restart: on-failure
      depends_on:
