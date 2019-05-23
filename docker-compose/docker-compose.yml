@@ -207,7 +207,7 @@ services:
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
-    image: mf2c/analytics-engine:0.4.0
+    image: mf2c/analytics-engine:0.4.5
     expose:
       - "46020"
     ports:
@@ -222,7 +222,7 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
   
   landscaper:
-    image: mf2c/landscaper:0.6
+    image: mf2c/landscaper:0.6.5
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
@@ -284,7 +284,7 @@ services:
       - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
   
   web:
-    image: mf2c/landscaper:0.6
+    image: mf2c/landscaper:0.6.5
     environment:
     - PYTHONPATH=/landscaper
     volumes:
