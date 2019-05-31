@@ -72,15 +72,18 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
         log "NO" "failed to create new service $SERVICE_ID"
 
 # Check if analytics return list of agents (!TO BE UPDATED TO PRINT IP ADDRESSES)
-(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H 'content-type: application/json' -d '{"name": "compss-hello-world"}' \
-| jq -es 'if . == [] then null else .[] | select(.status == 200) end') > /dev/null 2>&1 && \
-    log "OK" "list of devices returned successfully" || \
-        log "NO" "failed to return list of devices"
+ANALYTICS_IP_ADDRESS=$(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H 'content-type: application/json' -d '{"name": "compss-hello-world"}' \
+| jq 'if . == [] then null else .[].ipaddress end') > /dev/null 2>&1 && \
+    log "OK" "ip $ANALYTICS_IP_ADDRESS returned successfully" || \
+        log "NO" "failed to return list of ip addresses"
 
 # Start hello-world service
 SERVICE_ID=`echo $SERVICE_ID | tr -d '"'`
-SERVICE_INSTANCE=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{
-    "service_id": "'"$SERVICE_ID"'"
-}' | jq -es 'if . == [] then null else .[] | .service_instance end') && \
-    log "OK" "service instance $( jq -r '.id'<<< "${SERVICE_INSTANCE}") launched successfully" || \
-        log "NO" "failed to launch service instance $( jq -r '.id'<<< "${SERVICE_INSTANCE}")"
+SERVICE_INSTANCE=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'"}' \
+| jq 'if . == [] then null else .service_instance end') && \
+    log "OK" "service instance launched in $( jq '.agents[].url'<<< "${SERVICE_INSTANCE}") successfully" || \
+            log "NO" "failed to launch service instance"
+
+jq --arg IP_ADDRESS "$ANALYTICS_IP_ADDRESS" -e 'if . == [] then null else .agents[] | select(.url == $IP_ADDRESS) end' <<< "${SERVICE_INSTANCE}" && \
+    log "OK" "ip address from service instance is ok" || \
+        log "NO" "ip address from service instance does not match with ip from analytics"

@@ -16,7 +16,7 @@ services:
 
   ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:latest
+    image: mf2c/cimi-server:2.18
     restart: on-failure
     depends_on:
       - logicmodule1
@@ -47,7 +47,7 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.20
+    image: mf2c/dataclay-proxy:2.19
     depends_on:
       - logicmodule1
       - ds1java1
@@ -55,7 +55,7 @@ services:
       - "6472"
 
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.20
+    image: mf2c/dataclay-logicmodule:2.19
     ports:
       - "1034:1034"
     env_file:
@@ -68,7 +68,7 @@ services:
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.20
+    image: mf2c/dataclay-dsjava:2.19
     depends_on:
       - logicmodule1
     env_file:
@@ -94,7 +94,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.7.2
+    image: mf2c/service-manager:1.8.0
     restart: unless-stopped
     depends_on:
       - cimi
@@ -131,7 +131,7 @@ services:
 
   #################### SLA Manager #####################
   slalite:
-    image: mf2c/sla-management:0.5.0
+    image: mf2c/sla-management:0.6.0
     restart: on-failure
     expose:
       - "46030"
@@ -141,7 +141,7 @@ services:
 
   ################## Resource Manager ##################
   policies:
-     image: mf2c/policies:2.0.0
+     image: mf2c/policies:2.0.2
      restart: on-failure
      depends_on:
        - cimi
@@ -155,6 +155,7 @@ services:
        - "DEBUG=True"
        - "MF2C=True"
        - "isLeader=False"
+       - "leaderIP="
   
   discovery:
      image: mf2c/discovery:1.0
@@ -189,7 +190,8 @@ services:
        - LCAU_URL=213.205.14.13:46401
   
   resource-categorization:
-     image: mf2c/resource-categorization:latest
+     #build: /home/souvik/PycharmProjects/res-cat-mF2C-it2
+     image: mf2c/resource-categorization:latest-V2.0.12
      restart: on-failure
      depends_on:
        - policies
@@ -205,7 +207,7 @@ services:
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
-    image: mf2c/analytics-engine:0.4.0
+    image: mf2c/analytics-engine:0.4.5
     expose:
       - "46020"
     ports:
@@ -220,11 +222,12 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
   
   landscaper:
-    image: mf2c/landscaper:0.6
+    image: mf2c/landscaper:0.6.5
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
     - ~/ls_log:/landscaper/logs
+    - /var/run/docker.sock:/var/run/docker.sock
     depends_on: ["cimi", "neo4j", "proxy"]
     environment:
       - OS_TENANT_NAME=
@@ -272,15 +275,16 @@ services:
   
   neo4j:
     image: neo4j:2.3.12
+    privileged: true
     volumes:
-    - neo4j:/data
+      - neo4j:/data
     ports:
-    - "7475:7474" # expose the port for the console ui
+      - "7475:7474" # expose the port for the console ui
     environment:
-    - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
+      - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
   
   web:
-    image: mf2c/landscaper:0.6
+    image: mf2c/landscaper:0.6.5
     environment:
     - PYTHONPATH=/landscaper
     volumes:
