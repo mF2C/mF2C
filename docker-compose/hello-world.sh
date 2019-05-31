@@ -71,19 +71,32 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
     log "OK" "service $SERVICE_ID created successfully" || \
         log "NO" "failed to create new service $SERVICE_ID"
 
-# Check if analytics return list of agents (!TO BE UPDATED TO PRINT IP ADDRESSES)
+# Check if analytics return list of agents
 ANALYTICS_IP_ADDRESS=$(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H 'content-type: application/json' -d '{"name": "compss-hello-world"}' \
-| jq 'if . == [] then null else .[].ipaddress end') > /dev/null 2>&1 && \
-    log "OK" "ip $ANALYTICS_IP_ADDRESS returned successfully" || \
+| jq -e 'if . == [] then null else .[].ipaddress end') > /dev/null 2>&1
+
+if [[ ($ANALYTICS_IP_ADDRESS != null) && ($ANALYTICS_IP_ADDRESS != "") ]]
+    then
+        log "OK" "ip $ANALYTICS_IP_ADDRESS returned successfully"
+    else
         log "NO" "failed to return list of ip addresses"
+    fi
 
 # Start hello-world service
 SERVICE_ID=`echo $SERVICE_ID | tr -d '"'`
-SERVICE_INSTANCE=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'"}' \
-| jq 'if . == [] then null else .service_instance end') && \
-    log "OK" "service instance launched in $( jq '.agents[].url'<<< "${SERVICE_INSTANCE}") successfully" || \
-            log "NO" "failed to launch service instance"
+SERVICE_INSTANCE_IP=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'"}' \
+| jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
 
-jq --arg IP_ADDRESS "$ANALYTICS_IP_ADDRESS" -e 'if . == [] then null else .agents[] | select(.url == $IP_ADDRESS) end' <<< "${SERVICE_INSTANCE}" && \
-    log "OK" "ip address from service instance is ok" || \
-        log "NO" "ip address from service instance does not match with ip from analytics"
+if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]
+    then
+        log "OK" "service instance launched in $SERVICE_INSTANCE_IP successfully"
+    else
+        log "NO" "failed to launch service instance"
+    fi
+
+if [[ ($SERVICE_INSTANCE_IP == $ANALYTICS_IP_ADDRESS) && ($SERVICE_INSTANCE_IP != null) && ($ANALYTICS_IP_ADDRESS != null) && ($SERVICE_INSTANCE_IP != "") && ($SERVICE_INSTANCE_IP != "") ]]
+    then
+        log "OK" "ip address from service instance matches with is ok"
+    else
+        log "NO" "ip address from service instance [$SERVICE_INSTANCE_IP] does not match with ip from analytics [$ANALYTICS_IP_ADDRESS]"
+    fi
