@@ -110,8 +110,13 @@ services:
 
   ########## Lifecycle Manager + User Manager ##########
   lm-um:
-    image: mf2c/lifecycle-usermngt:1.0.6c
+    image: mf2c/lifecycle-usermngt:1.2.6
     restart: on-failure
+    depends_on:
+      - cimi
+      - resource-categorization
+      - analytics-engine
+      - landscaper
     expose:
       - "46300"
       - "46000"
@@ -119,13 +124,17 @@ services:
       - "46000:46000"
       - "46300:46300"
     environment:
-      - DOCKER_SWARM=True
-      - K8S_MASTER=False
       - HOST_IP=192.168.252.41
-      - DATACLAY_EP=
       - WORKING_DIR_VOLUME=/tmp/compose_files
+      - UM_WORKING_DIR_VOLUME=/tmp/mf2c/um/
+      - LM_WORKING_DIR_VOLUME=/tmp/mf2c/lm/
+      - SERVICE_CONSUMER=true
+      - RESOURCE_CONTRIBUTOR=true
+      - MAX_APPS=3
     volumes:
-      - /tmp/compose_files:/tmp/compose_files
+      - /tmp/mf2c/compose_files:/tmp/mf2c/compose_files
+      - /tmp/mf2c/um:/tmp/mf2c/um
+      - /tmp/mf2c/lm:/tmp/mf2c/lm
       - /var/run/docker.sock:/var/run/docker.sock
   ######################################################
 
