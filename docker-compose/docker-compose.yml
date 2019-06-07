@@ -125,7 +125,7 @@ services:
       - "46300:46300"
     environment:
       - HOST_IP=192.168.252.41
-      - WORKING_DIR_VOLUME=/tmp/compose_files
+      - WORKING_DIR_VOLUME=/tmp/mf2c/compose_files
       - UM_WORKING_DIR_VOLUME=/tmp/mf2c/um/
       - LM_WORKING_DIR_VOLUME=/tmp/mf2c/lm/
       - SERVICE_CONSUMER=true
