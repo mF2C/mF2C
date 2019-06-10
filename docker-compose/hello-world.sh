@@ -12,23 +12,24 @@ else
 	echo -e "\n    Use --include-tests to run all scripts in the 'tests' folder    \n"
 fi
 
-printf '\e[0;33m %-15s \e[0m Starting...\n' [HelloWorldTests]
+printf '\e[0;33m %-15s \e[0m Starting...\n' [HelloWorldTest]
 
 function log {
     text="$2"
+    tests="$3"
     if [[ $1 == "OK" ]]
     then
-        printf '\e[0;33m %-15s \e[32m SUCCESS:\e[0m %s \n' [HelloWorldTests] "$text"
+        printf '\e[0;33m %-15s \e[32m SUCCESS:\e[0m %s \n' "$tests" "$text"
     else
-        printf '\e[0;33m %-15s \e[0;31m FAILED:\e[0m %s \n' [HelloWorldTests] "$text"
+        printf '\e[0;33m %-15s \e[0;31m FAILED:\e[0m %s \n' "$tests" "$text"
     fi
 }
 
 # Check if there is at least one device-dynamic
 DEVICE_DYNAMIC_ID=$(curl -XGET "https://localhost/api/device-dynamic" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' \
 | jq -es 'if . == [] then null else .[] | .["deviceDynamics"][0].id end') && \
-    log "OK" "device dynamic $DEVICE_DYNAMIC_ID was created successfully" || \
-        log "NO" "no device dynamic was added"
+    log "OK" "device dynamic $DEVICE_DYNAMIC_ID was created successfully" [ResourceCategorization] || \
+        log "NO" "no device dynamic was added" [ResourceCategorization]
 
 # Create SLA template
 SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' -d '{
@@ -49,8 +50,8 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
         ]
     }
 }' | jq -es 'if . == [] then null else .[] | .["resource-id"] end') && \
-    log "OK" "service $SLA_TEMPLATE_ID created successfully" || \
-        log "NO" "failed to create new service $SLA_TEMPLATE_ID"
+    log "OK" "service $SLA_TEMPLATE_ID created successfully" [SLAManager] || \
+        log "NO" "failed to create new service $SLA_TEMPLATE_ID" [SLAManager]
 
 # Create hello-world service
 SLA_TEMPLATE_ID=`echo $SLA_TEMPLATE_ID | tr -d '"'`
@@ -68,8 +69,8 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
     "req_resource": ["sensor_1"],
     "opt_resource": ["sensor_2"]
 }' | jq -es 'if . == [] then null else .[] | .["resource-id"] end') && \
-    log "OK" "service $SERVICE_ID created successfully" || \
-        log "NO" "failed to create new service $SERVICE_ID"
+    log "OK" "service $SERVICE_ID created successfully" [ServiceManager] || \
+        log "NO" "failed to create new service $SERVICE_ID" [ServiceManager]
 
 # Check if analytics return list of agents
 ANALYTICS_IP_ADDRESS=$(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H 'content-type: application/json' -d '{"name": "compss-hello-world"}' \
@@ -77,9 +78,9 @@ ANALYTICS_IP_ADDRESS=$(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H
 
 if [[ ($ANALYTICS_IP_ADDRESS != null) && ($ANALYTICS_IP_ADDRESS != "") ]]
     then
-        log "OK" "ip $ANALYTICS_IP_ADDRESS returned successfully"
+        log "OK" "ip $ANALYTICS_IP_ADDRESS returned successfully" [Analytics]
     else
-        log "NO" "failed to return list of ip addresses"
+        log "NO" "failed to return list of ip addresses" [Analytics]
     fi
 
 # Start hello-world service
@@ -89,14 +90,14 @@ SERVICE_INSTANCE_IP=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ks
 
 if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]
     then
-        log "OK" "service instance launched in $SERVICE_INSTANCE_IP successfully"
+        log "OK" "service instance launched in $SERVICE_INSTANCE_IP successfully" [LifecycleManager]
     else
-        log "NO" "failed to launch service instance"
+        log "NO" "failed to launch service instance" [LifecycleManager]
     fi
 
 if [[ ($SERVICE_INSTANCE_IP == $ANALYTICS_IP_ADDRESS) && ($SERVICE_INSTANCE_IP != null) && ($ANALYTICS_IP_ADDRESS != null) && ($SERVICE_INSTANCE_IP != "") && ($SERVICE_INSTANCE_IP != "") ]]
     then
-        log "OK" "ip address from service instance matches with is ok"
+        log "OK" "ip address from service instance matches with is ok" [HelloWorldTest]
     else
-        log "NO" "ip address from service instance [$SERVICE_INSTANCE_IP] does not match with ip from analytics [$ANALYTICS_IP_ADDRESS]"
+        log "NO" "ip address from service instance [$SERVICE_INSTANCE_IP] does not match with ip from analytics [$ANALYTICS_IP_ADDRESS]" [HelloWorldTest]
     fi
