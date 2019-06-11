@@ -235,7 +235,7 @@ services:
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
-    - ~/ls_log:/landscaper/logs
+    - ./ls_log:/landscaper/logs
     - /var/run/docker.sock:/var/run/docker.sock
     depends_on: ["cimi", "neo4j", "proxy"]
     environment:
@@ -298,7 +298,7 @@ services:
     - PYTHONPATH=/landscaper
     volumes:
       - ./landscaper.cfg:/landscaper/landscaper.cfg
-      - ~/ls_log:/collector_log
+      - ./ls_log:/collector_log
     ports:
       - "9001:9001"
     depends_on:
