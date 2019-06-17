@@ -307,6 +307,21 @@ services:
     command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
 ######################################################
 
+  vpnserver:
+    image: mf2c/vpnserver:latest
+    cap_add:
+    - NET_ADMIN
+    container_name: vpnserver
+    environment:
+    - "TRUSTCA=https://213.205.14.13:54443/certauths/rest/it2trustedca"
+    ports:
+    - "1194:1194/udp"
+#    restart: always
+#    networks:
+#    - vpnbridge
+    volumes:
+    - vpnconfig:/etc/openvpn
+
 volumes:
   mydata: {}
   influx: {}
@@ -316,3 +331,4 @@ volumes:
   ringcontainer: {}
   ringcontainerexample: {}
   pkidata: {}
+  vpnconfig: {}
