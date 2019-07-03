@@ -327,14 +327,14 @@ mf2c-curl-post https://localhost/api/device-dynamic -d
 
 ### Special Note*
 
-- For those, who are using the `latest-V2.0.16` tagged `docker-image` for `resource-categorization` module, before testing the `resource-categorization` component and `POST` the uppermentioned information, they need to add the `status` filed to the `device` and need to remove the `status` filed from `device-dynamic`
+- For those, who are using the `latest-V2.0.16` tagged `docker-image` for `resource-categorization` module, before testing the `resource-categorization` component and `POST` the uppermentioned information, it is necessary to add the `status` filed to the `device` and need to remove the `status` filed from `device-dynamic`
 
 ### Troubleshooting
 
 To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
 
 
-## CHANGELOG
+## Change LOG
 
 ### latest-V2.0.16 (date 28/June/2019) [in complience with CIMI-server - 2.18 / 2.19 & DataClay version - 2.21]
 ### latest-V2.0.17 (date 28/June/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - (in progress**)]
