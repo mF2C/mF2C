@@ -180,9 +180,19 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ### Troubleshooting
 
+### Known Issues
 
+    + Leader will fail to find available backups as Topology is not coded to be received/generated.
 
 ## CHANGELOG
+
+### 2.0.3 (04/07/2019)
+
+#### Changed
+
+    * BUG: Agent resource not created correctly on Leader due isAuth and connected values.
+    * Incremented the amount of registration attempts to avoid errors on slower machines.
+
 
 ### 2.0.2 (20/05/2019)
 
