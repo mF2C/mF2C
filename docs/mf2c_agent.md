@@ -17,6 +17,7 @@ Executing the hello-world test:
 ### Troubleshooting
 
  - hello-world script (single-agent) fails when executed right after the agent is started. The waiting time for no failures is ~2-5 min, depending on the machine.
+ - Sometimes hello-world fails because landscaper does not get any device-dynamic registered on time. Restarting landscaper solves the issue. 
 
 ### Known issues
 
