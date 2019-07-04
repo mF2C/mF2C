@@ -47,7 +47,7 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.21
+    image: mf2c/dataclay-proxy:2.22
     depends_on:
       - logicmodule1
       - ds1java1
@@ -55,28 +55,28 @@ services:
       - "6472"
 
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.21
+    image: mf2c/dataclay-logicmodule:2.22
     ports:
       - "1034:1034"
-    env_file:
-      - ./env/LM.environment
     environment:
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
+      - LOGICMODULE_PORT_TCP=1034
+      - LOGICMODULE_HOST=logicmodule1
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.21
+    image: mf2c/dataclay-dsjava:2.22
     depends_on:
       - logicmodule1
-    env_file:
-      - ./env/DS.environment
-      - ./env/LM.environment
     environment:
       - DATASERVICE_NAME=DS1
       - DATASERVICE_HOST=ds1java1
+      - DATASERVICE_JAVA_PORT_TCP=2127
+      - LOGICMODULE_PORT_TCP=1034
+      - LOGICMODULE_HOST=logicmodule1
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
