@@ -199,7 +199,7 @@ services:
        - LCAU_URL=213.205.14.13:46401
   
   resource-categorization:
-     build: /home/souvik/PycharmProjects/mF2C_IT2_Final/mF2C/docker-compose
+     build: /home/souvik/PycharmProjects/mF2C_IT2_Final
      hostname: IRILD039
      #image: mf2c/resource-categorization:latest-V2.0.17
      restart: on-failure
