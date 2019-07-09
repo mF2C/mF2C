@@ -215,7 +215,7 @@ services:
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
-    image: mf2c/analytics-engine:0.5.0
+    image: mf2c/analytics-engine:0.5.5
     expose:
       - "46020"
     ports:
