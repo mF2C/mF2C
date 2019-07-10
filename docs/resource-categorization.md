@@ -147,7 +147,7 @@ mf2c-curl-post https://localhost/api/device -d
 }
 ```
 
-- **GET**  device-dynamic information - (**For `latest-V2.0.17`)
+- **GET**  device-dynamic information - (**For `latest-V2.0.17` \& later)
 
 ```bash
 curl -X GET "http://localhost/api/device-dynamic" -H "accept: application/json"
@@ -325,19 +325,130 @@ mf2c-curl-post https://localhost/api/device-dynamic -d
 }
 ```
 
+
+- **GET**  fog-area information - (**For `latest-V2.0.18` \& later)
+```bash
+curl -X GET "http://localhost/api/fog-area" -H "accept: application/json"
+```
+
+- **RESPONSES**
+    - **200** - Success
+    - **Response Payload:**
+```     
+{
+    "count": 1, 
+    "acl": {
+        "owner": {
+            "principal": 'ADMIN', 
+            "type": "ROLE"
+            }, 
+            "rules": [{
+                "principal": "USER", 
+                "type": "ROLE", 
+                "right": "MODIFY"
+                }]}, 
+                "resourceURI": "http://schemas.dmtf.org/cimi/2/FogAreaCollection", 
+                "id': fog-area", 
+                "operations": [{
+                    "rel": "add", 
+                    "href": "fog-area"
+                    }], 
+                    "fogAreas": [{
+                        "logicalCoresMax": 8, 
+                        "avgLogicalCores": 8, 
+                        "cpuMinPercent": 70.1, 
+                        "storageMin": 211773.75390625, 
+                        "avgProcessingCapacityPercent": 70.1, 
+                        "updated": "2019-07-10T08:49:12.738Z", 
+                        "ramTotal": 21845.33984375, 
+                        "ramMin": 21845.33984375, 
+                        "storageTotal": 211773.75390625, 
+                        "created": '2019-07-10T08:49:12.738Z', 
+                        "storageMax": 211773.75390625, 
+                        "numDevices": 1, 
+                        "physicalCoresMax": 4, 
+                        "leaderDevice": {
+                            "href": "device/f463558d-0604-4f70-b215-7dc6e6f9d4dd"
+                            }, 
+                           "logicalCoresMin": 8, 
+                           "physicalCoresMin": 4, 
+                           "id": "fog-area/ef91c756-ff7a-4a2b-b6c0-644f0d9266ae", 
+                           "cpuMaxPercent": 70.1, 
+                           "powerRemainingMax": "one or more devices has/have external power sources", 
+                           "acl": {
+                            "owner": {
+                                "principal": "ADMIN", 
+                                "type": "ROLE"
+                                }}, 
+                                "operations": [{
+                                    "rel": "edit", 
+                                    "href": "fog-area/ef91c756-ff7a-4a2b-b6c0-644f0d9266ae"
+                                    }, 
+                                    {
+                                    "rel": "delete", 
+                                    "href": "fog-area/ef91c756-ff7a-4a2b-b6c0-644f0d9266ae"
+                                    }], 
+                                    "resourceURI": "http://schemas.dmtf.org/cimi/2/FogArea", 
+                                    "ramMax": 21845.33984375, 
+                                    "powerRemainingMin": "100.0", 
+                                    "avgPhysicalCores": 4
+                                   }
+                                 ]
+
+}
+```
+
+
+
+
+- **POST**  fog-area information - (**For `latest-V2.0.18` \& later)
+```bash
+mf2c-curl-post https://localhost/api/fog-area -d
+```
+
+- **RESPONSES**
+    - **200** - Success
+    - **Response Payload:**
+```     
+{
+    "leaderDevice": {
+        "href": "device/497bb5e1-4138-411b-ab61-c70c925688a9"}, 
+    "numDevices": 2, 
+    "ramTotal": 42600.34765625, 
+    "ramMax": 21622.45703125, 
+    "ramMin": 20977.890625, 
+    "storageTotal": 423830.33984375, 
+    "storageMax": 211987.1015625, 
+    "storageMin": 211843.23828125, 
+    "avgProcessingCapacityPercent": 83.45, 
+    "cpuMaxPercent": 86.9, 
+    "cpuMinPercent": 80.0, 
+    "avgPhysicalCores": 4, 
+    "physicalCoresMax": 4, 
+    "physicalCoresMin": 4, 
+    "avgLogicalCores": 8, 
+    "logicalCoresMax": 8, 
+    "logicalCoresMin": 8, 
+    "powerRemainingMax": "one or more devices has/have external power sources", 
+    "powerRemainingMin": "100.0"
+}
+```
+
 ### Special Note*
 
 - For those, who are using the `latest-V2.0.16` tagged `docker-image` for `resource-categorization` module, before testing the `resource-categorization` component and `POST` the uppermentioned information, it is necessary to add the `status` filed to the `device` and need to remove the `status` filed from `device-dynamic`
 
 ### Troubleshooting
 
-To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
-
+- To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
+- Fix the multiple `device_ip` creation issue for a single agent
 
 ## Change LOG
 
+###latest-V2.0.18 (date 09/July/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22 +later]
+### latest-V2.0.17 (date 28/June/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22]
 ### latest-V2.0.16 (date 28/June/2019) [in complience with CIMI-server - 2.18 / 2.19 & DataClay version - 2.21]
-### latest-V2.0.17 (date 28/June/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - (in progress**)]
+
 
 #### Added
 
@@ -352,7 +463,7 @@ To get the `Host-IP` related information the resource-categorization module is r
  
  #### Work in progress**
  
- - Managing the `Fog-Area` resource information in the `leader` agent
+ - Filtering out the 'die-out' or 'unavailable' `agents` from a `Fog-Area`
 
 
 
