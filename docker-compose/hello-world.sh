@@ -19,9 +19,11 @@ function log {
     tests="$3"
     if [[ $1 == "OK" ]]
     then
-        printf '\e[0;33m %-15s \e[32m SUCCESS:\e[0m %s \n' "$tests" "$text"
+        printf '\e[0;33m %-23s \e[32m SUCCESS:\e[0m %s \n' "$tests" "$text"
+    elif [[ $1 == "INFO" ]]; then
+        printf '\e[0;33m %-23s \e[1;34m INFO:   \e[0m %s \n' "$tests" "$text"
     else
-        printf '\e[0;33m %-15s \e[0;31m FAILED:\e[0m %s \n' "$tests" "$text"
+        printf '\e[0;33m %-23s \e[0;31m FAILED: \e[0m %s \n' "$tests" "$text"
     fi
 }
 
@@ -41,7 +43,6 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
         "provider": { "id": "mf2c", "name": "mF2C Platform" },
         "client": { "id": "c02", "name": "A client" },
         "creation": "2018-01-16T17:09:45.01Z",
-        "expiration": "2019-01-17T17:09:45.01Z",
         "guarantees": [
             {
                 "name": "TestGuarantee",
@@ -49,12 +50,11 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
             }
         ]
     }
-}' | jq -es 'if . == [] then null else .[] | .["resource-id"] end') && \
+}' | jq -res 'if . == [] then null else .[] | .["resource-id"] end') && \
     log "OK" "service $SLA_TEMPLATE_ID created successfully" [SLAManager] || \
         log "NO" "failed to create new service $SLA_TEMPLATE_ID" [SLAManager]
 
 # Create hello-world service
-SLA_TEMPLATE_ID=`echo $SLA_TEMPLATE_ID | tr -d '"'`
 SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' -d '{
     "name": "compss-hello-world",
     "description": "hello world example",
@@ -85,8 +85,9 @@ if [[ ($ANALYTICS_IP_ADDRESS != null) && ($ANALYTICS_IP_ADDRESS != "") ]]
 
 # Start hello-world service
 SERVICE_ID=`echo $SERVICE_ID | tr -d '"'`
-SERVICE_INSTANCE_IP=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'"}' \
-| jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
+LM_OUTPUT=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'", "sla_template": "'"$SLA_TEMPLATE_ID"'"}') >/dev/null 2>&1
+SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
+SERVICE_INSTANCE_ID=$(echo "$LM_OUTPUT" | jq -r ".service_instance.id")
 
 if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]
     then
@@ -101,3 +102,18 @@ if [[ ($SERVICE_INSTANCE_IP == $ANALYTICS_IP_ADDRESS) && ($SERVICE_INSTANCE_IP !
     else
         log "NO" "ip address from service instance [$SERVICE_INSTANCE_IP] does not match with ip from analytics [$ANALYTICS_IP_ADDRESS]" [HelloWorldTest]
     fi
+
+SI_STATUS="created-not-initialized"
+while [ "$SI_STATUS" = "created-not-initialized" ]; do
+	sleep 5
+	SERVICE_INSTANCE=$(curl "https://localhost/api/$SERVICE_INSTANCE_ID" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN')
+	SI_STATUS=$(echo "$SERVICE_INSTANCE" | jq -re ".status")
+	log "INFO" "Service instance status = $SI_STATUS..." [LifecycleManager]
+done
+AGREEMENT_ID=$(echo "$SERVICE_INSTANCE" | jq -re ".agreement")
+
+if [[ -n "$AGREEMENT_ID" && "$AGREEMENT_ID" =~ ^agreement/.*$ ]]; then
+        log "OK" "Agreement created successfully" [SlaManagement]
+else
+        log "NO" "Failed to create agreement" [SlaManagement]
+fi
