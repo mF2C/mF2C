@@ -306,6 +306,17 @@ services:
       - neo4j
       - landscaper
     command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
+
+  resource-bootstrap:
+    image: mf2c/resource-bootstrap:1.0.0
+    restart: no
+    environment:
+      - CIMI_HOST=traefik
+      - CIMI_PORT=80
+    depends_on:
+      - proxy
+      - cimi
+
 ######################################################
 
 volumes:
