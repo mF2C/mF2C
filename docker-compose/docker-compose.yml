@@ -307,6 +307,19 @@ services:
       - landscaper
     command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
 
+  vpnclient:
+    image: mf2c/vpnclient:1.0.0
+    depends_on:
+      - vpnserver
+      - cau-client
+    environment:
+      - VPN_DAEMON=FALSE
+      - "CA_ENDPOINT=https://213.205.14.13:54443/certauths/rest/it2untrustedca"
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - pkidata:/pkidata
+
   resource-bootstrap:
     image: mf2c/resource-bootstrap:1.0.0
     restart: no
