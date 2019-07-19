@@ -24,7 +24,11 @@ Executing the hello-world test:
 
  - (multi-agent) when executing agent with "isLeader=True" and "leaderIP=", the address registered in `device-dynamic` is not correct.
  - (agent version PR #204) landscaper terminates with exit code 1. Component restart does not solve the problem.
-
+ - the logs from these components are illegible: `resource-categorization`
+ - the `cimi-server-events` job for `service-operation-report` resource is not catching exceptions when no resource is found
+ - CIMI updates are not working
+ - DCPROXY returns wrong error code when trying to create duplicated resource (like user). 400 instead of 409
+ 
 ## CHANGELOG
 
 ### 1.0.1 (28.06.19)
