@@ -140,12 +140,10 @@ services:
 
   #################### SLA Manager #####################
   slalite:
-    image: mf2c/sla-management:0.6.0
+    image: mf2c/sla-management:0.8.0
     restart: on-failure
     expose:
       - "46030"
-    environment:
-      - CIMI_URL=https://proxy:443/api
   ######################################################
 
   ################## Resource Manager ##################
@@ -310,7 +308,6 @@ services:
   vpnclient:
     image: mf2c/vpnclient:1.0.0
     depends_on:
-      - vpnserver
       - cau-client
     environment:
       - VPN_DAEMON=FALSE
@@ -322,7 +319,7 @@ services:
 
   resource-bootstrap:
     image: mf2c/resource-bootstrap:1.0.0
-    restart: no
+    restart: "no"
     environment:
       - CIMI_HOST=traefik
       - CIMI_PORT=80
