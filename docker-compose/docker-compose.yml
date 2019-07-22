@@ -321,7 +321,7 @@ services:
     image: mf2c/resource-bootstrap:1.0.0
     restart: "no"
     environment:
-      - CIMI_HOST=traefik
+      - CIMI_HOST=proxy
       - CIMI_PORT=80
     depends_on:
       - proxy
