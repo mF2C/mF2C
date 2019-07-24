@@ -309,6 +309,8 @@ services:
     image: mf2c/vpnclient:1.0.0
     depends_on:
       - cau-client
+    extra_hosts:
+      - "vpnserver:213.205.14.13"
     environment:
       - VPN_DAEMON=FALSE
       - "CA_ENDPOINT=https://213.205.14.13:54443/certauths/rest/it2untrustedca"
