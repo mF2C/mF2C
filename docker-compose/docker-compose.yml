@@ -310,7 +310,6 @@ services:
   vpnclient:
     image: mf2c/vpnclient:1.1.0
     depends_on:
-      - vpnserver
       - cau-client
     network_mode: "host"
     extra_hosts:
@@ -325,7 +324,7 @@ services:
 
   resource-bootstrap:
     image: mf2c/resource-bootstrap:1.0.0
-    restart: no
+    restart: "no"
     environment:
       - CIMI_HOST=traefik
       - CIMI_PORT=80
