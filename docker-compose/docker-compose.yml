@@ -198,7 +198,7 @@ services:
   aclib: 
      image: mf2c/aclib:v1.0
      depends_on:
-	- cau-client
+       - cau-client
      volumes:
        - pkidata:/pkidata
      expose:
