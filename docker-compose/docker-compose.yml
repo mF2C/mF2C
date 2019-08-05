@@ -185,17 +185,30 @@ services:
        - "IDKey=35F319CA1DFC9689F5A33631C8F93ED7C3120EE7AFA05B1672C7DF7B71F63A6753DEF5FD3AC9DB2EAF90CCAB6BFF31A486B51C7095FF958D228102B84EFD7736"
   
   cau-client:
-     image: mf2c/cau-client:v1.02
+     image: mf2c/cau-client-it2:v2.0
      depends_on:
        - policies
      volumes:
        - pkidata:/pkidata
      expose:
        - 46065
+     #using the cloud cau for the moment
      environment:
-       - CAU_URL=213.205.14.13:46400
-       - LCAU_URL=213.205.14.13:46401
+       - CCAU_URL=213.205.14.13:55443
+       - CAU_URL=213.205.14.13:55443
   
+  aclib: 
+     image: mf2c/aclib:v1.0
+     depends_on:
+	- cau-client
+     volumes:
+       - pkidata:/pkidata
+     expose:
+       - 46080
+     environment:
+       - ACLIB_PORT=46080
+       - CAUCLIENT_PORT=46065
+
   resource-categorization:
      #build: /home/souvik/PycharmProjects/mF2C_IT2_Final
      image: mf2c/resource-categorization:latest-V2.0.18
