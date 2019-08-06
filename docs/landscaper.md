@@ -16,6 +16,18 @@ Check the landscaper log located in the logs.
 
 ## CHANGELOG
 
+### Version 0.6.9
+
+### 01.08.2019 
+
+#### Added
+
+ - None
+
+#### Changed
+
+ - Docker collector will bootstrap swarm if node is not part of swarm cluster
+
 ### Version 0.6.5
 
 ### 23.05.2019 

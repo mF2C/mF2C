@@ -237,7 +237,7 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
   
   landscaper:
-    image: mf2c/landscaper:0.6.7
+    image: mf2c/landscaper:0.6.9
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
