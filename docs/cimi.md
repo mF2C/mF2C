@@ -108,6 +108,14 @@ Let's delete our own session:
 
 ## CHANGELOG
 
+### 2.23 (08/08/2019)
+
+#### Added
+
+#### Changed
+
+ - hwloc and cpuinfo attributes in device resource, have been made mandatory
+
 ### 2.22 (11/07/2019)
 
 #### Added
