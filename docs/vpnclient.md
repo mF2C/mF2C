@@ -13,14 +13,18 @@ details.
 
 ### API
 
-There is no API in this release.  The VPN client starts up and connects.
+The VPN client connects its private network into the host's network,
+so the host can route packets over the private network, and
+specifically to any other client connected to the VPN.  Therefore, any
+standard network API is available.  The client is configured to use
+the device `tun0`.
 
 ### Troubleshooting
 
 If the client credential is not available, the VPN client will
 sleep-loop waiting for credentials to become available; these are
 traditionally obtained by `cau-client` and stored in the `pkidata`
-volume.
+volume.  In this release, it sleep-loops forever, without timing out.
 
 #### Troubleshooting 1: VPN server
 
@@ -44,6 +48,13 @@ log message saying that the client is connected.  If it keeps
 producing output, it is a sign that it is either waiting for
 credentials to appear, or there is a networking error.
 
+### Security Considerations
+
+Apart from the usual considerations regarding the availability of mF2C
+fog credentials, note that the client does not alter the host's
+routing table.  Although the VPN connection is encrypted, the VPN
+offers no protection for host or container traffic routed outside the
+VPN.
 
 ## CHANGELOG
 
