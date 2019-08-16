@@ -43,6 +43,20 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.8.2 (16.08.19)
+
+#### Changed
+
+ - New library for the SSE client
+ - Fixes long strings formatting in the GUI
+ 
+### 1.8.1 (15.08.19)
+
+#### Changed
+
+ - Checks if cimi is up before trying to connect to the event manager
+ - Improves the logs
+ 
 ### 1.8.0 (14.05.19)
 
 #### Added
