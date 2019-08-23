@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 services:
   ####################### Proxy  ######################
   proxy:
@@ -16,7 +16,7 @@ services:
 
   ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.23
+    image: mf2c/cimi-server:2.27
     restart: on-failure
     depends_on:
       - logicmodule1
@@ -35,9 +35,13 @@ services:
     volumes:
       - ringcontainer:/opt/slipstream/ring-container
       - ringcontainerexample:/opt/slipstream/ring-example
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "wget", "http://localhost:8201/api/cloud-entry-point"]
 
   rc:
-    image: sixsq/ring-container:3.53-SNAPSHOT
+    image: sixsq/ring-container:3.52
     expose:
       - "5000"
     volumes:

@@ -108,6 +108,17 @@ Let's delete our own session:
 
 ## CHANGELOG
 
+### 2.27 (23/08/2019)
+
+#### Added
+
+ - session template and workflow for JWT token authorization
+
+#### Changed
+ 
+ - added healtheck to service initialization in Docker
+ - changed dependencies to production version of ring-container
+
 ### 2.23 (08/08/2019)
 
 #### Added
