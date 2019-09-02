@@ -68,3 +68,11 @@ Rewritten from IT1 version.  CAU-Client now runs a TCP-server to listen to reque
 
  - The get certificate function now takes in 3 arguments: deviceID, detectedLeaderID, IDkey.
  - The Agent's device ID, signed certificate and private key is written to /pkidata 
+ 
+### 2.1 (28/08/2019)
+
+#### Changed
+ - removed the IDKey parameter for the get cert operation.  Identification block validates this IDKey upstream.
+ - removed commented out redundant code
+ - updated code comments for Javadoc
+
