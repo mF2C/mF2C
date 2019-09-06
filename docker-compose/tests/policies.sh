@@ -44,3 +44,27 @@ log "IF" "imLeader=${ISLEADER}, imBackup=${ISBACKUP}"
 (curl -XGET "${CIMI_API_URL}/agent" -ksS -H 'slipstream-authn-info: internal ADMIN' | jq -e 'select(.count >= 1)' > /dev/null 2>&1 && \
     log "OK" "Agent resource created") || \
     log "NO" "Agent resource not created"
+
+# 4. Agent Started Successfully (Identification, Discovery, CAU client, Categorization)
+RMINFO=$(curl -XGET "${BASE_API_URL}/rm/components" -ksS 2>&1 )
+IDENTIFICATION=$(echo "${RMINFO}" | jq -r ".identification")
+DISCOVERY=$(echo "${RMINFO}" | jq -r ".discovery")
+CAU_CLIENT=$(echo "${RMINFO}" | jq -r ".cau_client")
+RES_CAT=$(echo "${RMINFO}" | jq -r ".categorization")
+STARTED=$(echo "${RMINFO}" | jq -r ".started")
+
+( [[ ${STARTED} == "true" ]]  && \
+    log "OK" "Agent Start workflow successfully started.") || \
+    log "NO" "Agent Start workflow not started."
+( [[ ${IDENTIFICATION} == "true" ]]  && \
+    log "OK" "Identification successfully triggered.") || \
+    log "NO" "Identification trigger failed."
+( [[ ${DISCOVERY} == "true" ]]  && \
+    log "OK" "Discovery successfully triggered.") || \
+    log "NO" "Discovery trigger failed."
+( [[ ${CAU_CLIENT} == "true" ]]  && \
+    log "OK" "CAU client successfully triggered.") || \
+    log "NO" "CAU client trigger failed."
+( [[ ${RES_CAT} == "true" ]]  && \
+    log "OK" "Resource Categorization successfully triggered.") || \
+    log "NO" "Resource Categorization trigger failed."
