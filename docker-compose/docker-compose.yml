@@ -38,7 +38,7 @@ services:
     healthcheck:
       start_period: 30s
       retries: 5
-      test: ["CMD", "wget", "http://localhost:8201/api/cloud-entry-point"]
+      test: ["CMD", "wget", "--spider", "http://localhost:8201/api/cloud-entry-point"]
 
   rc:
     image: sixsq/ring-container:3.52
