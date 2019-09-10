@@ -38,7 +38,7 @@ services:
     healthcheck:
       start_period: 30s
       retries: 5
-      test: ["CMD", "wget", "http://localhost:8201/api/cloud-entry-point"]
+      test: ["CMD", "wget", "--spider", "http://localhost:8201/api/cloud-entry-point"]
 
   rc:
     image: sixsq/ring-container:3.52
@@ -240,7 +240,7 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
 
   landscaper:
-    image: mf2c/landscaper:0.6.9
+    image: mf2c/landscaper:0.6.11
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg

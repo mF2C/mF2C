@@ -16,6 +16,18 @@ Check the landscaper log located in the logs.
 
 ## CHANGELOG
 
+### Version 0.6.11
+
+### 04.09.2019
+
+#### Added
+
+ - None
+
+#### Changed
+
+ - Fixed functionality to store and update container metrics in Cimi
+
 ### Version 0.6.9
 
 ### 01.08.2019 
