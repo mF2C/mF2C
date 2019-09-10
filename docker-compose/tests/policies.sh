@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 printf '\e[0;33m %-15s \e[0m Starting...\n' [PoliciesTests]
+DOCKER_NAME_POLICIES="policies"
 
 function log {
     text="$2"
@@ -15,21 +16,26 @@ function log {
     fi
 }
 
+function exec_docker {
+    container_name=$(docker ps -f "name=$DOCKER_NAME_POLICIES" --format '{{.Names}}')
+    exec_res=$(docker exec "${container_name}" /bin/bash -c "$1"  2>/dev/null)
+}
+
 BASE_API_URL=`echo ${BASE_API_URL:="http://localhost:46050"} | tr -d '"'`
 CIMI_API_URL=`echo ${CIMI_API_URL:="https://localhost/api"} | tr -d '"'`
 
-
-
 #### Policies Tests ####
 # 1. Policies API
-( [[ $(curl -I "${BASE_API_URL}" -ksS | head -n1 | cut -d" " -f2) -eq 200 ]] > /dev/null 2>&1 && \
+exec_docker "curl -I \"${BASE_API_URL}\" -ksS | head -n1 | cut -d\" \" -f2"
+( [[ ${exec_res} -eq 200 ]] > /dev/null 2>&1 && \
     log "OK" "Policies API working properly") || \
     log "NO" "Policies API not working properly"
 
 # 2. Policies role
-LEADERINFO=$(curl -XGET "${BASE_API_URL}/api/v2/resource-management/policies/leaderinfo" -ksS 2>&1 )
-ISLEADER=$(echo "${LEADERINFO}" | jq -r ".imLeader")
-ISBACKUP=$(echo "${LEADERINFO}" | jq -r ".imBackup")
+exec_docker "curl -XGET \"${BASE_API_URL}/api/v2/resource-management/policies/leaderinfo\" -ksS"
+LEADERINFO=${exec_res}
+ISLEADER=$(echo "${LEADERINFO}" | jq -r ".imLeader" 2>/dev/null)
+ISBACKUP=$(echo "${LEADERINFO}" | jq -r ".imBackup" 2>/dev/null)
 log "IF" "imLeader=${ISLEADER}, imBackup=${ISBACKUP}"
 ( [[ $ISLEADER == "false" || $ISLEADER == "true" ]] && \
     log "OK" "Policies leader role successfully received" ) || \
@@ -46,12 +52,13 @@ log "IF" "imLeader=${ISLEADER}, imBackup=${ISBACKUP}"
     log "NO" "Agent resource not created"
 
 # 4. Agent Started Successfully (Identification, Discovery, CAU client, Categorization)
-RMINFO=$(curl -XGET "${BASE_API_URL}/rm/components" -ksS 2>&1 )
-IDENTIFICATION=$(echo "${RMINFO}" | jq -r ".identification")
-DISCOVERY=$(echo "${RMINFO}" | jq -r ".discovery")
-CAU_CLIENT=$(echo "${RMINFO}" | jq -r ".cau_client")
-RES_CAT=$(echo "${RMINFO}" | jq -r ".categorization")
-STARTED=$(echo "${RMINFO}" | jq -r ".started")
+exec_docker "curl -XGET \"${BASE_API_URL}/rm/components\" -ksS"
+RMINFO=${exec_res}
+IDENTIFICATION=$(echo "${RMINFO}" | jq -r ".identification" 2>/dev/null)
+DISCOVERY=$(echo "${RMINFO}" | jq -r ".discovery" 2>/dev/null)
+CAU_CLIENT=$(echo "${RMINFO}" | jq -r ".cau_client" 2>/dev/null)
+RES_CAT=$(echo "${RMINFO}" | jq -r ".categorization" 2>/dev/null)
+STARTED=$(echo "${RMINFO}" | jq -r ".started" 2>/dev/null)
 
 ( [[ ${STARTED} == "true" ]]  && \
     log "OK" "Agent Start workflow successfully started.") || \
@@ -62,9 +69,15 @@ STARTED=$(echo "${RMINFO}" | jq -r ".started")
 ( [[ ${DISCOVERY} == "true" ]]  && \
     log "OK" "Discovery successfully triggered.") || \
     log "NO" "Discovery trigger failed."
-( [[ ${CAU_CLIENT} == "true" ]]  && \
+
+if [[ ${ISLEADER} == "false" ]]; then
+    ( [[  ${CAU_CLIENT} == "true" ]]  && \
     log "OK" "CAU client successfully triggered.") || \
     log "NO" "CAU client trigger failed."
+else
+    log "IF" "CAU client test skip."
+fi
+
 ( [[ ${RES_CAT} == "true" ]]  && \
     log "OK" "Resource Categorization successfully triggered.") || \
     log "NO" "Resource Categorization trigger failed."
