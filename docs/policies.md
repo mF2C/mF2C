@@ -186,6 +186,20 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ## CHANGELOG
 
+### 2.0.4 (10/09/2019)
+
+#### Added
+
+    + Discovery Triggers: JOIN and DHCP
+
+#### Changed
+    
+    * Discovery triggers are now more verbose on debug mode.
+    * Identification trigger updated
+    * CAU client trigger updated
+    * BUG: When identification doesn't provide a valid deviceID, CAU client fails, crashing the Agent CIMI resource.
+     
+
 ### 2.0.3 (04/07/2019)
 
 #### Changed
