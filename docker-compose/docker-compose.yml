@@ -169,7 +169,7 @@ services:
        - "WIFI_DEV_FLAG=${PHY}"
 
   discovery:
-     image: mf2c/discovery:1.0
+     image: mf2c/discovery:1.3
      restart: on-failure
      depends_on:
        - cimi
