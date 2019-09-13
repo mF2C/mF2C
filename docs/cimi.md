@@ -36,13 +36,13 @@ CIMI is routed to https://<endpoint>/api .
 #### Examples
 
 Entry Point
-~~~~~~~~~~~
+
 
 To allow the self-discovery of the existing system resources and allowed operations and requests, CIMI
 provides a public entry-point at *https://cimi/api/cloud-entry-point*.
 
 Create a user
-~~~~~~~~~~~~~
+
 
 1. create a regular user *testuser* with password *testpassword*
 
@@ -66,7 +66,7 @@ Create a user
 
 
 Get an existing resource collection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 Let's say we want to get a list of all the events registered in the database (the ones we have access to, and assuming the CIMI resource *events* exists):
 
@@ -76,7 +76,7 @@ Let's say we want to get a list of all the events registered in the database (th
 
 
 Filter for a specific dataset
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 CIMI provides mechanisms to search for data based on a filter. To provided grammar looks like the following:
 
@@ -87,7 +87,7 @@ CIMI provides mechanisms to search for data based on a filter. To provided gramm
 
 
 Delete a specific resource
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 Let's delete our own session:
 
@@ -107,6 +107,25 @@ Let's delete our own session:
 
 
 ## CHANGELOG
+
+### 2.27 (23/08/2019)
+
+#### Added
+
+ - session template and workflow for JWT token authorization
+
+#### Changed
+ 
+ - added healtheck to service initialization in Docker
+ - changed dependencies to production version of ring-container
+
+### 2.23 (08/08/2019)
+
+#### Added
+
+#### Changed
+
+ - hwloc and cpuinfo attributes in device resource, have been made mandatory
 
 ### 2.22 (11/07/2019)
 

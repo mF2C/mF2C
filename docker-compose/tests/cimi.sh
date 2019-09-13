@@ -35,7 +35,7 @@ BASE_API_URL=`echo ${BASE_API_URL:="https://localhost/api"} | tr -d '"'`
     log "OK" "correct 404 for non-existent user") || \
         log "NO" "incorrect response: did not receive 404 for non-existent user"
 
-USER=$(export LC_CTYPE=C; cat /dev/random | tr -dc "[:alpha:]" | head -c 8)
+USER=$(export LC_CTYPE=C; cat /dev/urandom | tr -dc "[:alpha:]" | head -c 8)
 # test "create user" operation
 (curl -XPOST "${BASE_API_URL}/user" -ksS -H 'content-type: application/json' -d '{
     "userTemplate": {

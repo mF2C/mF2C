@@ -6,7 +6,8 @@ then
 	tests=`ls $tests_folder`
 	for tester in $tests
 	do
-		eval $tests_folder$tests
+		echo "Current test: ${tester}..."
+		eval $tests_folder$tester
 	done
 else
 	echo -e "\n    Use --include-tests to run all scripts in the 'tests' folder    \n"
