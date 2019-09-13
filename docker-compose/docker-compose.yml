@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 services:
   ####################### Proxy  ######################
   proxy:
@@ -16,7 +16,7 @@ services:
 
   ######################## CIMI  #######################
   cimi:
-    image: mf2c/cimi-server:2.22
+    image: mf2c/cimi-server:2.27
     restart: on-failure
     depends_on:
       - logicmodule1
@@ -35,9 +35,13 @@ services:
     volumes:
       - ringcontainer:/opt/slipstream/ring-container
       - ringcontainerexample:/opt/slipstream/ring-example
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "wget", "--spider", "http://localhost:8201/api/cloud-entry-point"]
 
   rc:
-    image: sixsq/ring-container:3.53-SNAPSHOT
+    image: sixsq/ring-container:3.52
     expose:
       - "5000"
     volumes:
@@ -84,7 +88,7 @@ services:
 
   ################### Event Manager ###################
   event-manager:
-    image: mf2c/cimi-server-events
+    image: mf2c/cimi-server-events:1.0
     depends_on:
       - cimi
     expose:
@@ -94,7 +98,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.8.0
+    image: mf2c/service-manager:1.8.2
     restart: unless-stopped
     depends_on:
       - cimi
@@ -140,7 +144,7 @@ services:
 
   #################### SLA Manager #####################
   slalite:
-    image: mf2c/sla-management:0.8.0
+    image: mf2c/sla-management:0.8.1
     restart: on-failure
     expose:
       - "46030"
@@ -148,7 +152,7 @@ services:
 
   ################## Resource Manager ##################
   policies:
-     image: mf2c/policies:2.0.3
+     image: mf2c/policies:2.0.4
      restart: on-failure
      depends_on:
        - cimi
@@ -161,11 +165,11 @@ services:
      environment:
        - "DEBUG=True"
        - "MF2C=True"
-       - "isLeader=False"
-       - "leaderIP="
-  
+       - "isLeader=${isLeader}"
+       - "WIFI_DEV_FLAG=${PHY}"
+
   discovery:
-     image: mf2c/discovery:1.0
+     image: mf2c/discovery:1.3
      restart: on-failure
      depends_on:
        - cimi
@@ -173,7 +177,7 @@ services:
        - 46040
      cap_add:
        - NET_ADMIN
-  
+
   identification:
      image: mf2c/identification:v2
      restart: on-failure
@@ -181,21 +185,36 @@ services:
        - mydata:/data
      expose:
        - 46060
-  
+      environment: 
+      - mF2C_User=${usr}
+      - mF2C_Pass=${pwd}
+
   cau-client:
-     image: mf2c/cau-client:v1.02
+     image: mf2c/cau-client-it2:v2.1
      depends_on:
        - policies
      volumes:
        - pkidata:/pkidata
      expose:
        - 46065
+     #using the cloud cau for the moment
      environment:
-       - CAU_URL=213.205.14.13:46400
-       - LCAU_URL=213.205.14.13:46401
-  
+       - CCAU_URL=213.205.14.13:55443
+       - CAU_URL=213.205.14.13:55443
+
+  aclib:
+     image: mf2c/aclib:v1.0
+     depends_on:
+       - cau-client
+     volumes:
+       - pkidata:/pkidata
+     expose:
+       - 46080
+     environment:
+       - ACLIB_PORT=46080
+       - CAUCLIENT_PORT=46065
+
   resource-categorization:
-     #build: /home/souvik/PycharmProjects/mF2C_IT2_Final
      image: mf2c/resource-categorization:latest-V2.0.18
      hostname: IRILD039
      restart: on-failure
@@ -222,9 +241,9 @@ services:
       - "traefik.enable=true"
       - "traefik.port=46020"
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
-  
+
   landscaper:
-    image: mf2c/landscaper:0.6.7
+    image: mf2c/landscaper:0.6.11
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
@@ -239,7 +258,7 @@ services:
       - OS_PASSWORD=
       - OS_AUTH_URL=
     command: ["./start.sh", "http://neo4j:7474"]
-  
+
   telem_start:
     image: mf2c/telem_start:0.1
     command: sh /download.sh
@@ -247,7 +266,7 @@ services:
       - HOSTNAME
     depends_on:
       - snap
-  
+
   influxdb:
     image: influxdb
     expose:
@@ -274,7 +293,7 @@ services:
     environment:
       - SNAP_VERSION=2.0.0
       - SNAP_LOG_LEVEL=2
-  
+
   neo4j:
     image: neo4j:2.3.12
     privileged: true
@@ -284,7 +303,7 @@ services:
       - "7475:7474" # expose the port for the console ui
     environment:
       - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
-  
+
   web:
     image: mf2c/landscaper:0.6.5
     environment:
@@ -300,14 +319,14 @@ services:
     command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
 
   vpnclient:
-    image: mf2c/vpnclient:1.0.0
+    image: mf2c/vpnclient:1.1.0
     depends_on:
       - cau-client
+    network_mode: "host"
     extra_hosts:
       - "vpnserver:213.205.14.13"
     environment:
       - VPN_DAEMON=FALSE
-      - "CA_ENDPOINT=https://213.205.14.13:54443/certauths/rest/it2untrustedca"
     cap_add:
       - NET_ADMIN
     volumes:
