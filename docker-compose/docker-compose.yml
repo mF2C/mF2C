@@ -148,6 +148,10 @@ services:
     restart: on-failure
     expose:
       - "46030"
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "wget", "--spider", "http://localhost:46030"]
   ######################################################
 
   ################## Resource Manager ##################
