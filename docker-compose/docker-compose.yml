@@ -98,7 +98,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.8.2
+    image: mf2c/service-manager:1.8.3
     restart: unless-stopped
     depends_on:
       - cimi
@@ -110,6 +110,10 @@ services:
       - "traefik.port=46200"
     environment:
       - JAVA_OPTS=-Xms32m -Xmx256m
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "wget", "--spider", "http://localhost:46200/api"]
   ######################################################
 
   ########## Lifecycle Manager + User Manager ##########
