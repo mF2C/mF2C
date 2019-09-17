@@ -53,7 +53,7 @@ do
 done
 
 # Register new device
-endpoint="http://localhost:46060/api/v1/resource-management/identification/registerDevice | jq -r '.status'"
+endpoint="http://localhost:46060/api/v1/resource-management/identification/registerDevice"
 ans=`curl -s -XPOST ${endpoint} | jq -r '.status'`
 if [[ ${ans} -eq 201 ]]; then
     log "OK" "New device has been registered"
