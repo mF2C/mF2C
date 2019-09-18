@@ -188,6 +188,12 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ### 2.0.4 (10/09/2019)
 
+#### Changed
+
+    * Discovery is now outside the docker-compose network. Policies get automatically the IP
+
+### 2.0.4 (10/09/2019)
+
 #### Added
 
     + Discovery Triggers: JOIN and DHCP
