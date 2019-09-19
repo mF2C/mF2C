@@ -556,7 +556,7 @@ EOF
 
 progress "30" "Deploying docker-compose services"
 
-([ ! -f docker-compose.yml ] && cp mF2C/docker-compose/docker-compose.yml .) ||  write_compose_file
+([ ! -f docker-compose.yml ] && cp mF2C/docker-compose/docker-compose.yml .) || ([ ! -f docker-compose.yml ] && write_compose_file) || log "OK" "docker-compose found!"
 
 # Copy configuration files
 [ -d "mF2C/docker-compose" ] && cp mF2C/docker-compose/*.c* .
@@ -619,6 +619,7 @@ then
         ### Assign an IP to the wifi interface
         echo "Configuring interface with IP address"
         ip addr flush dev "${WIFI_DEV}"
+        ip link set "${WIFI_DEV}" down
         ip link set "${WIFI_DEV}" up
         ip addr add "$IP_AP$NETMASK" dev "${WIFI_DEV}"
 
