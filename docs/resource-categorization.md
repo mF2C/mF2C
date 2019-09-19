@@ -445,7 +445,7 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ## Change LOG
 
-###latest-V2.0.20 (date 19/September/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22 +later]
+###latest-V2.0.20 (date 19/September/2019)
 
 ###latest-V2.0.18 (date 09/July/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22 +later]
 
