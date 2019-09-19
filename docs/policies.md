@@ -186,7 +186,7 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ## CHANGELOG
 
-### 2.0.4 (10/09/2019)
+### 2.0.5 (18/09/2019)
 
 #### Changed
 
