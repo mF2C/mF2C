@@ -440,11 +440,13 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ### Troubleshooting
 
-- To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
+- For those who are using `latest-V2.0.16`; To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
 - Fix the multiple `device_ip` creation issue for a single agent
 
 ## Change LOG
 
+
+###latest-V2.0.20 (date 19/September/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22 +later]
 ###latest-V2.0.18 (date 09/July/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22 +later]
 ### latest-V2.0.17 (date 28/June/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22]
 ### latest-V2.0.16 (date 28/June/2019) [in complience with CIMI-server - 2.18 / 2.19 & DataClay version - 2.21]
@@ -452,18 +454,17 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 #### Added
 
- - Already added the `status` info in the `device-dynamic` 
+ - Solved the `deviceIP` related issues 
  - Added the `childips` info in the `leader agent`
+  - Filtered out the 'die-out' or 'unavailable' `agents` from a `Fog-Area`
 
 #### Changed
 
- - In the `leader agent` side the `resource-categorization` module is now adding/updating the `agent-resource` information
- - For `latest-V2.0.17` moved the `status` info from `device` to `device-dynamic`
- 
+- Nothing has been changed compare to previous version, only fixed the `deviceIP` related issue 
  
  #### Work in progress**
  
- - Filtering out the 'die-out' or 'unavailable' `agents` from a `Fog-Area`
+ - Need to find a way to connect with the VPN-Client for getting the `deviceIP`
 
 
 
