@@ -175,6 +175,10 @@ services:
        - "MF2C=True"
        - "isLeader=${isLeader}"
        - "WIFI_DEV_FLAG=${PHY}"
+     healthcheck:
+       start_period: 30s
+       retries: 5
+       test: ["CMD", "wget", "--spider", "http://localhost:46050"]
 
   discovery:
      image: mf2c/discovery:1.3
