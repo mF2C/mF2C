@@ -227,7 +227,7 @@ services:
        - CAUCLIENT_PORT=46065
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.19
+     image: mf2c/resource-categorization:latest-V2.0.20
      hostname: IRILD039
      restart: on-failure
      depends_on:
