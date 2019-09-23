@@ -444,23 +444,6 @@ mf2c-curl-post https://localhost/api/fog-area -d
 - Fix the multiple `device_ip` creation issue for a single agent
 
 ## Change LOG
-
- ### latest-V2.0.20 (date 19/September/2019) [in complience with CIMI-server - 2.27 +later & DataClay version - 2.23 +later]
- 
-#### Added
-
- - Solved the `deviceIP` related issues 
- - Added the `childips` info in the `leader agent`
- - Filtered out the 'die-out' or 'unavailable' `agents` from a `Fog-Area`
-
-#### Changed
-
-- Fixed the `deviceIP` related issue and reduced the time delay for storing `device-dynamic` and `agent-resource` information  
-
- 
- #### Work in progress**
- 
- - Need to find a way to connect with the VPN-Client for getting the `deviceIP`, incase of failing the `discovery` module for retrieving the IP 
  
  ### latest-V2.0.19 (date 30/July/September/2019) [in complience with CIMI-server - 2.23 +later & DataClay version - 2.22 +later]
  
