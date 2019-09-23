@@ -440,30 +440,45 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ### Troubleshooting
 
-- To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
+- For those who are using `latest-V2.0.16`; To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
 - Fix the multiple `device_ip` creation issue for a single agent
 
 ## Change LOG
+ 
+ ### latest-V2.0.19 (date 30/July/September/2019) [in complience with CIMI-server - 2.23 +later & DataClay version - 2.22 +later]
+ 
+ #### Added
 
-###latest-V2.0.18 (date 09/July/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22 +later]
-### latest-V2.0.17 (date 28/June/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22]
-### latest-V2.0.16 (date 28/June/2019) [in complience with CIMI-server - 2.18 / 2.19 & DataClay version - 2.21]
-
-
-#### Added
-
- - Already added the `status` info in the `device-dynamic` 
- - Added the `childips` info in the `leader agent`
+  - Added the functionality to retrieve the `deviceIP` from `discovery` module
 
 #### Changed
 
- - In the `leader agent` side the `resource-categorization` module is now adding/updating the `agent-resource` information
- - For `latest-V2.0.17` moved the `status` info from `device` to `device-dynamic`
+- Nothing has been changed compare to previous version, only partially fixed the `deviceIP` related issue  
+
+ ### latest-V2.0.18 (date 09/July/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22 +later]
  
- 
- #### Work in progress**
- 
- - Filtering out the 'die-out' or 'unavailable' `agents` from a `Fog-Area`
+  #### Added
+
+   - Added the `childips` info in the leader agent
+
+  #### Changed
+
+   - In the leader agent side the resource-categorization module is now adding/updating the `agent-resource` information
+   
+
+ ### latest-V2.0.17 (date 28/June/2019) [in complience with CIMI-server - 2.20 +later & DataClay version - 2.22]
+   
+  #### Added
+
+   - Already added the `status` info in the `device-dynamic`
+   
+  #### Changed
+  - For latest-V2.0.17 moved the `status` info from `device` to `device-dynamic`
+   
+   
+ ### latest-V2.0.16 (date 28/June/2019) [in complience with CIMI-server - 2.18 / 2.19 & DataClay version - 2.21]
+
+
 
 
 
