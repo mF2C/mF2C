@@ -444,8 +444,17 @@ mf2c-curl-post https://localhost/api/fog-area -d
 - Fix the multiple `device_ip` creation issue for a single agent
 
 ## Change LOG
+
+ ### latest-V2.0.20 (date 19/September/2019) [in complience with CIMI-server - 2.27 +later & DataClay version - 2.23 +later]
  
- ### latest-V2.0.19 (date 30/July/September/2019) [in complience with CIMI-server - 2.23 +later & DataClay version - 2.22 +later]
+#### Added
+ - Fixed the `deviceIP` related issues for both `leader` and `child` agent side
+ 
+ #### Changed 
+  - Nothing has been changed compare to previous version, except the `deviceIP` related issue has been fully solved
+
+ 
+ ### latest-V2.0.19 (date 30/July/2019) [in complience with CIMI-server - 2.23 +later & DataClay version - 2.22 +later]
  
  #### Added
 
@@ -477,6 +486,11 @@ mf2c-curl-post https://localhost/api/fog-area -d
    
    
  ### latest-V2.0.16 (date 28/June/2019) [in complience with CIMI-server - 2.18 / 2.19 & DataClay version - 2.21]
+ 
+ 
+ ## Work in progress
+ 
+ - Making a connection between `VPN-Client` and `Resource-Categorization` module; So that, in case of the failure of `discovery` module the `Resource-Categorization` can retrieve the `deviceIP` from `VPN-Client`
 
 
 
