@@ -190,6 +190,10 @@ services:
      - "46040:46040"
      cap_add:
        - NET_ADMIN
+     healthcheck:
+       start_period: 30s
+       retries: 5
+       test: curl --fail -s http://localhost:46040/api/v1/resource-management/discovery/ || exit 1
 
   identification:
      image: mf2c/identification:v2
