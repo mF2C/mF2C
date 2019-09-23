@@ -1,19 +1,40 @@
 #!/bin/bash -e
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
+function log {
+    text="$2"
+    if [[ $1 == "OK" ]]
+    then
+        printf '\e[0;33m %-15s \e[32m SUCCESS:\e[0m %s \n' [mF2CInstaller] "$text"
+    elif [[ $1 == "IF" ]]
+    then
+        printf '\e[0;33m %-15s \e[34m INFO:\e[0m %s \n' [mF2CInstaller] "$text"
+    elif [[ $1 == "WR" ]]
+    then
+        printf '\e[0;33m %-15s \e[93m WARNING:\e[0m %s \n' [mF2CInstaller] "$text"
+    else
+        printf '\e[0;33m %-15s \e[0;31m FAILED:\e[0m %s \n' [mF2CInstaller] "$text"
+    fi
+}
+
 function cleanup {
-    echo "WARN: Shutting down this mF2C agent..."
-    docker-compose -p mf2c down -v || echo "ERR: failed to deprovision docker-compose"
-    rm .env || echo "ERR: .env not found"
-    rm docker-compose.yml || echo "ERR: compose file not found"
-    rm -rf mF2C || echo "ERR: cloned mF2C repository not found"
-    rm *.cfg *.conf || echo "ERR: configuration files not found"
-    echo "INFO: Shutdown finigfshed"
+    log "IF" "Shutting down this mF2C agent..."
+    docker-compose -p mf2c down -v || log "ER" "Failed to deprovision docker-compose"
+    rm -f .env
+    [ -d mF2C ] && rm -f docker-compose.yml
+    [ -d mF2C ] && rm -rf prop
+    [ -d mF2C ] && rm -rf traefik
+    [ -d mF2C ] && rm -rf ls_log
+    [ -d mF2C ] && rm -f *.cfg *.conf
+    [ -d mF2C ] && rm -rf mF2C
+    log "IF" "Shutdown finished"
     exit 1
 }
 trap cleanup ERR
 
 PROJECT=mf2c
+DOCKER_NAME_DISCOVERY="discovery"
+IS_LEADER=False
 
 progress() {
     # $1 is the current percentage, from 0 to 100
@@ -26,286 +47,32 @@ progress() {
     printf "\r\e[K|%-*s| %3d%% %s\n" "50" "$char" "$1" "${@:2}";
 }
 
-write_compose_file() {
-    cat > docker-compose.yml <<EOF
-version: '3'
-services:
-  proxy:
-    image: traefik
-    restart: unless-stopped
-    command: --web --docker --docker.exposedByDefault=false --loglevel=info
-    volumes:
-     - /var/run/docker.sock:/var/run/docker.sock:ro
-     - ./traefik/traefik.toml:/traefik.toml
-    ports:
-     - "80:80"
-     - "443:443"
-  dcproxy:
-    image: mf2c/dataclay-proxy:latest
-    depends_on:
-      - logicmodule1
-    expose:
-      - "6472"
-  cimi:
-    image: mf2c/cimi-server:2.1-SNAPSHOT
-    depends_on:
-      - logicmodule1
-      - dcproxy
-    environment:
-      - DC_HOST=dcproxy
-      - DC_PORT=6472
-      - EPHEMERAL_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
-      - PERSISTENT_DB_BINDING_NS=com.sixsq.slipstream.db.dataclay.loader
-    expose:
-     - "8201"
-    labels:
-     - "traefik.enable=true"
-     #- "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
-     - "traefik.backend=cimi"
-     - "traefik.frontend.rule=PathPrefix:/,/"
-    volumes:
-     - ringcontainer:/opt/slipstream/ring-container
-     - ringcontainerexample:/opt/slipstream/ring-example
-  rc:
-    image: sixsq/ring-container:3.53-SNAPSHOT
-    expose:
-     - "5000"
-    volumes:
-     - ringcontainer:/opt/slipstream/ring-container
-     - ringcontainerexample:/opt/slipstream/ring-example
-    command: sh
-  slalite:
-    image: mf2c/sla-management:0.3.0
-    expose:
-     - "46030"
-    environment:
-     - CIMI_URL=https://proxy:443/api
-  lmpostgres1:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
-
-  logicmodule1:
-    image: "bscdataclay/logicmodule"
-    depends_on: ["lmpostgres1"]
-    ports:
-      - "11034:1034"
-    env_file:
-      - ./env/PG.environment
-      - ./env/LM.environment
-    environment:
-      - DATACLAY_ADMIN_USER=admin
-      - DATACLAY_ADMIN_PASSWORD=admin
-      - POSTGRES_HOST=lmpostgres1
-    volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
-  ds1postgres1:
-    image: postgres:9.5.12
-    env_file:
-      - ./env/PG.environment
-    command: -c fsync=off
-
-  ds1java1:
-    image: "bscdataclay/dsjava"
-    depends_on: ["ds1postgres1", "logicmodule1"]
-    ports:
-      - 2127
-    env_file:
-      - ./env/PG.environment
-      - ./env/DS.environment
-      - ./env/LM.environment
-    environment:
-      - DATASERVICE_NAME=DS1
-      - POSTGRES_HOST=ds1postgres1
-    volumes:
-      - ./prop/global.properties:/usr/src/app/cfgfiles/global.properties:ro
-      - ./prop/log4j2.xml:/usr/src/app/log4j2.xml:ro
-  COMPSs:
-    image: mf2c/compss-mf2c:1.0
-    expose:
-     - 8080
-    restart: unless-stopped
-  service-manager:
-    image: mf2c/service-manager:latest
-    restart: unless-stopped
-    depends_on:
-      - cimi
-    expose:
-      - 46200
-    ports:
-      - 46200:46200
-  discovery:
-    image: mf2c/discovery:latest
-    depends_on:
-      - cimi
-    expose:
-      - 46040
-    cap_add:
-      - NET_ADMIN
-  policies:
-    image: mf2c/policies:latest
-    depends_on:
-      - discovery
-    # container_name: policies
-    ports:
-      - "46050"
-      - "46051:46051"
-      - "46052:46052"
-  cau-client:
-    image: mf2c/cau-client:latest
-    depends_on:
-#   assuming cau and leader cau are bootstrapped elsewhere
-      - policies
-    # container_name: cau-client
-    expose:
-      - 46065
-#   please provide ip:port params for CAU and leader CAU
-    environment:
-      - CAU_URL=127.0.0.1:46400
-      - LCAU_URL=127.0.0.1:46410
-  identification:
-    image: mf2c/identification:latest
-    volumes:
-      - mydata:/data
-    expose:
-      - 46060
-  user-management:
-    image: mf2c/user-management:latest
-    expose:
-      - "46300"
-    environment:
-      - CIMI_URL=
-  lifecycle:
-    image: mf2c/lifecycle
-    expose:
-      - "46000"
-    ports:
-      - "46000:46000"
-    environment:
-      - CIMI_URL=
-      - STANDALONE_MODE=False
-      - HOST_IP=
-      - WORKING_DIR_VOLUME=/tmp/compose_files
-    volumes:
-      - /tmp/compose_files:/tmp/compose_files
-      - /var/run/docker.sock:/var/run/docker.sock
-  resouce-categorization:
-    image: mf2c/resource-categorization:latest
-    depends_on:
-      - cimi
-    expose:
-      - 46070
-    privileged: true
-  snaptemp:
-    image: mf2c/snaptemp:latest
-    command: sh /download.sh
-    depends_on:
-      - snap
-  influxdb:
-    image: influxdb
-    volumes:
-      - influx:/var/lib/influxdb
-    environment:
-      - INFLUXDB_DB=snap
-      - INFLUXDB_USER=snap
-      - INFLUXDB_USER_PASSWORD=snap
-      - INFLUXDB_ADMIN_USER=admin
-      - INFLUXDB_ADMIN_USER_PASSWORD=admin
-  snap:
-    image: intelsdi/snap:precise
-    ports:
-      - "8181:8181"
-    volumes: ['/proc:/proc_host', '/sys/fs/cgroup:/sys/fs/cgroup', '/var/run/docker.sock:/var/run/docker.sock']
-    depends_on:
-      - influxdb
-    environment:
-      - SNAP_VERSION=2.0.0
-      - SNAP_LOG_LEVEL=2
-  influxdb-analytics:
-    image: influxdb:latest
-    environment:
-      - ADMIN_USER=analytics_engine
-      - INFLUX_INIT_PWD=analytics_engine
-      - PRE_CREATE_DB=analytics_engine_development
-    volumes:
-      # Data persistency
-      - influx-analytics:/var/lib/influxdb
-  analytics_engine:
-    image: mf2c/analytics-engine:latest
-    expose:
-      - "46020"
-    depends_on:
-      - influxdb-analytics
-    volumes:
-      - ./analytics_engine.conf:/analytics_engine/analytics_engine.conf
-  neo4j:
-    image: neo4j:2.3.12
-    volumes:
-    - neo4j:/data
-    ports:
-    - "7475:7474" # expose the port for the console ui
-    environment:
-    - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
-  landscaper:
-    image: mf2c/landscaper:latest
-    volumes:
-    - landscaper:/landscaper/data
-    - ./landscaper.cfg:/landscaper/landscaper.cfg
-    depends_on:
-      - "neo4j"
-    environment:
-      - OS_TENANT_NAME=
-      - OS_PROJECT_NAME=
-      - OS_TENANT_ID=
-      - OS_USERNAME=
-      - OS_PASSWORD=
-      - OS_AUTH_URL=
-    command: ["/start.sh", "http://neo4j:7474"]
-  web:
-    image: mf2c/landscaper-api:latest
-    volumes:
-      - ./landscaper.cfg:/landscaper/landscaper.cfg
-    ports:
-      - "9001:9001"
-    depends_on:
-      - neo4j
-      - landscaper
-
-volumes:
-  mydata: {}
-  influx: {}
-  influx-analytics: {}
-  neo4j: {}
-  landscaper: {}
-  ringcontainer: {}
-  ringcontainerexample: {}
-EOF
-}
-
 usage='Usage:
 '$0' [OPTIONS]
 
 OPTIONS:
-\n --shutdown
+\n -S --shutdown
 \t Shutdown and delete the running mF2C deployment
-\n --isLeader
+\n -s --status
+\t Display the actual mF2C docker container status
+\n -L --isLeader
 \t Installs the mF2C system as a leader. This option is ignored when used together with --shutdown
 '
 
-IS_LEADER=False
 while [ "$1" != "" ]; do
   case $1 in
-    --shutdown )          DELETE_MODE=True;
+    --shutdown | -S )          DELETE_MODE=True;
     ;;
-    --isLeader )          IS_LEADER=True;
+    --isLeader | -L )          IS_LEADER=True;
     ;;
     -h )        echo -e "${usage}"
     exit 1
     ;;
-    * )         echo -e "Invalid option $1 \n\n${usage}"
+    --status | -s )  docker-compose -p ${PROJECT} ps
     exit 1
+    ;;
+    * )         echo -e "Invalid option $1 \n\n${usage}"
+    exit 0
   esac
   shift
 done
@@ -361,7 +128,18 @@ then
     WIFI_DEV=$(iw dev | awk '$1=="Interface"{print $2}')
     IN_USE=$(ip r | grep default | cut -d " " -f5)
     #find corresponding phy name
-    PHY=$(cat /sys/class/net/"$WIFI_DEV"/phy80211/name)
+    if [[ $WIFI_DEV != "" ]]; then
+        PHY=$(cat /sys/class/net/"$WIFI_DEV"/phy80211/name)
+    else
+        if [[ $(docker-compose -p $PROJECT ps 2>/dev/null | wc -l) -gt 2  ]]; then
+            log "WR" "Agent currently running. Interface cannot be attached to the mF2C agent. Shutdown required."
+        else
+            log "ER" "No WiFi interface dettected."
+        fi
+        exit 2
+    fi
+
+    log "IF" "WIFI_DEV=${WIFI_DEV}, IN_USE=${IN_USE}, PHY=${PHY}"
 else
     echo "ERR: the mF2C system is not compatible with your OS: $machine. Exit..."
     exit 1
@@ -369,7 +147,8 @@ fi
 
 progress "10" "Cloning mF2C"
 
-git clone https://github.com/mF2C/mF2C.git
+[ ! -f docker-compose.yml ] && git clone https://github.com/mF2C/mF2C.git
+[ -f docker-compose.yml ] && git pull
 
 progress "15" "Checking networking conflicts"
 
@@ -388,39 +167,65 @@ then
     done
 fi
 
+progress "25" "User credentials"
+read -p "Enter your mF2C Username: " MF2C_USER
+read -s -p "Enter your mF2C Password: " MF2C_PASS
+echo
+#MF2C_USER="test1234"
+#MF2C_PASS="12345678"
+
 progress "25" "Setup environment"
 
 # Write env file to be used by docker-compose
-cp mF2C/docker-compose/.env .env || cat > .env <<EOF
-IDKey=
-MF2C=True
-WIFI_DEV=
-JAVA_OPTS=
-isLeader=$IS_LEADER
-PHY=$PHY
+cp mF2C/docker-compose/.env .env 2>/dev/null || cat > .env <<EOF
+isLeader=${IS_LEADER}
+PHY=${PHY}
+WIFI_DEV_FLAG=${WIFI_DEV}
+usr=${MF2C_USER}
+pwd=${MF2C_PASS}
 EOF
 
-echo "TOPOLOGY=$ALLOWED_BACKUPS" >> .env
+progress "30" "Deploying docker-compose services"
 
-progress "40" "Deploying docker-compose services"
-
-cp mF2C/docker-compose/docker-compose.yml . ||  write_compose_file
+([ ! -f docker-compose.yml ] && cp mF2C/docker-compose/docker-compose.yml .) || log "OK" "docker-compose found!"
 
 # Copy configuration files
-cp mF2C/docker-compose/*.c* .
+[ -d "mF2C/docker-compose" ] && cp mF2C/docker-compose/*.c* .
 
-#Deploy compose
+# Copy directories
+[ -d "mF2C/docker-compose/prop" ] && cp -r mF2C/docker-compose/prop/ .
+[ -d "mF2C/docker-compose/traefik" ] && cp -r mF2C/docker-compose/traefik/ .
+
+progress "35" "Checking for agents running on the system"
+if [[ $(docker-compose -p $PROJECT ps | wc -l) -gt 2 ]]; then
+    log "WR" "Agent running dettected."
+    while true;
+    do
+        read -p "Do you wish to stop the current agent and continue? [y/n]" yn
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* ) exit;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+    docker-compose -p $PROJECT down -v || exit 0
+fi
+
+progress "40" "Pulling mF2C agent modules"
 docker-compose pull
+
+progress "50" "Deploy mF2C agent"
 docker-compose -p $PROJECT up -d
 
 progress "70" "Waiting for discovery to be up and running"
 
-#Monitor whether the discovery container has been created
-DOCKER_NAME_DISCOVERY="${PROJECT}_discovery_1"
+#Monitor whether the discovery container has been created and get container name
 while true
 do
-  if [[ $(docker ps -f "name=$DOCKER_NAME_DISCOVERY" --format '{{.Names}}') == $DOCKER_NAME_DISCOVERY ]]
-  then break
+  if [[ $(docker ps -f "name=$DOCKER_NAME_DISCOVERY" --format '{{.Names}}' | wc -l) -gt 0 ]]
+  then
+    container_name=$(docker ps -f "name=$DOCKER_NAME_DISCOVERY" --format '{{.Names}}')
+    break
   fi
 done
 
@@ -428,15 +233,35 @@ progress "90" "Binding wireless interface with discovery container"
 
 #Bind inet to discovery
 
-pid=$(docker inspect -f '{{.State.Pid}}' $DOCKER_NAME_DISCOVERY)
+pid=$(docker inspect -f '{{.State.Pid}}' $container_name)
 # Assign phy wireless interface to the container
 if [[ "$machine" != "Mac" ]]
 then
-  mkdir -p /var/run/netns
-  ln -s /proc/"$pid"/ns/net /var/run/netns/"$pid"
-  iw phy "$PHY" set netns "$pid"
-  #Bring the wireless interface up
-  docker exec -d "$DOCKER_NAME_DISCOVERY" ifconfig "$WIFI_DEV" up
+    #Bring the wireless interface up
+    ip addr flush dev "$WIFI_DEV"
+
+    docker exec -d "$container_name" ifconfig "${WIFI_DEV}" up
+
+    if [[ "$IS_LEADER" == "True" ]]; then
+        #Define the characteristics of the network that will be used by the leader
+        SUBNET="192.168.7"
+        IP_AP="192.168.7.1"
+        NETMASK="/24"
+        ### Assign an IP to the wifi interface
+        echo "Configuring interface with IP address"
+        ip addr flush dev "${WIFI_DEV}"
+        ip link set "${WIFI_DEV}" down
+        ip link set "${WIFI_DEV}" up
+        ip addr add "$IP_AP$NETMASK" dev "${WIFI_DEV}"
+
+        ### iptables rules for NAT
+        echo "Adding natting rule to iptables (container)"
+        iptables -t nat -A POSTROUTING -s $SUBNET.0$NETMASK ! -d $SUBNET.0$NETMASK -j MASQUERADE
+
+        ### Enable IP forwarding
+        echo "Enabling IP forwarding (container)"
+        echo 1 > /proc/sys/net/ipv4/ip_forward
+    fi
 fi
 
 progress "100" "Installation complete!"

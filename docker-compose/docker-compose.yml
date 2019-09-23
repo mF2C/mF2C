@@ -158,9 +158,9 @@ services:
       test: ["CMD", "wget", "--spider", "http://localhost:46030"]
   ######################################################
 
-  ################## Resource Manager ##################
+  ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.4
+     image: mf2c/policies:2.0.5
      restart: on-failure
      depends_on:
        - cimi
@@ -174,19 +174,20 @@ services:
        - "DEBUG=True"
        - "MF2C=True"
        - "isLeader=${isLeader}"
-       - "WIFI_DEV_FLAG=${PHY}"
+       - "WIFI_DEV_FLAG=${WIFI_DEV_FLAG}"
      healthcheck:
        start_period: 30s
        retries: 5
        test: ["CMD", "wget", "--spider", "http://localhost:46050"]
 
   discovery:
-     image: mf2c/discovery:1.3
+     image: mf2c/discovery:1.4
      restart: on-failure
      depends_on:
        - cimi
-     expose:
-       - 46040
+     network_mode: "host"
+     ports:
+     - "46040:46040"
      cap_add:
        - NET_ADMIN
 
