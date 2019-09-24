@@ -218,6 +218,12 @@ services:
      environment:
        - CCAU_URL=213.205.14.13:55443
        - CAU_URL=213.205.14.13:55443
+     healthcheck:
+       start_period: 60s
+       interval: 60s
+       timeout: 60s
+       retries: 5
+       test: ["CMD-SHELL", "echo getpubkey=1233211234567 | nc localhost 46065"]
 
   aclib:
      image: mf2c/aclib:v1.0
@@ -230,6 +236,12 @@ services:
      environment:
        - ACLIB_PORT=46080
        - CAUCLIENT_PORT=46065
+     healthcheck:
+       start_period: 70s
+       interval: 120s
+       timeout: 60s
+       retries: 3
+       test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
 
   resource-categorization:
      image: mf2c/resource-categorization:latest-V2.0.20
