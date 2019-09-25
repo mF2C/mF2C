@@ -16,6 +16,18 @@ Check the landscaper log located in the logs.
 
 ## CHANGELOG
 
+### Version 0.6.13
+
+### 25.09.2019
+
+#### Added
+
+ - None
+
+#### Changed
+
+ - Fixed generate_files() logic by making device dynamic optional 
+
 ### Version 0.6.11
 
 ### 04.09.2019
