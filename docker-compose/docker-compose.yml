@@ -254,6 +254,10 @@ services:
      privileged: true
      volumes:
        - /var/run/docker.sock:/var/run/docker.sock
+     healthcheck:
+       start_period: 60s
+       retries: 5
+       test: ["CMD", "wget", "--spider", "http://localhost:46070"]
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
