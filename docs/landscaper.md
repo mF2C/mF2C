@@ -14,6 +14,18 @@ Please see above referred document for examples
 
 Check the landscaper log located in the logs.
 
+### Version 0.6.14
+
+### 26.09.2019
+
+#### Added
+
+ - Added wifiAddress field to the device dynamic parser 
+
+#### Changed
+
+ - None
+
 ## CHANGELOG
 
 ### Version 0.6.13
