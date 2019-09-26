@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 docker run -d --restart=on-failure \
         -e mF2C_User=${MF2C_USER} \
