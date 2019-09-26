@@ -94,6 +94,10 @@ services:
     expose:
       - 8000
     restart: unless-stopped
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "netstat -a | grep '0.0.0.0:8000'"]
   ######################################################
 
   ################## Service Manager ###################
