@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 docker run -d --restart=on-failure \
         -e mF2C_User=${MF2C_USER} \
         -e mF2C_Pass=${MF2C_PWD} \
@@ -67,6 +69,11 @@ trigger_cat="curl -X POST http://localhost:46070/api/v1/resource-management/cate
 
 docker exec mf2c_micro_resource-categorization apk add curl
 docker exec mf2c_micro_resource-categorization sh -c "${trigger_cat}"
+while [ $? -ne 0 ]
+do
+  sleep 1
+  docker exec mf2c_micro_resource-categorization sh -c "${trigger_cat}"
+done
 
 #
 #display_usage() {
