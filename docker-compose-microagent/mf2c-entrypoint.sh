@@ -1,16 +1,73 @@
 #!/bin/sh
 set -e
 
-CLOUD_URL="https://dashboard.mf2c-project.eu"
+docker run -d --restart=on-failure \
+        -e mF2C_User=${MF2C_USER} \
+        -e mF2C_Pass=${MF2C_PWD} \
+        --name mf2c_micro_identification \
+        --label "PRODUCT=MF2C" \
+        mf2c/identification:ARMlatest
+
+docker run -d --restart=on-failure \
+        -v pkidata:/pkidata \
+        -e CCAU_URL=213.205.14.13:55443 \
+        -e CAU_URL=213.205.14.13:55443 \
+        --name mf2c_micro_cau-client \
+        --label "PRODUCT=MF2C" \
+        mf2c/cau-client-it2-arm
 
 
-docker run -it --network="host" \
-        --cap-add=NET_ADMIN
+register_cmd='curl -X POST http://localhost:46060/api/v1/resource-management/identification/registerDevice/'
+docker exec mf2c_micro_identification sh -c "${register_cmd}"
+while [ $? -ne 0 ]
+do
+  sleep 1
+  docker exec mf2c_micro_identification sh -c "${register_cmd}"
+done
+
+get_id='curl -X GET http://localhost:46060/api/v1/resource-management/identification/requestID'
+while [ -z $deviceID ]
+do
+  deviceID=$(docker exec mf2c_micro_identification sh -c "${get_id}" | jq -r .deviceID)
+  sleep 1
+done
+
+# variable coming from Nuvla
+export detectedLeaderID=${LEADER_ID:-$deviceID}
+
+docker exec mf2c_micro_cau-client sh -c "echo getpubkey=1233211234567 | nc localhost 46065"
+while [ $? -ne 0 ]
+do
+  sleep 1
+  docker exec mf2c_micro_cau-client sh -c "echo getpubkey=1233211234567 | nc localhost 46065"
+done
+
+cau_registration="echo detectedLeaderID=${detectedLeaderID},deviceID=${deviceID} | nc localhost 46065"
+docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
+
+docker run -d --network="host" \
+        --cap-add=NET_ADMIN \
         -v /var/run/docker.sock:/var/run/docker.sock \
         --name mf2c_micro_discovery \
         --label "PRODUCT=MF2C" \
         mf2c/discovery-microagent:latest
 
+docker run -d --hostname=IRILD039 --privileged \
+        -e LEADER_ENDPOINT="https://dashboard.mf2c-project.eu" \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        --name mf2c_micro_resource-categorization \
+        --label "PRODUCT=MF2C" \
+        mf2c/resource-categorization:latest-V2.0.20-arm
+
+trigger_cat_payload='{
+"deviceID":"'${deviceID}'",
+"detectedLeaderID":"'${detectedLeaderID}'",
+"isLeader":false
+}'
+trigger_cat="curl -X POST http://localhost:46070/api/v1/resource-management/categorization/start/ -H 'content-type:application/json' -d '${trigger_cat_payload}'"
+
+docker exec mf2c_micro_resource-categorization apk add curl
+docker exec mf2c_micro_resource-categorization sh -c "${trigger_cat}"
 
 #
 #display_usage() {
