@@ -1,6 +1,13 @@
 #!/bin/sh
 
+if [ -z ${MF2C_USER} ] || [ -z ${MF2C_PWD} ]
+then
+  echo "Missing MF2C_USER/MF2C_PWD credentials. Please export those"
+  exit 1
+fi
+
 set -x
+
 
 docker run -d --restart=on-failure \
         -e mF2C_User=${MF2C_USER} \
@@ -22,21 +29,21 @@ get_id='curl -X GET http://localhost:46060/api/v1/resource-management/identifica
 while [[ "$deviceID" != "null" ]]
 do
   deviceID=$(docker exec mf2c_micro_identification sh -c "${get_id}" | jq -r .deviceID)
-  sleep 1
+  sleep 2
 done
 
 register_cmd='curl -X POST http://localhost:46060/api/v1/resource-management/identification/registerDevice/'
 docker exec mf2c_micro_identification sh -c "${register_cmd}"
 while [ $? -ne 0 ]
 do
-  sleep 1
+  sleep 3
   docker exec mf2c_micro_identification sh -c "${register_cmd}"
 done
 
 while [[ "$deviceID" == "null" ]]
 do
   deviceID=$(docker exec mf2c_micro_identification sh -c "${get_id}" | jq -r .deviceID)
-  sleep 1
+  sleep 3
 done
 
 
@@ -46,7 +53,7 @@ export detectedLeaderID=${LEADER_ID:-$deviceID}
 docker exec mf2c_micro_cau-client sh -c "echo getpubkey=1233211234567 | nc localhost 46065"
 while [ $? -ne 0 ]
 do
-  sleep 1
+  sleep 5
   docker exec mf2c_micro_cau-client sh -c "echo getpubkey=1233211234567 | nc localhost 46065"
 done
 
@@ -78,7 +85,7 @@ docker exec mf2c_micro_resource-categorization apk add curl
 docker exec mf2c_micro_resource-categorization sh -c "${trigger_cat}"
 while [ $? -ne 0 ]
 do
-  sleep 1
+  sleep 2
   docker exec mf2c_micro_resource-categorization sh -c "${trigger_cat}"
 done
 
