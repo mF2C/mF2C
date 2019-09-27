@@ -64,6 +64,8 @@ services:
        
   logicmodule1:
     image: mf2c/dataclay-logicmodule:2.24
+    ports:
+       - "1034:1034"
     environment:
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
