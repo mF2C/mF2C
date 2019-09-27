@@ -1,6 +1,9 @@
 FROM docker:18.09.3
 
-RUN apk add curl lshw jq bc wget python openssh py-pip usbutils git --no-cache
+LABEL PRODUCT=MF2C
+LABEL description="Initializes the mF2C Microagent"
+
+RUN apk add jq --no-cache
 
 ADD mf2c-entrypoint.sh /usr/local/bin/mf2c-entrypoint.sh
 
