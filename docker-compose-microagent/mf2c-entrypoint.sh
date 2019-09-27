@@ -33,7 +33,7 @@ do
   docker exec mf2c_micro_identification sh -c "${register_cmd}"
 done
 
-while [[ "$deviceID" != "null" ]]
+while [[ "$deviceID" == "null" ]]
 do
   deviceID=$(docker exec mf2c_micro_identification sh -c "${get_id}" | jq -r .deviceID)
   sleep 1
