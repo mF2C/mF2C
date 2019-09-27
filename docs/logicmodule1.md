@@ -28,6 +28,20 @@ For mF2C system we have created a docker image with already registered model, ac
 dataClay API can be found at
 <https://www.bsc.es/sites/default/files/public/bscw2/content/software-app/technical-documentation/dataclay-1.0_0.pdf>
 
+### Security 
+
+Current dataClay implementation secures connection between logicmodule components which is the dataclay inter-agent communication in mF2c.
+
+dataClay uses traefik for port forwarding and certificate validation. It means that we have just to define where dataClay can find certificates. For that we have defined three environment variables in /docker-compose/prop/global.properties file at the mF2c repository (client trusted certificate, 
+client certificate and client key) used to identify the agent. 
+
+*REMEMBER: We assume the certificate to identify the client is the same than the one used in Traefik*:
+
+
+SSL_CLIENT_TRUSTED_CERTIFICATES=/ssl/rootCA.crt
+SSL_CLIENT_CERTIFICATE=/ssl/agent.crt
+SSL_CLIENT_KEY=/ssl/agent.pem #in PEM format
+
 ### Troubleshooting
 
 ## CHANGELOG
