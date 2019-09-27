@@ -18,6 +18,13 @@ docker run -d --restart=on-failure \
         mf2c/cau-client-it2-arm
 
 
+get_id='curl -X GET http://localhost:46060/api/v1/resource-management/identification/requestID'
+while [[ "$deviceID" != "null" ]]
+do
+  deviceID=$(docker exec mf2c_micro_identification sh -c "${get_id}" | jq -r .deviceID)
+  sleep 1
+done
+
 register_cmd='curl -X POST http://localhost:46060/api/v1/resource-management/identification/registerDevice/'
 docker exec mf2c_micro_identification sh -c "${register_cmd}"
 while [ $? -ne 0 ]
@@ -26,12 +33,12 @@ do
   docker exec mf2c_micro_identification sh -c "${register_cmd}"
 done
 
-get_id='curl -X GET http://localhost:46060/api/v1/resource-management/identification/requestID'
-while [ -z $deviceID ] || [[ "$deviceID" == "null" ]]
+while [[ "$deviceID" != "null" ]]
 do
   deviceID=$(docker exec mf2c_micro_identification sh -c "${get_id}" | jq -r .deviceID)
   sleep 1
 done
+
 
 # variable coming from Nuvla
 export detectedLeaderID=${LEADER_ID:-$deviceID}
