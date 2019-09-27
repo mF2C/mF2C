@@ -360,8 +360,6 @@ services:
     depends_on:
       - cau-client
     network_mode: "host"
-    expose:
-      - "1999"
     extra_hosts:
       - "vpnserver:213.205.14.13"
     cap_add:
