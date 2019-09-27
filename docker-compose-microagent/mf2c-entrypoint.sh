@@ -82,6 +82,25 @@ do
   docker exec mf2c_micro_resource-categorization sh -c "${trigger_cat}"
 done
 
+cat>>env.list <<EOF
+HOST_IP=192.168.252.41
+WORKING_DIR_VOLUME=/tmp/mf2c/compose_files
+UM_WORKING_DIR_VOLUME=/tmp/mf2c/um/
+LM_WORKING_DIR_VOLUME=/tmp/mf2c/lm/
+SERVICE_CONSUMER=true
+RESOURCE_CONTRIBUTOR=true
+MAX_APPS=3
+EOF
+
+docker run --rm -p 46300:46300 -p 46000:46000 --env-file env.list \
+        -v /tmp/mf2c/compose_files:/tmp/mf2c/compose_files \
+        -v /tmp/mf2c/um:/tmp/mf2c/um \
+        -v /tmp/mf2c/lm:/tmp/mf2c/lm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        --name mf2c_micro_lifecycle \
+        --label "PRODUCT=MF2C" \
+        mf2c/lifecycle:1.0.7-arm
+
 #
 #display_usage() {
 #  echo
