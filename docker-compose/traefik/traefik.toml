@@ -8,3 +8,11 @@ defaultEntryPoints = ["http", "https"]
         address = ":443"
             [entryPoints.https.tls]
 
+     #[entryPoints.https.tls.clientCA]
+     #files = ["/ssl/rootCA.crt"]
+     #optional = false
+
+     # For secure connection on frontend.local
+     #[[entryPoints.https.tls.certificates]]
+     #certFile = "/ssl/agent.crt"
+     #keyFile  = "/ssl/agent.pem"

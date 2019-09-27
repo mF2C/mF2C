@@ -51,28 +51,40 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.23
+    image: mf2c/dataclay-proxy:2.24
     depends_on:
       - logicmodule1
       - ds1java1
     expose:
       - "6472"
-
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD-SHELL", "health_check/wrapper_health_check.sh"]
+       
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.23
-    ports:
-      - "1034:1034"
+    image: mf2c/dataclay-logicmodule:2.24
     environment:
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
       - LOGICMODULE_PORT_TCP=1034
       - LOGICMODULE_HOST=logicmodule1
     volumes:
-      - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
+      - ./prop/global.secure.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=logicmodule1"
+      - "traefik.frontend.rule=Headers: service-alias,logicmodule1"
+      - "traefik.port=1034"
+      - "traefik.protocol=h2c"
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD-SHELL", "health_check/logicmodule_health_check.sh"]
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.23
+    image: mf2c/dataclay-dsjava:2.24
     depends_on:
       - logicmodule1
     environment:
@@ -84,6 +96,11 @@ services:
     volumes:
       - ./prop/global.properties:/usr/src/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/usr/src/dataclay/log4j2.xml:ro
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD-SHELL", "health_check/dataservice_health_check.sh"]
+       
   #####################################################
 
   ################### Event Manager ###################
