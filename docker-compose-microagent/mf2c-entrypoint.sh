@@ -27,7 +27,7 @@ do
 done
 
 get_id='curl -X GET http://localhost:46060/api/v1/resource-management/identification/requestID'
-while [ -z $deviceID ]
+while [ -z $deviceID ] || [[ "$deviceID" == "null" ]]
 do
   deviceID=$(docker exec mf2c_micro_identification sh -c "${get_id}" | jq -r .deviceID)
   sleep 1
