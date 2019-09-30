@@ -7,4 +7,5 @@ This is a test
    :maxdepth: 1
    :hidden:
 
-   cimi.md
+.. mdinclude:: cimi.md
+
