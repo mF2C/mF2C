@@ -17,19 +17,39 @@ In this repository you'll find the recipes and files necessary to deploy the mF2
 
 2. clone the main mF2C repository:
       
-    ````````
+    ```
     git clone https://github.com/mF2C/mF2C
     cd mF2C/docker-compose    
-3. deploy the agent using docker-compose:
+    ```
+
+3. deploy the agent by running:
     
-    ```````
-    docker-compose -p mf2c up -d
+    
+    `install.sh    # use -L if the node is a leader`
 
 4. run the hello-world test
-    ````
-    ./hello-world.sh
+    
+    `./hello-world.sh --include-tests`
 
+5. to shutdown the agent:
+
+    `./install.sh -S`
 
 # Docs
 
- - [cimi](./docs/cimi.md)
+ - [ACLib](./docs/aclib.html)
+ - [CIMI](./docs/cimi.html)
+ - [Analytics Engine](./docs/analytics_engine.html)
+ - [CAU Client](./docs/cau_client.html)
+ - [DCProxy](./docs/dcproxy.html)
+ - [ds1java1](./docs/ds1java1.html)
+ - [Identification](./docs/identification.html)
+ - [Landscaper](./docs/landscaper.html)
+ - [Logicmodule](./docs/logicmodule1.html)
+ - [mF2C Agent](./docs/mf2c_agent.html)
+ - [Policies](./docs/policies.html)
+ - [Resource Categorization](./docs/resource-categorization.html)
+ - [Service Manager](./docs/service_manager.html)
+ - [SLA Management](./docs/sla_management.html)
+ - [VPN client](./docs/vpnclient.html)
+
