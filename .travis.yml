@@ -1,0 +1,8 @@
+language: generic
+dist: trusty
+services:
+- docker
+script:
+- cd $TRAVIS_BUILD_DIR/docker-compose/ && docker-compose config
+notifications:
+  slack: mf2c:0xYqpf2CIZZsBtLp6599VOsG
