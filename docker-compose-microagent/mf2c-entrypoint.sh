@@ -72,7 +72,7 @@ docker run -d --hostname=IRILD039 --privileged \
         -v /var/run/docker.sock:/var/run/docker.sock \
         --name mf2c_micro_resource-categorization \
         --label "PRODUCT=MF2C" \
-        mf2c/resource-categorization:latest-V2.0.20-arm
+        mf2c/resource-categorization:latest-V2.0.21-arm
 
 trigger_cat_payload='{
 "deviceID":"'${deviceID}'",
