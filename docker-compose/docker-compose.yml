@@ -375,18 +375,20 @@ services:
     command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
 
   vpnclient:
-    image: mf2c/vpnclient:1.1.0
+    image: mf2c/vpnclient:1.1.2
     depends_on:
       - cau-client
     network_mode: "host"
     extra_hosts:
       - "vpnserver:213.205.14.13"
-    environment:
-      - VPN_DAEMON=FALSE
     cap_add:
       - NET_ADMIN
     volumes:
       - pkidata:/pkidata
+    healthcheck:
+      start_period: 120s
+      interval: 30s
+      test: curl -s https://localhost:1999/api/get_vpn_ip |grep -q connected
 
   resource-bootstrap:
     image: mf2c/resource-bootstrap:1.0.0
