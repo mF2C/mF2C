@@ -1,6 +1,8 @@
 # mF2C
 Towards an Open, Secure, Decentralized and Coordinated Fog-to-Cloud Management Ecosystem.
 
+[![CI](https://img.shields.io/travis/com/mF2C/mF2C?style=for-the-badge&logo=travis-ci&logoColor=white)](https://travis-ci.com/mF2C/mF2C)
+
 ### Components Build Status
 
 [cimi](https://github.com/mF2C/cimi) [![CircleCI](https://circleci.com/gh/mF2C/cimi/tree/master.svg?style=svg)](https://circleci.com/gh/mF2C/cimi/tree/master) 
