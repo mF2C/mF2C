@@ -116,7 +116,7 @@ services:
     healthcheck:
       start_period: 30s
       retries: 5
-      test: ["CMD", "netstat -a | grep '0.0.0.0:8000'"]
+      test: ["CMD", "sh", "-c", "netstat -a | grep '0.0.0.0:8000'"]
   ######################################################
 
   ################## Service Manager ###################
