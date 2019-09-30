@@ -104,6 +104,83 @@ else
 	log "OK" "Got JWT from ACLib"
 fi
 
+#######
+### CIMI integration test
+#######
+
+cat > session-template-jwt.json <<EOF
+{
+    "method": "jwt",
+    "instance": "jwt",
+    "name": "JWT Authentication",
+    "description": "External Authentication with JWT",
+    "token": "provide-valid-authentication-token",
+    "acl": {
+        "owner":{"principal":"ADMIN","type":"ROLE"},
+        "rules":[{"principal":"ADMIN","type":"ROLE","right":"ALL"},
+                 {"principal":"ANON","type":"ROLE","right":"VIEW"},
+                 {"principal":"USER","type":"ROLE","right":"VIEW"}]
+    }
+}
+EOF
+
+export JWT="${jwt}"
+
+cat > session-login-jwt.json <<EOF
+{
+    "name": "test-jwt",
+    "description": "session create document to test jwt authentication",
+    "sessionTemplate": {
+        "href": "session-template/jwt",
+        "token": "${JWT}"
+    }
+}
+EOF
+
+(curl -XGET "https://localhost/api/cloud-entry-point" -ksS | jq -e 'select(.baseURI != null)' > /dev/null 2>&1 && \
+    log "OK" " [CIMI] cloud-entry-point exists" && exit 0) || \
+        (log "NO" " [CIMI] unable to get cloud-entry-point" && exit 1)
+
+if [ $? -eq 0 ]
+then
+	# insert the session template that allows JWT authentication
+	curl -k -XPOST -d @session-template-jwt.json -H content-type:application/json -H 'slipstream-authn-info:internal ADMIN USER ANON' https://localhost/api/session-template | jq -e 'select(.status == 201)' > /dev/null 2>&1
+        if [ $? -eq 0 ]
+        then
+                cleanUp=1
+                log "OK" " [CIMI] successfully pushed new session template for JWT tokens"
+        else
+                log "FAILED" " [CIMI] failed to add new session template for JWT tokens"
+        fi
+
+	# remove any existing cookies
+	rm -f ~/cookies
+
+	# try authenticating with JWT
+	curl -k -sS  --cookie-jar ~/cookies -b ~/cookies -XPOST -d @session-login-jwt.json -H content-type:application/json https://localhost/api/session | jq -e 'select(.status == 201)' > /dev/null 2>&1
+        if [ $? -eq 0 ]
+        then
+                log "OK" " [CIMI] CIMI user-templates are working"
+        else
+                log "FAILED" " [CIMI] CIMI user-templates are NOT working"
+        fi
+
+	# clean up
+	if [ ! -z $cleanUp ]
+	then
+		curl -k -XDELETE -H 'slipstream-authn-info:internal ADMIN USER ANON' https://localhost/api/session-template/jwt | jq -e 'select(.status == 200)' > /dev/null 2>&1
+		if [ $? -eq 0 ]
+        	then
+                	log "OK" " [CIMI] deleted JWT session template"
+        	else
+                	log "FAILED" " [CIMI] failed to delete JWT session template"
+ 	        fi
+	fi
+	rm -f session-login-jwt.json
+	rm -f session-template-jwt.json
+fi
+
+
 #
 #echo "JWT : ${jwt}"
 #verify the token
