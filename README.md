@@ -5,14 +5,14 @@ Towards an Open, Secure, Decentralized and Coordinated Fog-to-Cloud Management E
 
 ### Components Build Status
 
-[cimi](https://github.com/mF2C/cimi) 
 [![CircleCI](https://circleci.com/gh/mF2C/cimi/tree/master.svg?style=svg)](https://circleci.com/gh/mF2C/cimi/tree/master) 
+[cimi](https://github.com/mF2C/cimi) 
 
-[service-manager](https://github.com/mF2C/service-manager) 
 [![CircleCI](https://circleci.com/gh/mF2C/service-manager.svg?style=svg)](https://circleci.com/gh/mF2C/service-manager)
+[service-manager](https://github.com/mF2C/service-manager) 
 
-[sla-management](https://github.com/mF2C/SlaManagement) 
 [![CircleCI](https://circleci.com/gh/mF2C/SlaManagement.svg?style=svg)](https://circleci.com/gh/mF2C/SlaManagement)
+[sla-management](https://github.com/mF2C/SlaManagement) 
 
 ### Deploying mF2C
 In this repository you'll find the recipes and files necessary to deploy the mF2C system in your device.
