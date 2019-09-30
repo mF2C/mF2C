@@ -28,3 +28,8 @@ In this repository you'll find the recipes and files necessary to deploy the mF2
 4. run the hello-world test
     ````
     ./hello-world.sh
+
+
+# Docs
+
+ - [cimi](./docs/cimi.md)
