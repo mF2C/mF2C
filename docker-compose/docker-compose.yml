@@ -288,7 +288,7 @@ services:
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
-    image: mf2c/analytics-engine:0.5.5
+    image: mf2c/recommender-test:1.0
     expose:
       - "46020"
     ports:
