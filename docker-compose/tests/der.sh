@@ -143,7 +143,7 @@ done
 
 
 
-log INFO "Starting operation with ${LM_API_URL}/service-instances/${SHORT_SERVICE_INSTANCE_ID}/compss"
+log INFO "Starting operation with ${LM_API_URL}/service-instances/${SHORT_SERVICE_INSTANCE_ID}/der"
 
 # Start operation
 LM_OUTPUT=$(curl -XPUT "${LM_API_URL}/service-instances/${SHORT_SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{
