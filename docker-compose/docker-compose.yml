@@ -131,8 +131,6 @@ services:
       - "traefik.enable=true"
       - "traefik.frontend.rule=PathPrefixStrip:/sm"
       - "traefik.port=46200"
-    environment:
-      - JAVA_OPTS=-Xms32m -Xmx256m
     healthcheck:
       start_period: 30s
       retries: 5
