@@ -7,6 +7,10 @@ function log {
     if [[ $1 == "OK" ]]
     then
         printf '\e[0;33m %-15s \e[32m SUCCESS:\e[0m %s \n' [CIMITests] "$text"
+    elif [[ $1 == "WARN" ]]
+    then
+        printf '\e[0;33m %-15s \e[33m WARNING:\e[0m %s \n' [CIMITests] "$text"
+
     else
         printf '\e[0;33m %-15s \e[0;31m FAILED:\e[0m %s \n' [CIMITests] "$text"
     fi
@@ -50,7 +54,7 @@ USER=$(export LC_CTYPE=C; cat /dev/urandom | tr -dc "[:alpha:]" | head -c 8)
         log "NO" "failed to create new user $USER"
 
 # verify creating same user results in conflict (409)
-(curl -XPOST "${BASE_API_URL}/user" -ksS -H 'content-type: application/json' -d '{
+response=$(curl -XPOST "${BASE_API_URL}/user" -ksS -H 'content-type: application/json' -d '{
     "userTemplate": {
         "href": "user-template/self-registration",
         "password": "testpassword",
@@ -58,15 +62,19 @@ USER=$(export LC_CTYPE=C; cat /dev/urandom | tr -dc "[:alpha:]" | head -c 8)
         "emailAddress": "testuser@testemail.com",
         "username": "'$USER'"
     }
-}' | jq -e 'select(.status == 409)' > /dev/null 2>&1 && \
+}')
+
+(echo "$response" | jq -e 'select(.status == 409)' > /dev/null 2>&1 && \
     log "OK" "user $USER cannot be created a second time") || \
+        (echo "$response" | jq -e 'select(.status == 400)' > /dev/null 2>&1 && \
+            log "WARN" "user $USER cannot be created a seconds time, but got the wrong HTTP error") || \
         log "NO" "no error or wrong error when trying to create $USER a second time"
 
 # test "create resource" operation
 ID=`curl -XPOST "${BASE_API_URL}/user-profile" -ksS -H 'slipstream-authn-info: internal ADMIN' -H 'content-type: application/json' -d '{
     "service_consumer": true,
     "resource_contributor": false,
-    "device_id": "some-device",
+    "device_id": "some-device"
 }' | jq -e -r '.["resource-id"]'` && \
     log "OK" "created new resource $ID successfully" || \
         log "NO" "failed to create new resource"
@@ -85,7 +93,7 @@ ID=`curl -XPOST "${BASE_API_URL}/user-profile" -ksS -H 'slipstream-authn-info: i
 (curl -XPUT "${BASE_API_URL}/${ID}" -ksS -H 'slipstream-authn-info: internal ADMIN' -H 'content-type: application/json' -d '{
     "service_consumer": false,
     "resource_contributor": true,
-    "device_id": "some-device",
+    "device_id": "some-device"
 }' --fail > /dev/null 2>&1 && \
     log "OK" "resource $ID update successfully") || \
         log "NO" "failed to update resource"
