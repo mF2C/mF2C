@@ -225,7 +225,7 @@ fi
 #jwe :
 #create request
 #
-jwe_req="{\"recs\":[\"c6968d75a7df20e2d2f81f87fe69bf0b7dd14f4a22cca5f15ffc645cb4d45944bfdc7a7a970a9e13a331161e304a3094d8e6e362e88bd7df0d7b5473b6d2aa80\"],\"typ\":\"jwe\",\"comp\":\"t\",\"payload\":\"${payload}\",\"sec\":\"pri\"}"
+jwe_req="{\"recs\":[\"${did}\"],\"typ\":\"jwe\",\"comp\":\"t\",\"payload\":\"${payload}\",\"sec\":\"pri\"}"
 #echo "${jwe_req}"
 jwe=$(echo ${jwe_req} | nc ${host_ip} ${port})
 if  [ -z  "${jwe}" ] || [ "${jwe:0:2}" == "err" ] ; then
