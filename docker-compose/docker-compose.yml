@@ -187,7 +187,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.5
+     image: mf2c/policies:2.0.7
      restart: on-failure
      depends_on:
        - cimi
@@ -195,7 +195,7 @@ services:
        - "46050"
      labels:
        - "traefik.enable=true"
-       - "traefik.frontend.rule=PathPrefix:/rm"
+       - "traefik.frontend.rule=PathPrefix:/rm,/api/v2/resource-management/policies"
        - "traefik.port=46050"
      environment:
        - "DEBUG=True"
@@ -208,7 +208,7 @@ services:
        test: ["CMD", "wget", "--spider", "http://localhost:46050"]
 
   discovery:
-     image: mf2c/discovery:1.4
+     image: mf2c/discovery:1.5
      restart: on-failure
      depends_on:
        - cimi
@@ -271,7 +271,7 @@ services:
        test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.20
+     image: mf2c/resource-categorization:latest-V2.0.21
      hostname: IRILD039
      restart: on-failure
      depends_on:
