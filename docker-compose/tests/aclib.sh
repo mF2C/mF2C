@@ -144,7 +144,7 @@ EOF
 if [ $? -eq 0 ]
 then
 	# insert the session template that allows JWT authentication
-	curl -k -XPOST -d @session-template-jwt.json -H content-type:application/json -H 'slipstream-authn-info:internal ADMIN USER ANON' https://localhost/api/session-template | jq -e 'select(.status == 201)' > /dev/null 2>&1
+	curl -ksS -XPOST -d @session-template-jwt.json -H content-type:application/json -H 'slipstream-authn-info:internal ADMIN USER ANON' https://localhost/api/session-template | jq -e 'select(.status == 201)' > /dev/null 2>&1
         if [ $? -eq 0 ]
         then
                 cleanUp=1
@@ -157,18 +157,18 @@ then
 	rm -f ~/cookies
 
 	# try authenticating with JWT
-	curl -k -sS  --cookie-jar ~/cookies -b ~/cookies -XPOST -d @session-login-jwt.json -H content-type:application/json https://localhost/api/session | jq -e 'select(.status == 201)' > /dev/null 2>&1
+	curl -ksS  --cookie-jar ~/cookies -b ~/cookies -XPOST -d @session-login-jwt.json -H content-type:application/json https://localhost/api/session | jq -e 'select(.status == 201)' > /dev/null 2>&1
         if [ $? -eq 0 ]
         then
-                log "OK" " [CIMI] CIMI user-templates are working"
+                log "OK" " [CIMI] successful login with JWT token"
         else
-                log "FAILED" " [CIMI] CIMI user-templates are NOT working"
+                log "FAILED" " [CIMI] failed to login with CIMI using JWT"
         fi
 
 	# clean up
 	if [ ! -z $cleanUp ]
 	then
-		curl -k -XDELETE -H 'slipstream-authn-info:internal ADMIN USER ANON' https://localhost/api/session-template/jwt | jq -e 'select(.status == 200)' > /dev/null 2>&1
+		curl -ksS -XDELETE -H 'slipstream-authn-info:internal ADMIN USER ANON' https://localhost/api/session-template/jwt | jq -e 'select(.status == 200)' > /dev/null 2>&1
 		if [ $? -eq 0 ]
         	then
                 	log "OK" " [CIMI] deleted JWT session template"
