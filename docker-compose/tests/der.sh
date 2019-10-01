@@ -1,5 +1,5 @@
 #!/bin/bash -e
-AGENT_IP=$(ifconfig -a | grep -A 5 "eno1" | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)
+AGENT_IP=$(ip route get 1.2.3.4 | awk '{print $7}' | head -n 1)
 SERVICE_NAME="COMPSs-test"
 SERVICE_IMAGE="mf2c/compss-test:it2.8"
 
