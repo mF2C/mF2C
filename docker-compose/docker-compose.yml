@@ -230,6 +230,10 @@ services:
      environment:
        - mF2C_User=${usr}
        - mF2C_Pass=${pwd}
+     healthcheck:
+       start_period: 30s
+       retries: 5
+       test: curl -f http://localhost:46060/api/v1/resource-management/identification/requestID || exit 1
        
   cau-client:
      image: mf2c/cau-client-it2:v2.1
