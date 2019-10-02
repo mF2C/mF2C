@@ -145,7 +145,7 @@ services:
       - cimi
       - resource-categorization
       - analytics-engine
-      - landscaper
+#      - landscaper
     expose:
       - "46300"
       - "46000"
