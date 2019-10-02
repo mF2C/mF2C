@@ -77,6 +77,8 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
 ANALYTICS_IP_ADDRESS=$(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H 'content-type: application/json' -d '{"name": "compss-hello-world"}' \
 | jq -e 'if . == [] then null else .[].ipaddress end') > /dev/null 2>&1
 
+ANALYTICS_IP_ADDRESS=`echo $ANALYTICS_IP_ADDRESS | tr -d '\n'`
+
 if [[ ($ANALYTICS_IP_ADDRESS != null) && ($ANALYTICS_IP_ADDRESS != "") ]]
     then
         log "OK" "ip $ANALYTICS_IP_ADDRESS returned successfully" [Analytics]
