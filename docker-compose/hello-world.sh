@@ -1,6 +1,25 @@
 #!/usr/bin/env bash
 
-if [[ "$1" == "--include-tests" ]]
+while [[ $# -gt 0 ]]
+do
+key="$1"
+case $key in
+    --num-agents)
+    num_agents_arg="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    --include-tests)
+    include_tests_arg=yes
+    shift # past argument
+    ;;
+    *)    # unknown option
+    shift # past argument
+    ;;
+esac
+done
+
+if [[ "$include_tests_arg" == "yes" ]]
 then
 	tests_folder="./tests/"
 	tests=`ls $tests_folder`
@@ -12,6 +31,7 @@ then
 else
 	echo -e "\n    Use --include-tests to run all scripts in the 'tests' folder    \n"
 fi
+
 
 printf '\e[0;33m %-15s \e[0m Starting...\n' [HelloWorldTest]
 
@@ -63,7 +83,7 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
     "exec_type": "compss",
     "sla_templates": ["'"$SLA_TEMPLATE_ID"'"],
     "agent_type": "normal",
-    "num_agents": 1,
+    "num_agents": "'"$num_agents_arg"'",
     "cpu_arch": "x86-64",
     "os": "linux",
     "storage_min": 0,
@@ -90,6 +110,7 @@ if [[ ($ANALYTICS_IP_ADDRESS != null) && ($ANALYTICS_IP_ADDRESS != "") ]]
 SERVICE_ID=`echo $SERVICE_ID | tr -d '"'`
 LM_OUTPUT=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'", "sla_template": "'"$SLA_TEMPLATE_ID"'"}') >/dev/null 2>&1
 SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
+SERVICE_INSTANCE_IP=`echo $SERVICE_INSTANCE_IP | tr -d '\n'`
 SERVICE_INSTANCE_ID=$(echo "$LM_OUTPUT" | jq -r ".service_instance.id")
 
 if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]
