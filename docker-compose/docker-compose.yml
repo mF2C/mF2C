@@ -282,7 +282,7 @@ services:
      healthcheck:
        start_period: 60s
        retries: 5
-       test: ["CMD", "wget", "--spider", "http://localhost:46070"]
+       test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/start/ || exit 1
 
   vpnclient:
     image: mf2c/vpnclient:1.1.2
