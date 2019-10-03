@@ -103,9 +103,7 @@ LM_OUTPUT=$(curl -XPUT "https://localhost/sm/api/service-instances/${SERVICE_INS
     "parameters":"<params paramId=\"0\"><direction>IN</direction><stream>UNSPECIFIED</stream><type>OBJECT_T</type><array paramId=\"0\"><componentClassname>java.lang.String</componentClassname><values><element paramId=\"0\"><className>java.lang.String</className><value xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xsi:type=\"xs:string\">60</value></element></values></array></params>"
 }')
 if [[ ! $(echo "${LM_OUTPUT}" | jq -r ".error" 2>/dev/null) == "false" ]]; then
-  log "NO" 'failed to launch compss operation
-    '"${LM_OUTPUT}"
-  shutdown
+  log "NO" "failed to launch compss operation"
 else
   log "OK" "operation started successfully"
 fi
