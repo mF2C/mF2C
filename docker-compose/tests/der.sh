@@ -1,5 +1,5 @@
 #!/bin/bash -e
-AGENT_IP=$(ifconfig -a | grep -A 5 "eno1" | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)
+AGENT_IP=$(ip route get 1.2.3.4 | awk '{print $7}' | head -n 1)
 SERVICE_NAME="COMPSs-test"
 SERVICE_IMAGE="mf2c/compss-test:it2.8"
 
@@ -41,16 +41,17 @@ trap ctrl_c INT
 log INFO "Waiting until mf2c platform is totally deployed..."
 
 DEVICE_COUNT=0
-ITERATIONS=0
 while [ "${DEVICE_COUNT}" = "0" ]; do
     sleep 1
-    DEVICE_COUNT=$(curl -k -H 'slipstream-authn-info:internal ADMIN' -H 'content-type:application/json' ${BASE_API_URL}/device 2>/dev/null | jq -re ".count" 2>/dev/null|| echo "0") 
-    ITERATIONS=$((ITERATIONS+1))
+    DEVICE_COUNT=$(curl -k -H 'slipstream-authn-info:internal ADMIN' -H 'content-type:application/json' ${BASE_API_URL}/sharing-model 2>/dev/null | jq -re ".count" 2>/dev/null|| echo "0") 
 done
+log INFO "    Sharing model already loaded."
 
-if (( ITERATIONS > 1 )); then
-    sleep 5
-fi
+while [ "${DEVICE_COUNT}" = "0" ]; do
+    sleep 1
+    DEVICE_COUNT=$(curl -k -H 'slipstream-authn-info:internal ADMIN' -H 'content-type:application/json' ${BASE_API_URL}/user-profile 2>/dev/null | jq -re ".count" 2>/dev/null|| echo "0") 
+done
+log INFO "    User profile already loaded."
 
 log INFO "Starting test execution..."
 ##### SERVICE CREATION
@@ -143,7 +144,7 @@ done
 
 
 
-log INFO "Starting operation with ${LM_API_URL}/service-instances/${SHORT_SERVICE_INSTANCE_ID}/compss"
+log INFO "Starting operation with ${LM_API_URL}/service-instances/${SHORT_SERVICE_INSTANCE_ID}/der"
 
 # Start operation
 LM_OUTPUT=$(curl -XPUT "${LM_API_URL}/service-instances/${SHORT_SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{

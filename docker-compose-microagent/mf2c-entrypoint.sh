@@ -65,7 +65,7 @@ docker run -d --network="host" \
         -v /var/run/docker.sock:/var/run/docker.sock \
         --name mf2c_micro_discovery \
         --label "PRODUCT=MF2C" \
-        mf2c/discovery-microagent:latest
+        mf2c/discovery-microagent:4.5
 
 docker run -d --hostname=IRILD039 --privileged \
         -e LEADER_ENDPOINT="https://dashboard.mf2c-project.eu" \
@@ -99,7 +99,7 @@ RESOURCE_CONTRIBUTOR=true
 MAX_APPS=3
 EOF
 
-docker run --rm -d -p 46300:46300 -p 46000:46000 --env-file env.list \
+docker run --rm -p 46300:46300 -p 46000:46000 --env-file env.list \
         -v /tmp/mf2c/compose_files:/tmp/mf2c/compose_files \
         -v /tmp/mf2c/um:/tmp/mf2c/um \
         -v /tmp/mf2c/lm:/tmp/mf2c/lm \
@@ -118,5 +118,5 @@ docker wait $parent
 docker rm -f "$mf2c_containers"
 EOF
 
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/cleaner.sh:/cleaner.sh docker sh /cleaner.sh
+#docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/cleaner.sh:/cleaner.sh docker sh /cleaner.sh
 
