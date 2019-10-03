@@ -43,6 +43,12 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.8.4 (03.10.19)
+
+#### Changed
+
+ - Now if a service-instance has no valid agreement and the qos-model cannot be submitted, the QoS Provider returns 404.
+
 ### 1.8.3 (16.09.19)
 
 #### Added
