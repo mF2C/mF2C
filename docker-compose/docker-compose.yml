@@ -303,7 +303,7 @@ services:
     healthcheck:
       start_period: 120s
       interval: 30s
-      test: curl -s https://localhost:1999/api/get_vpn_ip |grep -q connected
+      test: grep -q connected /usr/share/nginx/html/api/get_vpn_ip
 
   resource-bootstrap:
     image: mf2c/resource-bootstrap:1.3.0
