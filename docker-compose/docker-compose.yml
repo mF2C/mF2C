@@ -215,8 +215,6 @@ services:
      - "46040:46040"
      cap_add:
        - NET_ADMIN
-     volumes:
-       - vpninfo:/vpninfo:ro
      healthcheck:
        start_period: 30s
        retries: 5
