@@ -70,11 +70,25 @@ SERVICE_INSTANCE=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -
 SERVICE_INSTANCE_ID=$( jq -r '.id'<<< "${SERVICE_INSTANCE}")
 (curl -XGET "https://localhost/sm/api/${SERVICE_INSTANCE_ID}" -ksS \
  | jq -es 'if . == [] then null else .[] | select(.status == 200) end') > /dev/null 2>&1 && \
-    log "OK" "QoS for service instance $SERVICE_INSTANCE_ID checked successfully" || \
-        log "NO" "failed to check QoS for service instance $SERVICE_INSTANCE_ID"
+    log "OK" "QoS provider checked service-instance $SERVICE_INSTANCE_ID successfully" || \
+        log "NO" "QoS provider failed to check service-instance $SERVICE_INSTANCE_ID"
 
-# 6. check if qos-model (provider) is added
-AGREEMENT_ID=$(jq -r '.agreement'<<< "${SERVICE_INSTANCE}")
+# 6. check if sla-agreement is created
+SI_STATUS="created-not-initialized"
+while [ "$SI_STATUS" = "created-not-initialized" ]; do
+	sleep 5
+	SERVICE_INSTANCE=$(curl "https://localhost/api/$SERVICE_INSTANCE_ID" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN')
+	SI_STATUS=$(echo "$SERVICE_INSTANCE" | jq -re ".status")
+	log "INFO" "service instance status = $SI_STATUS..." [LifecycleManager]
+done
+AGREEMENT_ID=$(echo "$SERVICE_INSTANCE" | jq -re ".agreement")
+if [[ -n "$AGREEMENT_ID" && "$AGREEMENT_ID" =~ ^agreement/.*$ ]]; then
+        log "OK" "agreement created successfully" [SlaManagement]
+else
+        log "NO" "failed to create agreement" [SlaManagement]
+fi
+
+# 7. check if qos-model (provider) is added
 QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href="'$SERVICE_ID'"&$filter=agreement/href="'$AGREEMENT_ID'"' \
 -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' \
  | jq -es 'if . == [] then null else .[] | .["qos-models"][0].id end') && \
