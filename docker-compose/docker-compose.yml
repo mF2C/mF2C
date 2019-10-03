@@ -200,6 +200,7 @@ services:
        - "MF2C=True"
        - "isLeader=${isLeader}"
        - "WIFI_DEV_FLAG=${WIFI_DEV_FLAG}"
+       - "leaderIP=${leaderIP}"
      healthcheck:
        start_period: 30s
        retries: 5
