@@ -110,22 +110,30 @@ fi
 
 # 9. check if there are new service-operations-reports
 REPORT_EXIST="false"
+ATTEMPTS=0
 while [ "$REPORT_EXIST" = "false" ]; do
-  sleep 1
+  ATTEMPTS=$ATTEMPTS+1
+  if ((ATTEMPTS > 5)); then
+    break
+  fi
   SERVICE_OPERATION_REPORTS=$(curl "https://localhost/api/service-operation-report" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' | jq -es 'if . == [] then null else .[].serviceOperationReports | length end') >/dev/null 2>&1
   if ((SERVICE_OPERATION_REPORTS > 0)); then
     log "OK" "service-operation-reports are created successfully"
-    AGENTS_ADDED="true"
+    REPORT_EXIST="true"
   else
     log "NO" "no service-operation-report created"
   fi
-  REPORT_EXIST="true"
+  sleep 1
 done
 
 # 10. check if new agents are added to the service-instance by QoS enforcement
 AGENTS_ADDED="false"
+ATTEMPTS=0
 while [ "$AGENTS_ADDED" = "false" ]; do
-  sleep 1
+  ATTEMPTS=$ATTEMPTS+1
+  if ((ATTEMPTS > 5)); then
+    break
+  fi
   NUM_AGENTS=$(curl "https://localhost/api/$SERVICE_INSTANCE_ID" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' | jq -es 'if . == [] then null else .[].agents | length end') >/dev/null 2>&1
   if ((NUM_AGENTS > 1)); then
     log "OK" "agents added to service-instance successfully"
@@ -133,4 +141,5 @@ while [ "$AGENTS_ADDED" = "false" ]; do
   else
     log "NO" "agents are not added yet"
   fi
+  sleep 1
 done
