@@ -112,10 +112,13 @@ fi
 REPORT_EXIST="false"
 while [ "$REPORT_EXIST" = "false" ]; do
   sleep 1
-  SERVICE_OPERATION_REPORTS=$(curl "https://localhost/api/service-operation-report" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN')
-  (echo "$SERVICE_OPERATION_REPORTS" | jq -es 'if . == [] then null else .[] end') &&
-    log "OK" "service-operation-reports are created successfully" ||
+  SERVICE_OPERATION_REPORTS=$(curl "https://localhost/api/service-operation-report" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' | jq -es 'if . == [] then null else .[].serviceOperationReports | length end') >/dev/null 2>&1
+  if ((SERVICE_OPERATION_REPORTS > 0)); then
+    log "OK" "service-operation-reports are created successfully"
+    AGENTS_ADDED="true"
+  else
     log "NO" "no service-operation-report created"
+  fi
   REPORT_EXIST="true"
 done
 
@@ -123,8 +126,7 @@ done
 AGENTS_ADDED="false"
 while [ "$AGENTS_ADDED" = "false" ]; do
   sleep 1
-  SERVICE_INSTANCE=$(curl "https://localhost/api/$SERVICE_INSTANCE_ID" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN')
-  NUM_AGENTS=$(echo "$SERVICE_INSTANCE" | jq -es '.agents | length')
+  NUM_AGENTS=$(curl "https://localhost/api/$SERVICE_INSTANCE_ID" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' | jq -es 'if . == [] then null else .[].agents | length end') >/dev/null 2>&1
   if ((NUM_AGENTS > 1)); then
     log "OK" "agents added to service-instance successfully"
     AGENTS_ADDED="true"
