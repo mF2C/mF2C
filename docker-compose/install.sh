@@ -1,4 +1,7 @@
 #!/bin/bash -e
+# mF2C Installation Script
+# version: 1.1
+
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
 function log {
@@ -20,6 +23,11 @@ function log {
 function cleanup {
     log "IF" "Shutting down this mF2C agent..."
     docker-compose -p mf2c down -v || log "ER" "Failed to deprovision docker-compose"
+    WIFI_DEV_RESULT=$(cat .env | grep "WIFI_DEV_FLAG" | cut -d'=' -f2)
+    if [[ -f .env &&  ${WIFI_DEV_RESULT} != "" ]]; then
+        sudo ip link set $(cat .env | grep "WIFI_DEV_FLAG" | cut -d'=' -f2) down 2>/dev/null
+        log "OK" "${WIFI_DEV_RESULT} iface successfully set down."
+    fi
     rm -f .env
     [ -d mF2C ] && rm -f docker-compose.yml
     [ -d mF2C ] && rm -rf prop
@@ -35,6 +43,7 @@ trap cleanup ERR
 PROJECT=mf2c
 DOCKER_NAME_DISCOVERY="discovery"
 IS_LEADER=False
+IS_CLOUD=False
 
 progress() {
     # $1 is the current percentage, from 0 to 100
@@ -48,15 +57,19 @@ progress() {
 }
 
 usage='Usage:
-'$0' [OPTIONS]
+'$0' [OPTION]
 
 OPTIONS:
+[Only one option is allowed]
 \n -S --shutdown
 \t Shutdown and delete the running mF2C deployment
 \n -s --status
 \t Display the actual mF2C docker container status
 \n -L --isLeader
-\t Installs the mF2C system as a leader. This option is ignored when used together with --shutdown
+\t Installs the mF2C system as a leader.
+\n -C --isCloud
+\t Installs the mF2C system as Cloud.
+\n\t Only one option is allowed.
 '
 
 while [ "$1" != "" ]; do
@@ -70,6 +83,8 @@ while [ "$1" != "" ]; do
     ;;
     --status | -s )  docker-compose -p ${PROJECT} ps
     exit 1
+    ;;
+    --isCloud | -C )              IS_CLOUD=True;
     ;;
     * )         echo -e "Invalid option $1 \n\n${usage}"
     exit 0
@@ -109,40 +124,45 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
+#if [[ ${MF2C_CLOUD_AGENT} == "" ]]; then
+#    MF2C_CLOUD_AGENT="213.205.14.15"
+#    log "IF" "Using default mF2C cloud ${MF2C_CLOUD_AGENT}"
+#else
+#    log "IF" "mF2C cloud ${MF2C_CLOUD_AGENT} detected as env variable"
+#fi
+
 progress "5" "Checking OS compatibility"
 
-#Find inet name
-if [[ "$machine" == "Mac" ]]
-then
-    WIFI_DEV=$(networksetup -listallhardwareports | grep -1 "Wi-Fi" | awk '$1=="Device:"{print $2}')
-    IN_USE=$(route -n get default | awk '$1=="interface:"{print $2}')
-    echo "ERR: compatibility for Mac is not fully supported yet. Exit..."
-    read -p "Do you wish to continue? [y/n]" yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-elif [[ "$machine" == "Linux" ]]
-then
-    WIFI_DEV=$(iw dev | awk '$1=="Interface"{print $2}')
-    IN_USE=$(ip r | grep default | cut -d " " -f5)
-    #find corresponding phy name
-    if [[ $WIFI_DEV != "" ]]; then
-        PHY=$(cat /sys/class/net/"$WIFI_DEV"/phy80211/name)
-    else
-        if [[ $(docker-compose -p $PROJECT ps 2>/dev/null | wc -l) -gt 2  ]]; then
-            log "WR" "Agent currently running. Interface cannot be attached to the mF2C agent. Shutdown required."
-        else
-            log "ER" "No WiFi interface dettected."
+if [[ "${IS_CLOUD}" != "True" ]]; then
+    if [[ "$machine" == "Mac" ]]
+    then
+        WIFI_DEV=$(networksetup -listallhardwareports | grep -1 "Wi-Fi" | awk '$1=="Device:"{print $2}')
+        IN_USE=$(route -n get default | awk '$1=="interface:"{print $2}')
+        echo "ERR: compatibility for Mac is not fully supported yet. Exit..."
+        read -p "Do you wish to continue? [y/n]" yn
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* ) exit;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    elif [[ "$machine" == "Linux" ]]
+    then
+        WIFI_DEV=$(/sbin/iw dev | awk '$1=="Interface"{print $2}')
+        IN_USE=$(ip r | grep default | cut -d " " -f5)
+        #find corresponding phy name
+        if [[ $WIFI_DEV != "" ]]; then
+            PHY=$(cat /sys/class/net/"$WIFI_DEV"/phy80211/name)
+        elif [[ ${IS_CLOUD} != "True" ]]; then
+            log "IF" "WiFi interface not detected. VPN connection to cloud will be used."
         fi
-        exit 2
-    fi
 
-    log "IF" "WIFI_DEV=${WIFI_DEV}, IN_USE=${IN_USE}, PHY=${PHY}"
+        log "IF" "WIFI_DEV=${WIFI_DEV}, IN_USE=${IN_USE}, PHY=${PHY}"
+    else
+        echo "ERR: the mF2C system is not compatible with your OS: $machine. Exit..."
+        exit 1
+    fi
 else
-    echo "ERR: the mF2C system is not compatible with your OS: $machine. Exit..."
-    exit 1
+    log "IF" "Cloud Agent deployment does not configure any WiFi interface."
 fi
 
 progress "10" "Cloning mF2C"
@@ -155,7 +175,7 @@ progress "15" "Checking networking conflicts"
 # Check that the given interface is not used by the host as the default route
 if [[ "$IN_USE" == "$WIFI_DEV" ]]
 then
-    echo -e "${BLUE}[INFO]${NC} The selected interface is configured as the default route, if you use it you will lose internet connectivity"
+    log "IF" "The selected interface is configured as the default route, if you use it you will lose internet connectivity"
     while true;
     do
         read -p "Do you wish to continue? [y/n]" yn
@@ -171,19 +191,23 @@ progress "25" "User credentials"
 read -p "Enter your mF2C Username: " MF2C_USER
 read -s -p "Enter your mF2C Password: " MF2C_PASS
 echo
-#MF2C_USER="test1234"
-#MF2C_PASS="12345678"
 
 progress "25" "Setup environment"
 
 # Write env file to be used by docker-compose
-cp mF2C/docker-compose/.env .env 2>/dev/null || cat > .env <<EOF
+if [[ ! -f .env ]]; then
+    cp mF2C/docker-compose/.env .env 2>/dev/null || cat > .env <<EOF
 isLeader=${IS_LEADER}
+isCloud=${IS_CLOUD}
 PHY=${PHY}
 WIFI_DEV_FLAG=${WIFI_DEV}
 usr=${MF2C_USER}
 pwd=${MF2C_PASS}
 EOF
+    log "OK" "New .env file created"
+else
+    log "IF" "Using existing .env file in the directory"
+fi
 
 progress "30" "Deploying docker-compose services"
 
@@ -198,7 +222,7 @@ progress "30" "Deploying docker-compose services"
 
 progress "35" "Checking for agents running on the system"
 if [[ $(docker-compose -p $PROJECT ps | wc -l) -gt 2 ]]; then
-    log "WR" "Agent running dettected."
+    log "WR" "Agent running detected."
     while true;
     do
         read -p "Do you wish to stop the current agent and continue? [y/n]" yn
@@ -235,32 +259,33 @@ progress "90" "Binding wireless interface with discovery container"
 
 pid=$(docker inspect -f '{{.State.Pid}}' $container_name)
 # Assign phy wireless interface to the container
-if [[ "$machine" != "Mac" ]]
+if [[ ("$machine" != "Mac") && (${WIFI_DEV} != "") ]]
 then
     #Bring the wireless interface up
-    ip addr flush dev "$WIFI_DEV"
+    sudo ip addr flush dev "$WIFI_DEV"
 
     docker exec -d "$container_name" ifconfig "${WIFI_DEV}" up
 
     if [[ "$IS_LEADER" == "True" ]]; then
         #Define the characteristics of the network that will be used by the leader
+        log "IF" "Configuring WiFi device as mF2C Leader"
         SUBNET="192.168.7"
         IP_AP="192.168.7.1"
         NETMASK="/24"
         ### Assign an IP to the wifi interface
         echo "Configuring interface with IP address"
-        ip addr flush dev "${WIFI_DEV}"
-        ip link set "${WIFI_DEV}" down
-        ip link set "${WIFI_DEV}" up
-        ip addr add "$IP_AP$NETMASK" dev "${WIFI_DEV}"
+        sudo ip addr flush dev "${WIFI_DEV}"
+        sudo ip link set "${WIFI_DEV}" down
+        sudo ip link set "${WIFI_DEV}" up
+        sudo ip addr add "$IP_AP$NETMASK" dev "${WIFI_DEV}"
 
         ### iptables rules for NAT
         echo "Adding natting rule to iptables (container)"
-        iptables -t nat -A POSTROUTING -s $SUBNET.0$NETMASK ! -d $SUBNET.0$NETMASK -j MASQUERADE
+        sudo iptables -t nat -A POSTROUTING -s $SUBNET.0$NETMASK ! -d $SUBNET.0$NETMASK -j MASQUERADE
 
         ### Enable IP forwarding
         echo "Enabling IP forwarding (container)"
-        echo 1 > /proc/sys/net/ipv4/ip_forward
+        sudo su -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
     fi
 fi
 
