@@ -43,6 +43,12 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.9.0 (07.10.19)
+
+#### Changed
+
+ - QoS Provider updated to work without `agreement` and with `device_id` instead of `url` in the `agent` resource.
+
 ### 1.8.4 (03.10.19)
 
 #### Changed
