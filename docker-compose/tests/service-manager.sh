@@ -6,6 +6,8 @@ function log() {
   text="$2"
   if [[ $1 == "OK" ]]; then
     printf '\e[0;33m %-15s \e[32m SUCCESS:\e[0m %s \n' [ServiceManagerTests] "$text"
+  elif [[ $1 == "INFO" ]]; then
+    printf '\e[0;33m %-23s \e[1;34m INFO:\e[0m %s \n' [ServiceManagerTests] "$text"
   else
     printf '\e[0;33m %-15s \e[0;31m FAILED:\e[0m %s \n' [ServiceManagerTests] "$text"
   fi
@@ -110,36 +112,44 @@ fi
 
 # 9. check if there are new service-operations-reports
 REPORT_EXIST="false"
-ATTEMPTS=0
+ATTEMPTS=1
 while [ "$REPORT_EXIST" = "false" ]; do
-  ATTEMPTS=$ATTEMPTS+1
-  if ((ATTEMPTS > 5)); then
-    break
-  fi
   SERVICE_OPERATION_REPORTS=$(curl "https://localhost/api/service-operation-report" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' | jq -es 'if . == [] then null else .[].serviceOperationReports | length end') >/dev/null 2>&1
   if ((SERVICE_OPERATION_REPORTS > 0)); then
-    log "OK" "service-operation-reports are created successfully"
     REPORT_EXIST="true"
-  else
-    log "NO" "no service-operation-report created"
+    break
+  fi
+  log "INFO" "no service-operation-report created yet"
+  ATTEMPTS=$ATTEMPTS+1
+  if ((ATTEMPTS > 10)); then
+    break
   fi
   sleep 1
 done
+if [[ $REPORT_EXIST == "true" ]]; then
+  log "OK" "service-operation-reports created successfully"
+else
+  log "No" "no service-operation-report created"
+fi
 
 # 10. check if new agents are added to the service-instance by QoS enforcement
 AGENTS_ADDED="false"
-ATTEMPTS=0
+ATTEMPTS=1
 while [ "$AGENTS_ADDED" = "false" ]; do
-  ATTEMPTS=$ATTEMPTS+1
-  if ((ATTEMPTS > 5)); then
-    break
-  fi
   NUM_AGENTS=$(curl "https://localhost/api/$SERVICE_INSTANCE_ID" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' | jq -es 'if . == [] then null else .[].agents | length end') >/dev/null 2>&1
   if ((NUM_AGENTS > 1)); then
-    log "OK" "agents added to service-instance successfully"
     AGENTS_ADDED="true"
-  else
-    log "NO" "agents are not added yet"
+    break
+  fi
+  log "INFO" "no agents added yet"
+  ATTEMPTS=$ATTEMPTS+1
+  if ((ATTEMPTS > 10)); then
+    break
   fi
   sleep 1
 done
+if [[ $AGENTS_ADDED == "true" ]]; then
+  log "OK" "agents added to service-instance successfully"
+else
+  log "No" "no agents were added"
+fi
