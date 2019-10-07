@@ -4,11 +4,11 @@ function log() {
   text="$2"
   tests="$3"
   if [[ $1 == "OK" ]]; then
-    printf '\e[0;33m %-15s \e[32m SUCCESS:\e[0m %s \n' "$tests" "$text"
+    printf '\e[0;33m %-23s \e[32m SUCCESS:\e[0m %s \n' "$tests" "$text"
   elif [[ $1 == "INFO" ]]; then
-    printf '\e[0;33m %-15s \e[1;34m INFO:\e[0m %s \n' "$tests" "$text"
+    printf '\e[0;33m %-23s \e[1;34m INFO:\e[0m %s \n' "$tests" "$text"
   else
-    printf '\e[0;33m %-15s \e[0;31m FAILED:\e[0m %s \n' "$tests" "$text"
+    printf '\e[0;33m %-23s \e[0;31m FAILED:\e[0m %s \n' "$tests" "$text"
   fi
 }
 
