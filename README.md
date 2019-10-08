@@ -29,14 +29,19 @@ In this repository you'll find the recipes and files necessary to deploy the mF2
 
 3. deploy the agent by running:
     
-    
     `install.sh    # use -L if the node is a leader`
+    
+4. wait until all components are healthy
 
-4. run the hello-world test
+    `install.sh -s`
+    
+    **NOTE: Running an Agent with an unhealthy component may cause unexpected errors in the whole stack.** 
+
+5. run the hello-world test
     
     `./hello-world.sh --include-tests`
 
-5. to shutdown the agent:
+6. to shutdown the agent:
 
     `./install.sh -S`
 
