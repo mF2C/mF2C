@@ -43,6 +43,12 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.9.1 (08.10.19)
+
+#### Changed
+
+ - Fixes a bug when updating a `qos-model` into cimi.
+
 ### 1.9.0 (07.10.19)
 
 #### Changed
