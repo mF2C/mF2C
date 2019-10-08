@@ -1,8 +1,9 @@
 # Changelog (User Management)
 
-## [1.3.8] - 2019-10-08
+## [1.3.9] - 2019-10-08
 ### Changed
 - UM returns `device_id` when called from LM before deploying a service
+- UM assessment interval changed
 
 ## [1.3.7] - 2019-10-01
 ### Changed
