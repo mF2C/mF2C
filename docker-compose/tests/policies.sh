@@ -70,13 +70,9 @@ STARTED=$(echo "${RMINFO}" | jq -r ".started" 2>/dev/null)
     log "OK" "Discovery successfully triggered.") || \
     log "NO" "Discovery trigger failed."
 
-if [[ ${ISLEADER} == "false" ]]; then
-    ( [[  ${CAU_CLIENT} == "true" ]]  && \
+( [[  ${CAU_CLIENT} == "true" ]]  && \
     log "OK" "CAU client successfully triggered.") || \
     log "NO" "CAU client trigger failed."
-else
-    log "IF" "CAU client test skip."
-fi
 
 ( [[ ${RES_CAT} == "true" ]]  && \
     log "OK" "Resource Categorization successfully triggered.") || \
