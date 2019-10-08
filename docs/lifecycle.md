@@ -1,5 +1,12 @@
 # Changelog (Lifecycle Manager)
 
+## [1.3.8] - 2019-10-08
+### Changed
+- Service deployment - Agent selection: workflow updated; the LM calls the UM before calling the QoS Provider
+
+### Fixed
+- create agreement path was fixed
+
 ## [1.3.7] - 2019-09-17
 ### Added
 - new service added to check health of components: UM and LM
