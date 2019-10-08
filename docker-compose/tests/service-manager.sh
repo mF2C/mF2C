@@ -60,12 +60,17 @@ CATEGORY=$(curl -XGET "https://localhost/api/${SERVICE_ID}" -ksS -H 'content-typ
   log "OK" "service $SERVICE_ID was categorized as $CATEGORY" [Categorizer] ||
   log "NO" "service $SERVICE_ID is not categorized" [Categorizer]
 
-# 4. submit service-instance before checking QoS
-SERVICE_INSTANCE=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{
-    "service_id": "'$SERVICE_ID'"
-}' | jq -es 'if . == [] then null else .[] | .service_instance end') &&
-  log "OK" "service-instance $(jq -r '.id' <<<"${SERVICE_INSTANCE}") launched successfully" [LifecycleManager] ||
-  log "NO" "failed to launch service-instance $(jq -r '.id' <<<"${SERVICE_INSTANCE}")" [LifecycleManager]
+# 4. submit service-instance
+LM_OUTPUT=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'", "sla_template": "'"$SLA_TEMPLATE_ID"'"}') >/dev/null 2>&1
+SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
+SERVICE_INSTANCE_IP=`echo $SERVICE_INSTANCE_IP | tr -d '\n'`
+SERVICE_INSTANCE_ID=$(echo "$LM_OUTPUT" | jq -r ".service_instance.id")
+if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]
+    then
+        log "OK" "service-instance launched in $SERVICE_INSTANCE_IP successfully" [LifecycleManager]
+    else
+        log "NO" "failed to launch service-instance" [LifecycleManager]
+    fi
 
 # 5. check QoS (provider) from service-instance
 SERVICE_INSTANCE_ID=$(jq -r '.id' <<<"${SERVICE_INSTANCE}")
