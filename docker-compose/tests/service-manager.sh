@@ -73,7 +73,6 @@ if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]
     fi
 
 # 5. check QoS (provider) from service-instance
-SERVICE_INSTANCE_ID=$(jq -r '.id' <<<"${SERVICE_INSTANCE}")
 (curl -XGET "https://localhost/sm/api/${SERVICE_INSTANCE_ID}" -ksS |
   jq -es 'if . == [] then null else .[] | select(.status == 200) end') >/dev/null 2>&1 &&
   log "OK" "QoS provider checked service-instance $SERVICE_INSTANCE_ID successfully" [QoSProvider] ||
