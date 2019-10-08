@@ -90,11 +90,11 @@ else
 fi
 
 # 7. check if qos-model (provider) is added
-QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href="'$SERVICE_ID'"&$filter=agreement/href="'$AGREEMENT_ID'"' \
+QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href="'$SERVICE_ID'"' \
   -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' |
   jq -es 'if . == [] then null else .[] | .["qos-models"][0].id end') &&
-  log "OK" "qos-model $QOS_MODEL_ID for agreement $AGREEMENT_ID was created successfully" [QoSProvider] ||
-  log "NO" "qos-model for agreement $AGREEMENT_ID does not exist" [QoSProvider]
+  log "OK" "qos-model $QOS_MODEL_ID was created successfully" [QoSProvider] ||
+  log "NO" "qos-model does not exist" [QoSProvider]
 
 # 8. start an operation during 60 seconds
 LM_OUTPUT=$(curl -XPUT "https://localhost/sm/api/service-instances/${SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{
