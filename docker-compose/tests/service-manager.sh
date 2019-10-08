@@ -101,7 +101,7 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
   log "NO" "qos-model does not exist" [QoSProvider]
 
 # 8. start an operation during 60 seconds
-LM_OUTPUT=$(curl -XPUT "https://localhost/sm/api/service-instances/${SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{
+LM_OUTPUT=$(curl -XPUT "http://localhost:46000/api/v2/lm/service-instances/${SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{
     "operation":"start-job",
     "ceiClass":"es.bsc.compss.agent.test.TestItf",
     "className":"es.bsc.compss.agent.test.Test",
