@@ -43,6 +43,24 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.9.1 (08.10.19)
+
+#### Changed
+
+ - Fixes a bug when updating a `qos-model` into cimi.
+
+### 1.9.0 (07.10.19)
+
+#### Changed
+
+ - QoS Provider updated to work without `agreement` and with `device_id` instead of `url` in the `agent` resource.
+
+### 1.8.4 (03.10.19)
+
+#### Changed
+
+ - Now if a service-instance has no valid agreement and the qos-model cannot be submitted, the QoS Provider returns 404.
+
 ### 1.8.3 (16.09.19)
 
 #### Added
