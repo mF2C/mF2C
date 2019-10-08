@@ -445,6 +445,14 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ## Change LOG
 
+### latest-V2.0.22 (date 08/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+ 
+#### Added
+ - Fixed `VPN Client` connection
+ 
+ #### Changed 
+  - Nothing changed compare to previous version
+
  ### latest-V2.0.21 (date 04/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
  
 #### Added
@@ -503,7 +511,7 @@ mf2c-curl-post https://localhost/api/fog-area -d
  
  ## Work in progress
  
- - Making a connection between `VPN-Client` and `Resource-Categorization` module; So that, in case of the failure of `discovery` module the `Resource-Categorization` can retrieve the `deviceIP` from `VPN-Client`
+ - Workin on the code for making it full functional with `Static IP`
 
 
 
