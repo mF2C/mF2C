@@ -61,5 +61,6 @@ In this repository you'll find the recipes and files necessary to deploy the mF2
  - [Resource Categorization](./docs/resource-categorization.md)
  - [Service Manager](./docs/service_manager.md)
  - [SLA Management](./docs/sla_management.md)
+ - [SLA Management UI](./docs/sla_management_ui.md)
  - [VPN client](./docs/vpnclient.md)
 
