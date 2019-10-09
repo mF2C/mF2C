@@ -22,7 +22,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
         "type": "template",
         "name": "compss-hello-world",
         "provider": { "id": "mf2c", "name": "mF2C Platform" },
-        "client": { "id": "c02", "name": "A client" },
+        "client": { "id": "test1234", "name": "A client" },
         "creation": "2018-01-16T17:09:45.01Z",
         "guarantees": [
             {
@@ -62,15 +62,14 @@ CATEGORY=$(curl -XGET "https://localhost/api/${SERVICE_ID}" -ksS -H 'content-typ
 
 # 4. submit service-instance
 LM_OUTPUT=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'", "sla_template": "'"$SLA_TEMPLATE_ID"'"}') >/dev/null 2>&1
-SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
-SERVICE_INSTANCE_IP=`echo $SERVICE_INSTANCE_IP | tr -d '\n'`
+SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') >/dev/null 2>&1
+SERVICE_INSTANCE_IP=$(echo $SERVICE_INSTANCE_IP | tr -d '\n')
 SERVICE_INSTANCE_ID=$(echo "$LM_OUTPUT" | jq -r ".service_instance.id")
-if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]
-    then
-        log "OK" "service-instance launched in $SERVICE_INSTANCE_IP successfully" [LifecycleManager]
-    else
-        log "NO" "failed to launch service-instance" [LifecycleManager]
-    fi
+if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]; then
+  log "OK" "service-instance launched in $SERVICE_INSTANCE_IP successfully" [LifecycleManager]
+else
+  log "NO" "failed to launch service-instance" [LifecycleManager]
+fi
 
 # 5. check QoS (provider) from service-instance
 (curl -XGET "https://localhost/sm/api/${SERVICE_INSTANCE_ID}" -ksS |
@@ -100,7 +99,17 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
   log "OK" "qos-model $QOS_MODEL_ID was created successfully" [QoSProvider] ||
   log "NO" "qos-model does not exist" [QoSProvider]
 
-# 8. start an operation during 60 seconds
+# 8. check COMPSs agent availability
+log INFO "waiting for agent to boot..."
+sleep 20
+COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
+for agent in ${COMPSs_AGENTS}; do
+  curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
+    log OK "agent ${agent} testes successfully" ||
+    log ERROR "failed to reach agent ${agent}"
+done
+
+# 9. start an operation during 60 seconds
 LM_OUTPUT=$(curl -XPUT "http://localhost:46000/api/v2/lm/service-instances/${SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{
     "operation":"start-job",
     "ceiClass":"es.bsc.compss.agent.test.TestItf",
@@ -115,7 +124,7 @@ else
   log "OK" "operation started successfully" [LifecycleManager]
 fi
 
-# 9. check if there are new service-operations-reports
+# 10. check if there are new service-operations-reports
 REPORT_EXIST="false"
 ATTEMPTS=1
 while [ "$REPORT_EXIST" = "false" ]; do
@@ -137,7 +146,7 @@ else
   log "No" "no service operation reports were created" [COMPSs]
 fi
 
-# 10. check if new agents are added to the service-instance by QoS enforcement
+# 11. check if new agents are added to the service-instance by QoS enforcement
 AGENTS_ADDED="false"
 ATTEMPTS=1
 while [ "$AGENTS_ADDED" = "false" ]; do
