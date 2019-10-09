@@ -100,13 +100,13 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
   log "NO" "qos-model does not exist" [QoSProvider]
 
 # 8. check COMPSs agent availability
-log INFO "waiting for agent to boot..."
+log INFO "waiting for agent to boot..." [COMPSs]
 sleep 20
 COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
 for agent in ${COMPSs_AGENTS}; do
   curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
-    log OK "agent ${agent} testes successfully" ||
-    log ERROR "failed to reach agent ${agent}"
+    log OK "agent ${agent} testes successfully" [COMPSs] ||
+    log ERROR "failed to reach agent ${agent}" [COMPSs]
 done
 
 # 9. start an operation during 60 seconds
