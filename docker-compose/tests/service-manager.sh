@@ -105,12 +105,13 @@ sleep 20
 COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
 for agent in ${COMPSs_AGENTS}; do
   curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
-    log OK "agent ${agent} testes successfully" [COMPSs] ||
+    log OK "agent ${agent} tested successfully" [COMPSs] ||
     log ERROR "failed to reach agent ${agent}" [COMPSs]
 done
 
 # 9. start an operation during 60 seconds
-LM_OUTPUT=$(curl -XPUT "http://localhost:46000/api/v2/lm/service-instances/${SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{
+SHORT_SERVICE_INSTANCE_ID=$(echo "${SERVICE_INSTANCE_ID}" | cut -d '/' -f 2)
+LM_OUTPUT=$(curl -XPUT "http://localhost:46000/api/v2/lm/service-instances/${SHORT_SERVICE_INSTANCE_ID}/der" -ksS -H 'content-type: application/json' -d '{
     "operation":"start-job",
     "ceiClass":"es.bsc.compss.agent.test.TestItf",
     "className":"es.bsc.compss.agent.test.Test",
