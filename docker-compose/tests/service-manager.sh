@@ -101,7 +101,7 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
 
 # 8. check COMPSs agent availability
 log INFO "waiting for agent to boot..." [COMPSs]
-sleep 20
+sleep 30
 COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
 for agent in ${COMPSs_AGENTS}; do
   curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
