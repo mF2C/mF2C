@@ -306,7 +306,7 @@ services:
        test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/start/ || exit 1
 
   vpnclient:
-    image: mf2c/vpnclient:1.1.4
+    image: mf2c/vpnclient:1.1.5
     depends_on:
       - cau-client
     network_mode: "host"
