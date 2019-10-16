@@ -285,7 +285,7 @@ services:
        test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.22
+     image: mf2c/resource-categorization:latest-V2.0.23
      hostname: IRILD039
      restart: on-failure
      depends_on:
@@ -303,7 +303,7 @@ services:
      healthcheck:
        start_period: 60s
        retries: 5
-       test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/start/ || exit 1
+       test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/run/ || exit 1
 
   vpnclient:
     image: mf2c/vpnclient:1.1.5
