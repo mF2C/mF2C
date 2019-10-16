@@ -348,7 +348,10 @@ services:
 #      - "traefik.enable=true"
 #      - "traefik.port=46020"
 #      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
-#
+#    healthcheck:
+#      start_period: 30s
+#      retries: 5
+#      test: curl --fail -s http://localhost:46020/mf2c/optimal || exit 1
   landscaper:
     image: mf2c/landscaper:0.6.14
     volumes:
@@ -389,6 +392,10 @@ services:
       - INFLUXDB_ADMIN_USER=admin
       - INFLUXDB_ADMIN_USER_PASSWORD=admin
       - INFLUXDB_HTTP_LOG_ENABLED=false
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "wget", "--spider", "http://localhost:8086/ping"]
   snap:
     image: intelsdi/snap:xenial
     hostname: snap
@@ -410,6 +417,10 @@ services:
       - "7475:7474" # expose the port for the console ui
     environment:
       - NEO4J_AUTH=neo4j/password # neo4j requires change from default password, should reflect landscape.cfg
+    healthcheck:
+      start_period: 1m
+      retries: 5
+      test: curl -i http://127.0.0.1:7474 2>&1 | grep -c -e '200 OK'
 
   web:
     image: mf2c/landscaper:0.6.14
@@ -424,6 +435,10 @@ services:
       - neo4j
       - landscaper
     command: ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:9001", "-w", "2", "--chdir", "/landscaper/landscaper/web", "application:APP"]
+    healthcheck:
+      start_period: 90s
+      retries: 5
+      test: curl --fail -s http://localhost:9001/graph || exit 1
 
 
 ######################################################
