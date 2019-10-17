@@ -27,7 +27,7 @@ endpoint="http://localhost:46060/api/v1/resource-management/identification/reque
 
 
 # Is the device already registered?
-exec_docker $endpoint
+exec_docker "curl -XGET -s ${endpoint}"
 ans=`echo -e "${exec_res}" | jq -r '.status'`
 if [[ ${ans} -eq 200 ]]; then
     log "OK" "The device is registered"
