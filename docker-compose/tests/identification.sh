@@ -45,3 +45,4 @@ if [[ ${registered} == "OK" ]]; then
     deviceID=${deviceID:0:8}
     printf '\e[0;33m %-15s \e[0;36m INFO:\e[0m %s \n' [Identification-Test] "The truncated IDKey string is ${IDKey} and the truncated deviceID string is ${deviceID}"
 fi
+
