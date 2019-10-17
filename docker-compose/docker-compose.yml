@@ -200,8 +200,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-#     image: mf2c/policies:2.0.8
-     build: Policies
+     image: mf2c/policies:2.0.8
      restart: on-failure
      depends_on:
        - cimi
