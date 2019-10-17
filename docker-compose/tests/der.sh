@@ -41,16 +41,17 @@ trap ctrl_c INT
 log INFO "Waiting until mf2c platform is totally deployed..."
 
 DEVICE_COUNT=0
-ITERATIONS=0
 while [ "${DEVICE_COUNT}" = "0" ]; do
     sleep 1
-    DEVICE_COUNT=$(curl -k -H 'slipstream-authn-info:internal ADMIN' -H 'content-type:application/json' ${BASE_API_URL}/device 2>/dev/null | jq -re ".count" 2>/dev/null|| echo "0") 
-    ITERATIONS=$((ITERATIONS+1))
+    DEVICE_COUNT=$(curl -k -H 'slipstream-authn-info:internal ADMIN' -H 'content-type:application/json' ${BASE_API_URL}/sharing-model 2>/dev/null | jq -re ".count" 2>/dev/null|| echo "0") 
 done
+log INFO "    Sharing model already loaded."
 
-if (( ITERATIONS > 1 )); then
-    sleep 5
-fi
+while [ "${DEVICE_COUNT}" = "0" ]; do
+    sleep 1
+    DEVICE_COUNT=$(curl -k -H 'slipstream-authn-info:internal ADMIN' -H 'content-type:application/json' ${BASE_API_URL}/user-profile 2>/dev/null | jq -re ".count" 2>/dev/null|| echo "0") 
+done
+log INFO "    User profile already loaded."
 
 log INFO "Starting test execution..."
 ##### SERVICE CREATION

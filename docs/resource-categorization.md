@@ -445,6 +445,27 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ## Change LOG
 
+### latest-V2.0.22 (date 08/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+ 
+#### Added
+ - Fixed `VPN Client` connection
+ 
+ #### Changed 
+  - Nothing changed compare to previous version
+
+ ### latest-V2.0.21 (date 04/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+ 
+#### Added
+ - Fixed the health check issue
+ - added the shared volume for getting the `deviceIP` from `VPN-Client`
+ 
+ #### Changed 
+  - Modified the functionality to get the `deviceIP` from `VPN-Client` incase of `discovery` failure
+  - Open a new URL (`http://localhost:46070/api/v1/resource-management/categorization/run/`) for checking the health of docker-container
+  
+ #### Known issues - 
+  - Still the `vpnclient.status` file is missing from `/var/lib/docker/volumes/mf2c_vpninfo/_data/vpnclient.status`, need to check and fix this issue
+
  ### latest-V2.0.20 (date 19/September/2019) [in complience with CIMI-server - 2.27 +later & DataClay version - 2.23 +later]
  
 #### Added
@@ -490,7 +511,7 @@ mf2c-curl-post https://localhost/api/fog-area -d
  
  ## Work in progress
  
- - Making a connection between `VPN-Client` and `Resource-Categorization` module; So that, in case of the failure of `discovery` module the `Resource-Categorization` can retrieve the `deviceIP` from `VPN-Client`
+ - Workin on the code for making it full functional with `Static IP`
 
 
 

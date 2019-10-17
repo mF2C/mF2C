@@ -44,6 +44,20 @@ client is likely to be in a bad state.
 Additional information about the status field is available in the VPN
 repository.
 
+#### Shared volume
+
+As of 1.1.4, this information can also be written to a file location
+(which by default is `/dev/null`, meaning it gets ignored.)  By
+setting the environment variable `VPNINFO` to the location, the extra
+copy gets written.  This file location would typically be inside a
+shared volume, thus allowing containers that cannot reach `vpnclient`
+over the network to alse get this metadata.
+
+As an example, if the `vpninfo` volume is mounted on `/vpninfo` in the
+client, the `VPNINFO` environment variable could be set to
+`/vpninfo/vpnclient.json` to create and update a file `vpnclient.json`
+inside the volume.
+
 ### Troubleshooting
 
 If the client credential is not available, the VPN client will
@@ -103,6 +117,19 @@ offers no protection for host or container traffic routed outside the
 VPN.
 
 ## CHANGELOG
+
+### 1.1.5
+
+ - bugfix where the stats part of the JSON response was incomplete during start
+
+### 1.1.4
+
+ - Optionally write a copy of metadata to shared volume
+
+
+### 1.1.3
+
+ - Since status is now mainly done through API, client exits only if API won't launch
 
 ### 1.1.2
 

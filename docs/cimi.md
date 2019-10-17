@@ -112,6 +112,12 @@ Let's delete our own session:
 
 #### Added
 
+ - added custom mock operation "deploy" to service-instance, that redirects request to Lifecycle Manager
+
+### 2.27 (23/08/2019)
+
+#### Added
+
  - session template and workflow for JWT token authorization
 
 #### Changed
