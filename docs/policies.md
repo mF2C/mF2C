@@ -52,6 +52,12 @@ To run policies module along other mF2C components, is necessary to specify the 
 - "isLeader=False"
 ```
 
+##### To deploy in Cloud
+
+```yaml
+- "isCloud=True"
+```
+
 ##### To specify static leader and device IPs:
 
 ```yaml
@@ -61,6 +67,11 @@ To run policies module along other mF2C components, is necessary to specify the 
 
 **NOTE**: Only used when Discovery cannot detect a nearby Leader. These variables should only be used for testing purposes and internal mF2C procedures may fail if they are modified.
 
+##### To specify the address of the Cloud Agent (Ignored if deployed as Cloud Agent)
+
+```yaml
+- "MF2C_CLOUD_AGENT=172.0.0.1"
+``` 
 
 ### API
 
@@ -135,7 +146,8 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/leaderinfo" -H
     - **200** - Success
     - **Response Payload:** `{
   "imLeader": false,
-  "imBackup": false
+  "imBackup": false,
+  "imCloud": false
 }`
 
 #### Reelection
@@ -215,9 +227,24 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ### Known Issues
 
-    + Leader will fail to find available backups as Topology is not coded to be received/generated.
+    * If discovery and VPN fail to provide a valid IP of the agent and leader, Policies module will fail to create CIMI agent resource.
 
 ## CHANGELOG
+
+### 2.0.8 (17/10/2019)
+
+#### Added
+
+    + Get IP from VPN
+    + Separated cloud flow without Discovery and Area Resilience
+    + Cloud address as environment variable
+    + Discovery watch trigger in Leader flow
+
+#### Changed
+
+    * leader_info now has isCloud
+    * Device without a Wifi configured is not capable to be Backup
+
 
 ### 2.0.7 (01/10/2019)
 
