@@ -29,7 +29,9 @@ In this repository you'll find the recipes and files necessary to deploy the mF2
 
 3. deploy the agent by running:
     
-    `install.sh    # use -L if the node is a leader`
+    `install.sh`
+    
+    *use `install.sh -L` if the node is a leader or `install.sh -C` if the node is a Cloud Agent*
     
 4. wait until all components are healthy
 

@@ -200,7 +200,8 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.7
+#     image: mf2c/policies:2.0.8
+     build: Policies
      restart: on-failure
      depends_on:
        - cimi
@@ -214,8 +215,11 @@ services:
        - "DEBUG=True"
        - "MF2C=True"
        - "isLeader=${isLeader}"
+       - "isCloud=${isCloud}"
        - "WIFI_DEV_FLAG=${WIFI_DEV_FLAG}"
-       - "leaderIP=${leaderIP}"
+       - "MF2C_CLOUD_AGENT=${MF2C_CLOUD_AGENT}"
+     volumes:
+       - vpninfo:/vpninfo
      healthcheck:
        start_period: 30s
        retries: 5
@@ -289,7 +293,7 @@ services:
        test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.22
+     image: mf2c/resource-categorization:latest-V2.0.23
      hostname: IRILD039
      restart: on-failure
      depends_on:
@@ -307,7 +311,7 @@ services:
      healthcheck:
        start_period: 60s
        retries: 5
-       test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/start/ || exit 1
+       test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/run/ || exit 1
 
   vpnclient:
     image: mf2c/vpnclient:1.1.5
