@@ -54,7 +54,7 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
   log "NO" "failed to create new service $SERVICE_ID" [ServiceManager]
 
 # 3. check if service is categorized
-SERVICE_ID=$(echo $SERVICE_ID | tr -d '"')
+SERVICE_ID=`echo $SERVICE_ID | tr -d '"'`
 CATEGORY=$(curl -XGET "https://localhost/api/${SERVICE_ID}" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' |
   jq -es 'if . == [] then null else .[] | .["category"] end') &&
   log "OK" "service $SERVICE_ID was categorized as $CATEGORY" [Categorizer] ||
@@ -62,8 +62,8 @@ CATEGORY=$(curl -XGET "https://localhost/api/${SERVICE_ID}" -ksS -H 'content-typ
 
 # 4. submit service-instance
 LM_OUTPUT=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'", "sla_template": "'"$SLA_TEMPLATE_ID"'"}') >/dev/null 2>&1
-SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') >/dev/null 2>&1
-SERVICE_INSTANCE_IP=$(echo $SERVICE_INSTANCE_IP | tr -d '\n')
+SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
+SERVICE_INSTANCE_IP=`echo $SERVICE_INSTANCE_IP | tr -d '\n'`
 SERVICE_INSTANCE_ID=$(echo "$LM_OUTPUT" | jq -r ".service_instance.id")
 if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]; then
   log "OK" "service-instance launched in $SERVICE_INSTANCE_IP successfully" [LifecycleManager]
@@ -101,7 +101,7 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
 
 # 8. check COMPSs agent availability
 log INFO "waiting for agent to boot..." [COMPSs]
-sleep 20
+sleep 60
 COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
 for agent in ${COMPSs_AGENTS}; do
   curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
