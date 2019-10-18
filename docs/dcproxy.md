@@ -62,6 +62,14 @@ Any update of those fields will move and synchronize objects automatically.
 
 ## CHANGELOG
 
+### 2.25 (17.10.2019)
+
+#### Added
+
+ - Service-operation-report is replicated and synchronized in leaders
+
+#### Changed
+
 ### 2.24 (27.09.2019)
 
 #### Added

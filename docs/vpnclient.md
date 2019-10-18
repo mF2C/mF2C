@@ -118,6 +118,10 @@ VPN.
 
 ## CHANGELOG
 
+### 1.1.5
+
+ - bugfix where the stats part of the JSON response was incomplete during start
+
 ### 1.1.4
 
  - Optionally write a copy of metadata to shared volume
