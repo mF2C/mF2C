@@ -49,6 +49,15 @@ services:
       - ringcontainerexample:/opt/slipstream/ring-example
     command: sh
 
+  cimi-ui:
+    image: mf2c/cimi-ui
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.backend=cimi-ui"
+      - "traefik.backend.healthcheck.path=/webui/webui.html"
+      - "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
+      - "traefik.frontend.rule=Path:/,/webui/,/{a:webui.*},/{b:css.*},/{c:images.*},/{d:js.*}"
   #################### Dataclay  #######################
   dcproxy:
     image: mf2c/dataclay-proxy:2.26
