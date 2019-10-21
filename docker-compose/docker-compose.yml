@@ -121,7 +121,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.9.1
+    image: mf2c/service-manager:1.9.2
     restart: unless-stopped
     depends_on:
       - cimi
