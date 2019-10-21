@@ -101,15 +101,13 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
 
 # 8. check COMPSs agent availability
 log INFO "waiting for compps agent to boot..." [COMPSs]
-AGENTS_UP="false"
-while [ "$AGENTS_UP" = "false" ]; do
+while true; do
   sleep 5
-  FOUND=$(curl -XGET "http://${SERVICE_INSTANCE_IP}/COMPSs/test" 2>/dev/null)
-  if [[ "$FOUND" == "Found" ]]; then
-    log OK "compss agent ${SERVICE_INSTANCE_IP} booted successfully" [COMPSs]
-    AGENTS_UP="true"
+  if [[ $(curl -XGET 'http://"'$SERVICE_INSTANCE_IP'"/COMPSs/test' 2>/dev/null) == "Found" ]]; then
+    log "OK" "compss agent $SERVICE_INSTANCE_IP booted successfully" [COMPSs]
+    break
   else
-    log ERROR "failed to reach compss agent in ${SERVICE_INSTANCE_IP}" [COMPSs]
+    log "NO" "failed to reach compss agent in $SERVICE_INSTANCE_IP" [COMPSs]
   fi
 done
 
