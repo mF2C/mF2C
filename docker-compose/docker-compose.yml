@@ -51,7 +51,7 @@ services:
 
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.25
+    image: mf2c/dataclay-proxy:2.26
     depends_on:
       - logicmodule1
       - ds1java1
@@ -63,7 +63,7 @@ services:
       test: ["CMD-SHELL", "health_check/wrapper_health_check.sh"]
        
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.25
+    image: mf2c/dataclay-logicmodule:2.26
     ports:
        - "1034:1034"
     environment:
@@ -86,7 +86,7 @@ services:
       test: ["CMD-SHELL", "health_check/logicmodule_health_check.sh"]
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.25
+    image: mf2c/dataclay-dsjava:2.26
     depends_on:
       - logicmodule1
     environment:
