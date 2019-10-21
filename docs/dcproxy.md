@@ -62,6 +62,12 @@ Any update of those fields will move and synchronize objects automatically.
 
 ## CHANGELOG
 
+### 2.26 (18.10.2019)
+
+#### Changed
+
+ - Service-operation-report 'operation_id' field is now synchronized
+
 ### 2.25 (17.10.2019)
 
 #### Added

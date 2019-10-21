@@ -46,6 +46,12 @@ SSL_CLIENT_KEY=/ssl/agent.pem #in PEM format
 
 ## CHANGELOG
 
+### 2.26 (18.10.2019)
+
+#### Changed
+
+ - Service-operation-report 'operation_id' field is now synchronized
+
 ### 2.25 (17.10.2019)
 
 #### Added
