@@ -103,7 +103,8 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
 log INFO "waiting for compps agent to boot..." [COMPSs]
 while true; do
   sleep 5
-  if [[ $(curl -XGET 'http://"'$SERVICE_INSTANCE_IP'"/COMPSs/test' 2>/dev/null) == "Found" ]]; then
+  SERVICE_INSTANCE_IP=$(echo "$SERVICE_INSTANCE_IP" | tr -d '"')
+  if [[ $(curl -XGET "http://$SERVICE_INSTANCE_IP/COMPSs/test" 2>/dev/null) == "Found" ]]; then
     log "OK" "compss agent $SERVICE_INSTANCE_IP booted successfully" [COMPSs]
     break
   else
