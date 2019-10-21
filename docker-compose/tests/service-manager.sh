@@ -39,7 +39,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
 SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' -d '{
     "name": "compss-hello-world",
     "description": "hello world example",
-    "exec": "mf2c/compss-test:it2.8",
+    "exec": "mf2c/compss-test:it2.9",
     "exec_type": "compss",
     "sla_templates": ["'"$SLA_TEMPLATE_ID"'"],
     "agent_type": "normal",
@@ -100,8 +100,8 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
   log "NO" "qos-model does not exist" [QoSProvider]
 
 # 8. check COMPSs agent availability
-log INFO "waiting for agent to boot..." [COMPSs]
-sleep 60
+log INFO "waiting for compps agent to boot..." [COMPSs]
+sleep 25
 COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
 for agent in ${COMPSs_AGENTS}; do
   curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
@@ -158,7 +158,7 @@ while [ "$AGENTS_ADDED" = "false" ]; do
   fi
   log "INFO" "no agents added yet" [QoSEnforcement]
   ATTEMPTS=$ATTEMPTS+1
-  if ((ATTEMPTS > 10)); then
+  if ((ATTEMPTS > 20)); then
     break
   fi
   sleep 1
