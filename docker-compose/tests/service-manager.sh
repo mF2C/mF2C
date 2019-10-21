@@ -27,7 +27,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
         "guarantees": [
             {
                 "name": "TestGuarantee",
-                "constraint": "execution_time < 1000"
+                "constraint": "execution_time < 5"
             }
         ]
     }
