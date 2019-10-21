@@ -104,12 +104,13 @@ log INFO "waiting for compps agent to boot..." [COMPSs]
 AGENTS_UP="false"
 while [ "$AGENTS_UP" = "false" ]; do
   sleep 5
-  COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
-  for agent in ${COMPSs_AGENTS}; do
-    curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
-      log OK "agent ${agent} tested successfully" [COMPSs] | AGENTS_UP="true" ||
-      log ERROR "failed to reach agent ${agent}" [COMPSs]
-  done
+  FOUND=$(curl -XGET "http://${SERVICE_INSTANCE_IP}/COMPSs/test" 2>/dev/null)
+  if [[ "$FOUND" == "Found" ]]; then
+    log OK "compss agent ${SERVICE_INSTANCE_IP} booted successfully" [COMPSs]
+    AGENTS_UP="true"
+  else
+    log ERROR "failed to reach compss agent in ${SERVICE_INSTANCE_IP}" [COMPSs]
+  fi
 done
 
 # 9. start an operation during 60 seconds
