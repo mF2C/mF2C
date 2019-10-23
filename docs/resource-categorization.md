@@ -445,6 +445,15 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ## Change LOG
 
+
+### latest-V2.0.23 (date 17/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+ 
+#### Added
+ - Added the `print` method to show the existence of `vpnclient.status` file and also show the content of the file
+ 
+ #### Changed 
+  - Nothing changed compare to previous version
+
 ### latest-V2.0.22 (date 08/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
  
 #### Added
