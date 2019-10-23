@@ -65,7 +65,7 @@ docker run -d --network="host" \
         -v /var/run/docker.sock:/var/run/docker.sock \
         --name mf2c_micro_discovery \
         --label "PRODUCT=MF2C" \
-        mf2c/discovery-microagent:4.5
+        mf2c/discovery-microagent:4.6
 
 docker run -d --hostname=IRILD039 --privileged \
         -e LEADER_ENDPOINT="https://dashboard.mf2c-project.eu" \
