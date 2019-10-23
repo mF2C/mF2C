@@ -101,6 +101,7 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
 
 # 8. check COMPSs agent availability
 log INFO "waiting for compps agent to boot..." [COMPSs]
+sleep 40
 while true; do
   sleep 5
   SERVICE_INSTANCE_IP=$(echo "$SERVICE_INSTANCE_IP" | tr -d '"')
