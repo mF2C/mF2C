@@ -60,7 +60,7 @@ services:
       - "traefik.frontend.rule=Path:/,/webui/,/{a:webui.*},/{b:css.*},/{c:images.*},/{d:js.*}"
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.26
+    image: mf2c/dataclay-proxy:2.27
     depends_on:
       - logicmodule1
       - ds1java1
@@ -72,7 +72,7 @@ services:
       test: ["CMD-SHELL", "health_check/wrapper_health_check.sh"]
        
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.26
+    image: mf2c/dataclay-logicmodule:2.27
     ports:
        - "1034:1034"
     environment:
@@ -95,7 +95,7 @@ services:
       test: ["CMD-SHELL", "health_check/logicmodule_health_check.sh"]
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.26
+    image: mf2c/dataclay-dsjava:2.27
     depends_on:
       - logicmodule1
     environment:
@@ -130,7 +130,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/service-manager:1.9.1
+    image: mf2c/service-manager:1.9.2
     restart: unless-stopped
     depends_on:
       - cimi
@@ -298,7 +298,7 @@ services:
        test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.22
+     image: mf2c/resource-categorization:latest-V2.0.23
      hostname: IRILD039
      restart: on-failure
      depends_on:
@@ -316,7 +316,7 @@ services:
      healthcheck:
        start_period: 60s
        retries: 5
-       test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/start/ || exit 1
+       test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/run/ || exit 1
 
   vpnclient:
     image: mf2c/vpnclient:1.1.5

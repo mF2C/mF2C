@@ -27,7 +27,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
         "guarantees": [
             {
                 "name": "TestGuarantee",
-                "constraint": "execution_time < 1000"
+                "constraint": "execution_time < 5"
             }
         ]
     }
@@ -39,7 +39,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
 SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' -d '{
     "name": "compss-hello-world",
     "description": "hello world example",
-    "exec": "mf2c/compss-test:it2.8",
+    "exec": "mf2c/compss-test:it2.9",
     "exec_type": "compss",
     "sla_templates": ["'"$SLA_TEMPLATE_ID"'"],
     "agent_type": "normal",
@@ -54,7 +54,7 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
   log "NO" "failed to create new service $SERVICE_ID" [ServiceManager]
 
 # 3. check if service is categorized
-SERVICE_ID=`echo $SERVICE_ID | tr -d '"'`
+SERVICE_ID=$(echo $SERVICE_ID | tr -d '"')
 CATEGORY=$(curl -XGET "https://localhost/api/${SERVICE_ID}" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' |
   jq -es 'if . == [] then null else .[] | .["category"] end') &&
   log "OK" "service $SERVICE_ID was categorized as $CATEGORY" [Categorizer] ||
@@ -62,8 +62,8 @@ CATEGORY=$(curl -XGET "https://localhost/api/${SERVICE_ID}" -ksS -H 'content-typ
 
 # 4. submit service-instance
 LM_OUTPUT=$(curl -XPOST "http://localhost:46000/api/v2/lm/service" -ksS -H 'content-type: application/json' -d '{ "service_id": "'"$SERVICE_ID"'", "sla_template": "'"$SLA_TEMPLATE_ID"'"}') >/dev/null 2>&1
-SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') > /dev/null 2>&1
-SERVICE_INSTANCE_IP=`echo $SERVICE_INSTANCE_IP | tr -d '\n'`
+SERVICE_INSTANCE_IP=$(echo $LM_OUTPUT | jq -e 'if . == [] then null else .service_instance.agents[].url end') >/dev/null 2>&1
+SERVICE_INSTANCE_IP=$(echo $SERVICE_INSTANCE_IP | tr -d '\n')
 SERVICE_INSTANCE_ID=$(echo "$LM_OUTPUT" | jq -r ".service_instance.id")
 if [[ ($SERVICE_INSTANCE_IP != null) && ($SERVICE_INSTANCE_IP != "") ]]; then
   log "OK" "service-instance launched in $SERVICE_INSTANCE_IP successfully" [LifecycleManager]
@@ -100,13 +100,17 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
   log "NO" "qos-model does not exist" [QoSProvider]
 
 # 8. check COMPSs agent availability
-log INFO "waiting for agent to boot..." [COMPSs]
-sleep 60
-COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
-for agent in ${COMPSs_AGENTS}; do
-  curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
-    log OK "agent ${agent} tested successfully" [COMPSs] ||
-    log ERROR "failed to reach agent ${agent}" [COMPSs]
+log INFO "waiting for compps agent to boot..." [COMPSs]
+sleep 40
+while true; do
+  sleep 5
+  SERVICE_INSTANCE_IP=$(echo "$SERVICE_INSTANCE_IP" | tr -d '"')
+  if [[ $(curl -XGET "http://$SERVICE_INSTANCE_IP/COMPSs/test" 2>/dev/null) == "Found" ]]; then
+    log "OK" "compss agent $SERVICE_INSTANCE_IP booted successfully" [COMPSs]
+    break
+  else
+    log "NO" "failed to reach compss agent in $SERVICE_INSTANCE_IP" [COMPSs]
+  fi
 done
 
 # 9. start an operation during 60 seconds
@@ -158,7 +162,7 @@ while [ "$AGENTS_ADDED" = "false" ]; do
   fi
   log "INFO" "no agents added yet" [QoSEnforcement]
   ATTEMPTS=$ATTEMPTS+1
-  if ((ATTEMPTS > 10)); then
+  if ((ATTEMPTS > 20)); then
     break
   fi
   sleep 1
