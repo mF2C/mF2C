@@ -43,6 +43,14 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.9.2 (21.10.19)
+
+#### Changed
+
+ - Updates logging in the QoS Enforcement.
+ - Fixes a bug in QoS enforcement when retrieving a service from a service-instance.
+ - Fixes a bug in QoS with SLA constraint parameters
+
 ### 1.9.1 (08.10.19)
 
 #### Changed

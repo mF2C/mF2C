@@ -27,7 +27,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
         "guarantees": [
             {
                 "name": "TestGuarantee",
-                "constraint": "execution_time < 1000"
+                "constraint": "execution_time < 5"
             }
         ]
     }
@@ -39,7 +39,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
 SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' -d '{
     "name": "compss-hello-world",
     "description": "hello world example",
-    "exec": "mf2c/compss-test:it2.8",
+    "exec": "mf2c/compss-test:it2.9",
     "exec_type": "compss",
     "sla_templates": ["'"$SLA_TEMPLATE_ID"'"],
     "agent_type": "normal",
@@ -100,13 +100,17 @@ QOS_MODEL_ID=$(curl -XGET 'https://localhost/api/qos-model?$filter=service/href=
   log "NO" "qos-model does not exist" [QoSProvider]
 
 # 8. check COMPSs agent availability
-log INFO "waiting for agent to boot..." [COMPSs]
-sleep 30
-COMPSs_AGENTS=$(curl "https://localhost/api/${SERVICE_INSTANCE_ID}" -ksS -H 'slipstream-authn-info: super ADMIN' | jq '.agents[] | (.url+":"+ (.ports[0]|tostring))' | tr -d '"')
-for agent in ${COMPSs_AGENTS}; do
-  curl -XGET http://${agent}/COMPSs/test 2>/dev/null &&
-    log OK "agent ${agent} tested successfully" [COMPSs] ||
-    log ERROR "failed to reach agent ${agent}" [COMPSs]
+log INFO "waiting for compps agent to boot..." [COMPSs]
+sleep 40
+while true; do
+  sleep 5
+  SERVICE_INSTANCE_IP=$(echo "$SERVICE_INSTANCE_IP" | tr -d '"')
+  if [[ $(curl -XGET "http://$SERVICE_INSTANCE_IP/COMPSs/test" 2>/dev/null) == "Found" ]]; then
+    log "OK" "compss agent $SERVICE_INSTANCE_IP booted successfully" [COMPSs]
+    break
+  else
+    log "NO" "failed to reach compss agent in $SERVICE_INSTANCE_IP" [COMPSs]
+  fi
 done
 
 # 9. start an operation during 60 seconds
@@ -158,7 +162,7 @@ while [ "$AGENTS_ADDED" = "false" ]; do
   fi
   log "INFO" "no agents added yet" [QoSEnforcement]
   ATTEMPTS=$ATTEMPTS+1
-  if ((ATTEMPTS > 10)); then
+  if ((ATTEMPTS > 20)); then
     break
   fi
   sleep 1

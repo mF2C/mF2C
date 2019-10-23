@@ -31,6 +31,18 @@ dataClay API can be found at
 
 ## CHANGELOG
 
+### 2.27 (21.10.2019)
+
+#### Added
+
+ - ServiceContainerMetric is replicated and field stop_time is synchronized 
+
+### 2.26 (18.10.2019)
+
+#### Changed
+
+ - Service-operation-report 'operation_id' field is now synchronized
+
 ### 2.25 (17.10.2019)
 
 #### Added

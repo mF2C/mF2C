@@ -14,11 +14,17 @@ function log {
 
 BASE_API_URL=`echo ${BASE_API_URL:="http://localhost:9001/"} | tr -d '"'`
 
+HOSTNAME_SYSFS="/proc/sys/kernel/hostname"
+
+read HOSTNAME < $HOSTNAME_SYSFS
+
+
+
 ### Test Landscpae operations
-# test if graph contains compss-test 
-(curl -XGET "${BASE_API_URL}/graph" -ksS | jq -e '.nodes | tostring| contains("compss-test")' | grep -q true > /dev/null 2>&1 && \
-    log "OK" "compss-test docker container exist in landscape") || \
-        log "NO" "compss-test docker container dosn't exist in landscape" 
+# test if graph contains hostname data 
+(curl -XGET "${BASE_API_URL}/graph" -ksS | jq -e '.nodes | tostring| contains("'$HOSTNAME'")' | grep -q true > /dev/null 2>&1 && \
+    log "OK" "host metadata exist in landscape") || \
+        log "NO" "host metadata dosn't exist in landscape" 
 
 #test if mf2c device id is populated 
 (curl -XGET "${BASE_API_URL}/graph" -ksS | jq -e '.nodes | tostring| contains("mf2c_device_id")' | grep -q true  > /dev/null 2>&1 && \
@@ -26,7 +32,7 @@ BASE_API_URL=`echo ${BASE_API_URL:="http://localhost:9001/"} | tr -d '"'`
         log "NO" "mf2c_device_id is not populated in landscape" 
 
 
-#test if mf2c network is stored in lanscape 
-(curl -XGET "${BASE_API_URL}/graph" -ksS | jq -e '.nodes | tostring| contains("mf2c_default")' | grep -q true  > /dev/null 2>&1 && \
-    log "OK" "mf2c_default network is stored in landscape") || \
-        log "NO" "mf2c_default network is not stored in landscape" 
+#test if docker metadata is stored in lanscape 
+(curl -XGET "${BASE_API_URL}/graph" -ksS | jq -e '.nodes | tostring| contains("docker_container")' | grep -q true  > /dev/null 2>&1 && \
+    log "OK" "docker metadata is stored in landscape") || \
+        log "NO" "docker metadata is not stored in landscape" 

@@ -79,7 +79,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
 SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' -d '{
     "name": "compss-hello-world",
     "description": "hello world example",
-    "exec": "mf2c/compss-test:it2.8",
+    "exec": "mf2c/compss-test:it2.9",
     "exec_type": "compss",
     "sla_templates": ["'"$SLA_TEMPLATE_ID"'"],
     "agent_type": "normal",
