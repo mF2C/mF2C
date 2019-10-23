@@ -200,7 +200,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.8
+     image: mf2c/policies:2.0.9
      restart: on-failure
      depends_on:
        - cimi
@@ -220,9 +220,9 @@ services:
      volumes:
        - vpninfo:/vpninfo
      healthcheck:
-       start_period: 30s
+       start_period: 60s
        retries: 5
-       test: ["CMD", "wget", "--spider", "http://localhost:46050"]
+       test: ["CMD", "wget", "--spider", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
 
   discovery:
      image: mf2c/discovery:1.5
