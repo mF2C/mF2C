@@ -301,7 +301,7 @@ services:
        test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.23
+     image: mf2c/resource-categorization:latest-V2.0.24
      hostname: IRILD039
      restart: on-failure
      depends_on:
@@ -316,6 +316,7 @@ services:
      volumes:
        - /var/run/docker.sock:/var/run/docker.sock
        - vpninfo:/vpninfo
+       - /etc/hostname:/etc/hostname
      healthcheck:
        start_period: 60s
        retries: 5
