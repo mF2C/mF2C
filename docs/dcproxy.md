@@ -62,6 +62,12 @@ Any update of those fields will move and synchronize objects automatically.
 
 ## CHANGELOG
 
+### 2.27 (21.10.2019)
+
+#### Added
+
+ - ServiceContainerMetric is replicated and field stop_time is synchronized 
+
 ### 2.26 (18.10.2019)
 
 #### Changed
