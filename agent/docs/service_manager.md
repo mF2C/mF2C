@@ -43,6 +43,12 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.9.3 (24.10.19)
+
+#### Changed
+
+ - Now QoS enforcement takes into account the number of agents used from service-instance instead from service.
+ 
 ### 1.9.2 (21.10.19)
 
 #### Changed
