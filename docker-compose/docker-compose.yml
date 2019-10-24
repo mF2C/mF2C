@@ -338,7 +338,7 @@ services:
       test: grep -q connected /usr/share/nginx/html/api/get_vpn_ip
 
   resource-bootstrap:
-    image: mf2c/resource-bootstrap:1.3.0
+    image: mf2c/resource-bootstrap:1.4.1
     restart: "no"
     environment:
       - CIMI_HOST=proxy
