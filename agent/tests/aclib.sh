@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 # Script to test aclib running as part of an agent.
 # The tests only work after the Agent has obtained its certificate
 # as they need to use the deviceID and the RSA keypair
