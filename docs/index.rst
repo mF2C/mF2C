@@ -14,6 +14,7 @@
    mf2c_agent.md
    policies.md
    resource-categorization.md
+   resource-bootstrap.md
    service_manager.md
    sla_management.md
    vpnclient.md
