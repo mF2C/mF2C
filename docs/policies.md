@@ -52,6 +52,12 @@ To run policies module along other mF2C components, is necessary to specify the 
 - "isLeader=False"
 ```
 
+##### To deploy in Cloud
+
+```yaml
+- "isCloud=True"
+```
+
 ##### To specify static leader and device IPs:
 
 ```yaml
@@ -61,6 +67,11 @@ To run policies module along other mF2C components, is necessary to specify the 
 
 **NOTE**: Only used when Discovery cannot detect a nearby Leader. These variables should only be used for testing purposes and internal mF2C procedures may fail if they are modified.
 
+##### To specify the address of the Cloud Agent (Ignored if deployed as Cloud Agent)
+
+```yaml
+- "MF2C_CLOUD_AGENT=172.0.0.1"
+``` 
 
 ### API
 
@@ -101,6 +112,52 @@ curl -X GET "http://localhost/rm/components" -H "accept: application/json"
     }
     ```
 
+#### Healthcheck
+
+Health of the Policies module. Policies only works properly under GREEN and YELLOW status codes.
+
+> **GREEN:** All components successfully triggered, IPs correctly setup, Backup elected (if Leader) and deviceID generated.
+>
+> **YELLOW:** Discovery failed or leader not found (only in agent side) but IPs correctly setup, Backup not elected (if Leader).
+>
+> **RED:** Component(s) trigger failed, IPs not set, deviceID not generated
+>
+> **ORANGE:** YELLOW or RED status, but still starting. 
+
+- **GET** /api/v2/resource-management/policies/healthcheck
+
+```bash
+curl -X GET "http://localhost//api/v2/resource-management/policies/healthcheck" -H "accept: application/json"
+```
+
+- **RESPONSES**
+    - **200** - Health OK GREEN or YELLOW
+    - **400** - Health NOK ORANGE or RED 
+    - **Response Payload:**
+    ```json
+        {
+        "health": true,                        // 'True if the component is considered to work properly (GREEN and YELLOW status).'),
+        "startup": true,                       // "True if the module has finished the agent startup flow."),
+        "startup_time": 40.0,                  // "Time considered as startup (ORANGE status when failure)"),
+        "status": "GREEN",                     // "Status code of the component. GREEN: all OK, YELLOW: failure detected but working, ORANGE: Failed but starting, RED: critical failure."),
+        "API": true,                           // "True if API working"),
+        "discovery": true,                     // "True if Discovery not failed on trigger"),
+        "identification": true,                // "True if Identification not failed on trigger"),
+        "cau-client":  true,                   // "True if CAU-client not failed on trigger"),
+        "res-cat": true,                       // "True if Res. Categorization not failed on trigger"),
+        "area-resilience": true,               // "True if sub-module Area Resilience started"),
+        "vpn-client": true,                    // "True if VPN is stablished and got IP"),
+        "deviceIP": true,                      // "True if deviceIP not empty"),
+        "leaderIP": true,                      // "True if leaderIP not empty or isCloud = True"),
+        "cloudIP": true,                       // "True if cloudIP not empty"),
+        "deviceID": true,                      // "True if deviceID not empty"),
+        "backupElected": true,                 // "True if (activeBackups > 0 and isLeader=True) or isCloud=True"),
+        "leaderfound": true,                   // "True if leader found by discovery or (isCloud = True || isLeader = True)"),
+        "JOIN-MYIP": true,                     // "True if joined and IP from discovery obtained or (isCloud = True || isLeader = True)"),
+        "wifi-iface": true                     // "True if wifi iface not empty or (isCloud = True)")
+        }
+    ```
+
 #### Keepalive
 
 Keepalive entrypoint for Leader. Backups send message to this address and check if the Leader is alive. Only registered backups are allowed to send keepalives, others will be rejected.
@@ -135,7 +192,8 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/leaderinfo" -H
     - **200** - Success
     - **Response Payload:** `{
   "imLeader": false,
-  "imBackup": false
+  "imBackup": false,
+  "imCloud": false
 }`
 
 #### Reelection
@@ -215,9 +273,32 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ### Known Issues
 
-    + Leader will fail to find available backups as Topology is not coded to be received/generated.
+    * If discovery and VPN fail to provide a valid IP of the agent and leader, Policies module will fail to create CIMI agent resource.
 
 ## CHANGELOG
+
+### 2.0.9 (23/10/2019)
+
+#### Changed
+
+    * Healthckech now provides more information + integration test
+    * Resource-categorization trigger issue on Cloud flow solved
+    * Minor bugs fixed
+
+### 2.0.8 (17/10/2019)
+
+#### Added
+
+    + Get IP from VPN
+    + Separated cloud flow without Discovery and Area Resilience
+    + Cloud address as environment variable
+    + Discovery watch trigger in Leader flow
+
+#### Changed
+
+    * leader_info now has isCloud
+    * Device without a Wifi configured is not capable to be Backup
+
 
 ### 2.0.7 (01/10/2019)
 

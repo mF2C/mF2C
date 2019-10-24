@@ -209,7 +209,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.7
+     image: mf2c/policies:2.0.9
      restart: on-failure
      depends_on:
        - cimi
@@ -223,12 +223,15 @@ services:
        - "DEBUG=True"
        - "MF2C=True"
        - "isLeader=${isLeader}"
+       - "isCloud=${isCloud}"
        - "WIFI_DEV_FLAG=${WIFI_DEV_FLAG}"
-       - "leaderIP=${leaderIP}"
+       - "MF2C_CLOUD_AGENT=${MF2C_CLOUD_AGENT}"
+     volumes:
+       - vpninfo:/vpninfo
      healthcheck:
-       start_period: 30s
+       start_period: 60s
        retries: 5
-       test: ["CMD", "wget", "--spider", "http://localhost:46050"]
+       test: ["CMD", "wget", "--spider", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
 
   discovery:
      image: mf2c/discovery:1.5
@@ -298,7 +301,7 @@ services:
        test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.23
+     image: mf2c/resource-categorization:latest-V2.0.24
      hostname: IRILD039
      restart: on-failure
      depends_on:
@@ -313,6 +316,7 @@ services:
      volumes:
        - /var/run/docker.sock:/var/run/docker.sock
        - vpninfo:/vpninfo
+       - /etc/hostname:/etc/hostname
      healthcheck:
        start_period: 60s
        retries: 5

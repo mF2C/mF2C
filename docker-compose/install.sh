@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # mF2C Installation Script
-# version: 1.1
+# version: 1.2
 
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
@@ -124,12 +124,21 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
-#if [[ ${MF2C_CLOUD_AGENT} == "" ]]; then
-#    MF2C_CLOUD_AGENT="213.205.14.15"
-#    log "IF" "Using default mF2C cloud ${MF2C_CLOUD_AGENT}"
-#else
-#    log "IF" "mF2C cloud ${MF2C_CLOUD_AGENT} detected as env variable"
-#fi
+if [[ ${IS_CLOUD} != "True" ]]; then
+    if [[ ${MF2C_CLOUD_AGENT} == "" ]]; then
+        MF2C_CLOUD_AGENT="dashboard.mf2c-project.eu"
+        MF2C_CLOUD_AGENT="213.205.14.15"
+        read -p "Enter the mF2C Cloud provider address (ENTER for default) [${MF2C_CLOUD_AGENT}]: " input_cloud
+        if [[ "$input_cloud" == "" ]]; then
+            log "IF" "Using default provider address: ${MF2C_CLOUD_AGENT}"
+        else
+            MF2C_CLOUD_AGENT=${input_cloud}
+            log "IF" "Cloud provider address: ${MF2C_CLOUD_AGENT}"
+        fi
+    else
+        log "IF" "mF2C Cloud provider ${MF2C_CLOUD_AGENT} detected as env variable"
+    fi
+fi
 
 progress "5" "Checking OS compatibility"
 
@@ -173,7 +182,7 @@ progress "10" "Cloning mF2C"
 progress "15" "Checking networking conflicts"
 
 # Check that the given interface is not used by the host as the default route
-if [[ "$IN_USE" == "$WIFI_DEV" ]]
+if [[ "$IN_USE" == "$WIFI_DEV" && ${IS_CLOUD} != "True" ]]
 then
     log "IF" "The selected interface is configured as the default route, if you use it you will lose internet connectivity"
     while true;
@@ -188,9 +197,16 @@ then
 fi
 
 progress "25" "User credentials"
-read -p "Enter your mF2C Username: " MF2C_USER
-read -s -p "Enter your mF2C Password: " MF2C_PASS
-echo
+if [[ "${IS_CLOUD}" == "True" ]]; then
+    MF2C_USER="admincloud"
+    MF2C_PASS=$(cat /proc/sys/kernel/random/uuid)
+    log "IF" "Default MF2C User for Cloud Agent: ${MF2C_USER}"
+    log "IF" "MF2C Generated password for Cloud Agent: ${MF2C_PASS}"
+else
+    read -p "Enter your mF2C Username: " MF2C_USER
+    read -s -p "Enter your mF2C Password: " MF2C_PASS
+    echo
+fi
 
 progress "25" "Setup environment"
 
@@ -199,6 +215,7 @@ if [[ ! -f .env ]]; then
     cp mF2C/docker-compose/.env .env 2>/dev/null || cat > .env <<EOF
 isLeader=${IS_LEADER}
 isCloud=${IS_CLOUD}
+MF2C_CLOUD_AGENT=${MF2C_CLOUD_AGENT}
 PHY=${PHY}
 WIFI_DEV_FLAG=${WIFI_DEV}
 usr=${MF2C_USER}
