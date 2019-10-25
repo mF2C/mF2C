@@ -355,38 +355,28 @@ services:
       - cimi
 
   ##### Analytics Engine + Recomender + Landscaper #####
-
   analytics-engine:
-    image: mf2c/recommender-test:1.0
+    image: mf2c/analytics-engine:0.5.7
+    restart: on-failure
     expose:
       - "46020"
     ports:
       - "46020:46020"
+    depends_on:
+      - influxdb
+    volumes:
+      - ./analytics_engine.conf:/root/analytics_engine/analytics_engine.conf
     labels:
       - "traefik.enable=true"
       - "traefik.port=46020"
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
-
-#  analytics-engine:
-#    image: mf2c/analytics-engine:0.5.5
-#    expose:
-#      - "46020"
-#    ports:
-#      - "46020:46020"
-#    depends_on:
-#      - influxdb
-#    volumes:
-#      - ./analytics_engine.conf:/root/analytics_engine/analytics_engine.conf
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.port=46020"
-#      - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
-#    healthcheck:
-#      start_period: 30s
-#      retries: 5
-#      test: curl --fail -s http://localhost:46020/mf2c/optimal || exit 1
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: curl --fail -s http://localhost:46020/ || exit 1
   landscaper:
     image: mf2c/landscaper:0.6.14
+    restart: on-failure
     volumes:
     - landscaper:/landscaper/data
     - ./landscaper.cfg:/landscaper/landscaper.cfg
