@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # mF2C Installation Script
-# version: 1.2
+# version: 1.3
 
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
@@ -212,7 +212,7 @@ progress "25" "Setup environment"
 
 # Write env file to be used by docker-compose
 if [[ ! -f .env ]]; then
-    cp mF2C/docker-compose/.env .env 2>/dev/null || cat > .env <<EOF
+    cp mF2C/agent/.env .env 2>/dev/null || cat > .env <<EOF
 isLeader=${IS_LEADER}
 isCloud=${IS_CLOUD}
 MF2C_CLOUD_AGENT=${MF2C_CLOUD_AGENT}
@@ -228,14 +228,14 @@ fi
 
 progress "30" "Deploying docker-compose services"
 
-([ ! -f docker-compose.yml ] && cp mF2C/docker-compose/docker-compose.yml .) || log "OK" "docker-compose found!"
+([ ! -f docker-compose.yml ] && cp mF2C/agent/docker-compose.yml .) || log "OK" "docker-compose found!"
 
 # Copy configuration files
-[ -d "mF2C/docker-compose" ] && cp mF2C/docker-compose/*.c* .
+[ -d "mF2C/agent" ] && cp mF2C/agent/*.c* .
 
 # Copy directories
-[ -d "mF2C/docker-compose/prop" ] && cp -r mF2C/docker-compose/prop/ .
-[ -d "mF2C/docker-compose/traefik" ] && cp -r mF2C/docker-compose/traefik/ .
+[ -d "mF2C/agent/prop" ] && cp -r mF2C/agent/prop/ .
+[ -d "mF2C/agent/traefik" ] && cp -r mF2C/agent/traefik/ .
 
 progress "35" "Checking for agents running on the system"
 if [[ $(docker-compose -p $PROJECT ps | wc -l) -gt 2 ]]; then
