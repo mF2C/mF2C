@@ -283,6 +283,12 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ## CHANGELOG
 
+### 2.0.11 (25/10/2019)
+
+#### Changed
+
+    * Watch trigger on the leader fixed
+
 ### 2.0.10 (24/10/2019)
 
 #### Changed
