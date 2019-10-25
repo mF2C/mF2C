@@ -71,7 +71,13 @@ To run policies module along other mF2C components, is necessary to specify the 
 
 ```yaml
 - "MF2C_CLOUD_AGENT=172.0.0.1"
-``` 
+```
+
+##### To specify the amount of retry attempts to register a device
+
+```yaml
+- "REGISTRATION_MAX_RETRY=20"
+```
 
 ### API
 
@@ -276,6 +282,19 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
     * If discovery and VPN fail to provide a valid IP of the agent and leader, Policies module will fail to create CIMI agent resource.
 
 ## CHANGELOG
+
+### 2.0.11 (25/10/2019)
+
+#### Changed
+
+    * Watch trigger on the leader fixed
+
+### 2.0.10 (24/10/2019)
+
+#### Changed
+
+    * Identification registration trigger in cloud waits until device is registered.
+    
 
 ### 2.0.9 (23/10/2019)
 
