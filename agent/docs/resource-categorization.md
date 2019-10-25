@@ -445,6 +445,13 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ## Change LOG
 
+### latest-V2.0.25 (date 24/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+
+#### Changed
+
+ - IP is now collecting from the `agent` resource
+
+
 ### latest-V2.0.24 (date 23/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
 
 #### Changed

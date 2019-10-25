@@ -109,7 +109,7 @@ while true; do
     log "OK" "compss agent $SERVICE_INSTANCE_IP booted successfully" [COMPSs]
     break
   else
-    log "NO" "failed to reach compss agent in $SERVICE_INSTANCE_IP" [COMPSs]
+    log "NO" "failed to reach compss agent in $SERVICE_INSTANCE_IP... retrying in 5 seconds" [COMPSs]
   fi
 done
 
@@ -138,7 +138,7 @@ while [ "$REPORT_EXIST" = "false" ]; do
     REPORT_EXIST="true"
     break
   fi
-  log "INFO" "no service operation reports created yet" [COMPSs]
+  log "INFO" "no service operation reports created yet... retrying in 1 second" [COMPSs]
   ATTEMPTS=$ATTEMPTS+1
   if ((ATTEMPTS > 10)); then
     break
@@ -148,7 +148,7 @@ done
 if [[ $REPORT_EXIST == "true" ]]; then
   log "OK" "service operation reports created successfully" [COMPSs]
 else
-  log "No" "no service operation reports were created" [COMPSs]
+  log "No" "maximum number of retries exceed, no service operation reports were created" [COMPSs]
 fi
 
 # 11. check if new agents are added to the service-instance by QoS enforcement
@@ -160,17 +160,17 @@ while [ "$AGENTS_ADDED" = "false" ]; do
     AGENTS_ADDED="true"
     break
   fi
-  log "INFO" "no agents added yet" [QoSEnforcement]
+  log "INFO" "no agents added yet... retrying in 5 seconds" [QoSEnforcement]
   ATTEMPTS=$ATTEMPTS+1
   if ((ATTEMPTS > 20)); then
     break
   fi
-  sleep 1
+  sleep 5
 done
 if [[ $AGENTS_ADDED == "true" ]]; then
   log "OK" "agents added to service-instance successfully" [QoSEnforcement]
 else
-  log "No" "no agents were added" [QoSEnforcement]
+  log "No" "maximum number of retries exceed, no agents were added" [QoSEnforcement]
 fi
 
 log "INFO" "Finished." [ServiceManagerTests]
