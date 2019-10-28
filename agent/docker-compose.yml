@@ -1,5 +1,14 @@
 version: '3.4'
+
+x-logging-params: 
+   &logging_params
+   options:
+      max-size: "1m"
+      max-file: "10"
+   driver: json-file
+   
 services:
+   
   ####################### Proxy  ######################
   proxy:
     image: traefik:1.7.14
@@ -12,6 +21,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    logging: *logging_params
+      
   ######################################################
 
   ######################## CIMI  #######################
@@ -39,6 +50,7 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD", "wget", "--spider", "http://localhost:8201/api/cloud-entry-point"]
+    logging: *logging_params
 
   rc:
     image: sixsq/ring-container:3.52
@@ -48,6 +60,7 @@ services:
       - ringcontainer:/opt/slipstream/ring-container
       - ringcontainerexample:/opt/slipstream/ring-example
     command: sh
+    logging: *logging_params
 
   cimi-ui:
     image: mf2c/cimi-ui
@@ -58,6 +71,8 @@ services:
       - "traefik.backend.healthcheck.path=/webui/webui.html"
       - "traefik.frontend.headers.customRequestHeaders=slipstream-authn-info:"
       - "traefik.frontend.rule=Path:/,/webui/,/{a:webui.*},/{b:css.*},/{c:images.*},/{d:js.*}"
+    logging: *logging_params
+      
   #################### Dataclay  #######################
   dcproxy:
     image: mf2c/dataclay-proxy:2.27
@@ -70,6 +85,7 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD-SHELL", "health_check/wrapper_health_check.sh"]
+    logging: *logging_params
        
   logicmodule1:
     image: mf2c/dataclay-logicmodule:2.27
@@ -93,6 +109,7 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD-SHELL", "health_check/logicmodule_health_check.sh"]
+    logging: *logging_params
 
   ds1java1:
     image: mf2c/dataclay-dsjava:2.27
@@ -111,6 +128,7 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD-SHELL", "health_check/dataservice_health_check.sh"]
+    logging: *logging_params
        
   #####################################################
 
@@ -126,6 +144,8 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD", "sh", "-c", "netstat -a | grep '0.0.0.0:8000'"]
+    logging: *logging_params
+      
   ######################################################
 
   ################## Service Manager ###################
@@ -144,6 +164,8 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD", "wget", "--spider", "http://localhost:46200/api"]
+    logging: *logging_params
+      
   ######################################################
 
   ########## Lifecycle Manager + User Manager ##########
@@ -177,6 +199,8 @@ services:
       start_period: 60s
       retries: 5
       test: ["CMD", "wget", "--spider", "http://localhost:46000/api/v2/lm/isumalive"]
+    logging: *logging_params
+      
   ######################################################
 
   #################### SLA Manager #####################
@@ -189,6 +213,7 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD", "wget", "--spider", "http://localhost:46030"]
+    logging: *logging_params
 
   slalite-ui:
     image: mf2c/sla-ui:0.1.3
@@ -204,6 +229,7 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD", "wget", "--spider", "http://localhost:8000/sla"]
+    logging: *logging_params
 
   ######################################################
 
@@ -232,6 +258,7 @@ services:
        start_period: 60s
        retries: 5
        test: ["CMD", "wget", "--spider", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
+     logging: *logging_params
 
   discovery:
      image: mf2c/discovery:1.5
@@ -247,6 +274,7 @@ services:
        start_period: 30s
        retries: 5
        test: curl --fail -s http://localhost:46040/api/v1/resource-management/discovery/ || exit 1
+     logging: *logging_params
 
   identification:
      image: mf2c/identification:v2
@@ -262,6 +290,7 @@ services:
        start_period: 30s
        retries: 5
        test: curl -f http://localhost:46060/api/v1/resource-management/identification/requestID || exit 1
+     logging: *logging_params
        
   cau-client:
      image: mf2c/cau-client-it2:v2.1
@@ -281,6 +310,7 @@ services:
        timeout: 60s
        retries: 5
        test: ["CMD-SHELL", "echo getpubkey=1233211234567 | nc localhost 46065"]
+     logging: *logging_params
 
   aclib:
      image: mf2c/aclib:v1.0
@@ -299,6 +329,7 @@ services:
        timeout: 60s
        retries: 3
        test: ["CMD-SHELL", "echo {\"sec\":\"pro\",\"comp\":\"f\",\"payload\":\"ping\",\"typ\":\"jws\"} | nc localhost 46080"]
+     logging: *logging_params
 
   resource-categorization:
      image: mf2c/resource-categorization:latest-V2.0.25
@@ -321,6 +352,7 @@ services:
        start_period: 60s
        retries: 5
        test: curl --fail -s http://localhost:46070/api/v1/resource-management/categorization/run/ || exit 1
+     logging: *logging_params
 
   vpnclient:
     image: mf2c/vpnclient:1.1.5
@@ -340,6 +372,7 @@ services:
       start_period: 120s
       interval: 30s
       test: grep -q connected /usr/share/nginx/html/api/get_vpn_ip
+    logging: *logging_params
 
   resource-bootstrap:
     image: mf2c/resource-bootstrap:1.4.1
@@ -353,6 +386,7 @@ services:
     depends_on:
       - proxy
       - cimi
+    logging: *logging_params
 
   ##### Analytics Engine + Recomender + Landscaper #####
 
@@ -366,6 +400,7 @@ services:
       - "traefik.enable=true"
       - "traefik.port=46020"
       - "traefik.frontend.rule=PathPrefixStrip:/analytics-engine"
+    logging: *logging_params
 
 #  analytics-engine:
 #    image: mf2c/analytics-engine:0.5.5
@@ -401,6 +436,7 @@ services:
       - OS_PASSWORD=
       - OS_AUTH_URL=
     command: ["./start.sh", "http://neo4j:7474"]
+    logging: *logging_params
 
   telem_start:
     image: mf2c/telem_start:0.1
@@ -409,6 +445,7 @@ services:
       - HOSTNAME
     depends_on:
       - snap
+    logging: *logging_params
 
   influxdb:
     image: influxdb
@@ -429,6 +466,8 @@ services:
       start_period: 30s
       retries: 5
       test: ["CMD", "wget", "--spider", "http://localhost:8086/ping"]
+    logging: *logging_params
+      
   snap:
     image: intelsdi/snap:xenial
     hostname: snap
@@ -440,6 +479,7 @@ services:
     environment:
       - SNAP_VERSION=2.0.0
       - SNAP_LOG_LEVEL=2
+    logging: *logging_params
 
   neo4j:
     image: neo4j:2.3.12
@@ -454,6 +494,7 @@ services:
       start_period: 1m
       retries: 5
       test: curl -i http://127.0.0.1:7474 2>&1 | grep -c -e '200 OK'
+    logging: *logging_params
 
   web:
     image: mf2c/landscaper:0.6.14
@@ -472,6 +513,7 @@ services:
       start_period: 90s
       retries: 5
       test: curl --fail -s http://localhost:9001/graph || exit 1
+    logging: *logging_params
 
 
 ######################################################
