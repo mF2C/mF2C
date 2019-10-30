@@ -443,7 +443,14 @@ mf2c-curl-post https://localhost/api/fog-area -d
 - For those who are using `latest-V2.0.16`; To get the `Host-IP` related information the resource-categorization module is running another container `alpine:latest` . So it might possible that sometimes we may not be able to get the output value from that container.
 - Fix the multiple `device_ip` creation issue for a single agent
 
-## Change LOG
+## Change LOG 
+
+### latest-V2.0.26 (date 25/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+
+#### Changed
+
+ - Changed the `hostname` in `hwloc` info with correct one
+
 
 ### latest-V2.0.25 (date 24/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
 
