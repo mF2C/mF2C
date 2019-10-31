@@ -332,7 +332,7 @@ services:
      logging: *logging_params
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.25
+     image: mf2c/resource-categorization:latest-V2.0.26
      hostname: IRILD039
      restart: on-failure
      depends_on:
