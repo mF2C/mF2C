@@ -66,7 +66,7 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
         "creation": "2018-01-16T17:09:45.01Z",
         "guarantees": [
             {
-                "name": "TestGuarantee",
+                "name": "es.bsc.compss.agent.test.Test.main",
                 "constraint": "execution_time < 10"
             }
         ]
