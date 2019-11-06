@@ -65,7 +65,7 @@ docker run -d --network="host" \
         -v /var/run/docker.sock:/var/run/docker.sock \
         --name mf2c_micro_discovery \
         --label "PRODUCT=MF2C" \
-        mf2c/discovery-microagent:4.7
+        mf2c/discovery-microagent:4.8
 
 docker run -d --hostname=IRILD039 --privileged \
         -e LEADER_ENDPOINT="https://dashboard.mf2c-project.eu" \
@@ -74,7 +74,7 @@ docker run -d --hostname=IRILD039 --privileged \
         -v vpninfo:/vpninfo \
         --name mf2c_micro_resource-categorization \
         --label "PRODUCT=MF2C" \
-        mf2c/resource-categorization:latest-V2.0.23-arm
+        mf2c/resource-categorization:resCatlatest-V2.0.25-arm
 
 trigger_cat_payload='{
 "deviceID":"'${deviceID}'",
