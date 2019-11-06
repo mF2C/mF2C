@@ -445,6 +445,19 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ## Change LOG 
 
+### latest-V2.0.28 (date 05/November/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+
+#### Changed
+
+ - Added the functionality to filter out the bad IPs from `device-dynamic` and `agent` resources
+
+### latest-V2.0.27 (date 01/November/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
+
+#### Changed
+
+ - Fix the synchornization issue for `device-dynamic` and `fog-area` resources.
+
+
 ### latest-V2.0.26 (date 25/October/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.24 +later]
 
 #### Changed
@@ -537,9 +550,6 @@ mf2c-curl-post https://localhost/api/fog-area -d
  ### latest-V2.0.16 (date 28/June/2019) [in complience with CIMI-server - 2.18 / 2.19 & DataClay version - 2.21]
  
  
- ## Work in progress
- 
- - Workin on the code for making it full functional with `Static IP`
 
 
 
