@@ -43,6 +43,11 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.10.0 (13.11.19)
+
+ - Updated QoS enforcement to consider different guarantees for every service operation
+ - Updated SM-LM interface for the GUI
+
 ### 1.9.3 (24.10.19)
 
 #### Changed
