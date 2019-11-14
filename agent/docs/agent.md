@@ -25,7 +25,7 @@
     git clone https://github.com/mF2C/mF2C
     cd mF2C/agent    
     ```
-2. Register a new user [here](http://dashboard.mf2c-project.eu:800/main.html). (Omitted if already registered. One user can have multiple agents.)
+2. Register a new user [here](http://dashboard.mf2c-project.eu:800/main.html). Validate the registration on the validation mail sent to the specified email. (Omitted if already registered. One user can have multiple agents.)
 3. Execute the `install.sh` script:
    
    ```bash
@@ -60,7 +60,7 @@
     git clone https://github.com/mF2C/mF2C
     cd mF2C/agent    
     ```
-2. Register a new user [here](http://dashboard.mf2c-project.eu:800/main.html). (Omitted if already registered. One user can have multiple agents.)
+2. Register a new user [here](http://dashboard.mf2c-project.eu:800/main.html). Validate the registration on the validation mail sent to the specified email. (Omitted if already registered. One user can have multiple agents.)
 3. Create a new `.env` file:
 
     ```bash
@@ -170,3 +170,7 @@ Be careful, IPs must be numerical and valid. If a wrong IP is specified, the top
     - run `sudo usermod -aG docker your-user` and replace `your-user` with your unix user. More info [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
     - reboot the system to apply changes and try to install again.
     - another way is to execute the `install.sh` or `docker-compose` with **root** privileges.
+    
+- **Validation email not received**: Some email servers filter the validation email as spam or even block the message.
+    - normally it takes from 1 to 3 minutes to receive the email.
+    - `Gmail` domain has been tested and works most of the time.
