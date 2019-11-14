@@ -1,6 +1,6 @@
 # mF2C Agent
 
-insert description
+.
 
 ## Prerequisites
 
@@ -126,17 +126,42 @@ insert description
 
 ### Clean-up
 
-The mF2C stack uses a considerable amount of resources, specially disk and RAM. Once the agent is unistalled, is highly recommended to remove the downloaded docker images. More information [here](https://docs.docker.com/config/pruning/). 
+The mF2C stack uses a considerable amount of resources, specially disk and RAM. Once the agent is uninstalled, is highly recommended to remove the downloaded docker images. More information [here](https://docs.docker.com/config/pruning/). 
 
 ```bash
 docker image prune -a
 ```
 
+## Topology formation
+
+The mF2C agent automatically build the topology (connect to the Leader/Cloud Agent, resource information sync, leave detection, etc...) using primarily the [Discovery](https://github.com/mF2C/ResourceManagement/tree/master/Discovery#mf2c-discovery) mechanism. 
+
+However, if the device does not have a Wireless NIC or a Leader is not detected, a secondary mechanism is used to connect the agent to the Cloud Agent. This connection is done by joining to the mF2C [VPN](https://github.com/mF2C/vpn#establishing-credentials-for-authentication) using the mF2C user credentials.
+
+Both mechanisms are automatically triggered at the agent installation, except for the Cloud Agent.
+
+### Manual topology
+
+Additionally, the mF2C agent also allow to introduce an static topology, by specifying the IPs in each agent.
+
+To create the static topology, in each device modify the `docker-compose.yml` file as follows:
+
+- Inside the file, at the `policies` service definition, add two environment variables:
+    ```yaml
+    - "leaderIP=192.168.4.44"
+    - "deviceIP=192.168.4.4"
+    ``` 
+    - Replace both IPs with the Leader IP and the device own IP for the Agent. The Leader will automatically connect to the specified Cloud IP at the installation (if VPN is available).
+
+Static variables will only be active if `Discovery` has failed or Leader is not detected. If static variables are not set, VPN is used.
+
+Be careful, IPs must be numerical and valid. If a wrong IP is specified, the topology may fail as well.
+
 ## Troubleshooting
 
-- **Unhealthy components**: Some components may be unhealthy due to issues during the installation, bad configuration, or other issues. This can happen at any time and provides an easy mechanism to detect uncontrolled behaviours. Please check the documentation for the afected component to see possible causes and solutions.
+- **Unhealthy components**: Some components may be unhealthy due to issues during the installation, bad configuration, or other issues. This can happen at any time and provides an easy mechanism to detect uncontrolled behaviours. Please check the documentation for the affected component to see possible causes and solutions.
 
-- **Uninstall failure**: Sometimes, docker-compose deprovisioning fails due to containers attached to the mf2c docker network that are not stopped automatically.
+- **Uninstall failure**: Sometimes, docker-compose deprovision fails due to containers attached to the mf2c docker network that are not stopped automatically.
     - run `./install.sh -s`, `docker-compose -p mf2c ps`, or `docker ps` and for each container displayed, run `docker stop <id>`, where `<id>` is the container ID.
     - When no container is displayed, try again to uninstall the agent.
     - Disregard the warning or error message regarding the WiFi detach if the installation is not successful.
