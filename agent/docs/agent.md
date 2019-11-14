@@ -11,7 +11,9 @@ insert description
 - Additional packages are required to run the installation and test scripts:
     - `iw`: Tool for configuring Linux wireless devices. More info [here](https://wireless.wiki.kernel.org/en/users/Documentation/iw).
     - `jq`: Command-line JSON processor. More info [here](https://stedolan.github.io/jq/download/).
+    - `git`: Version control system. More info [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - An Internet connection.
+- Ports `80`, `443`, `1034`, `46000`, `46300`, `46040`, `46020`, `8086`, `8181`, `7474`, and `9001` must be free.
 
 ## mF2C Agent installation
 
@@ -27,7 +29,7 @@ insert description
 3. Execute the `install.sh` script:
    
    ```bash
-   install.sh
+   ./install.sh
    ```
     
     *type `install.sh -L` if you want to deploy a Leader Agent or `install.sh -C` to deploy a Cloud Agent*
@@ -35,7 +37,7 @@ insert description
     - Follow the instructions inside the script.
 4. Once installation is completed, wait until all components are healthy
     ```bash
-    install.sh -s
+    ./install.sh -s
     ```
     
     **NOTE: Running an Agent with an unhealthy component may cause unexpected errors in the whole stack.**
@@ -139,3 +141,7 @@ docker image prune -a
     - When no container is displayed, try again to uninstall the agent.
     - Disregard the warning or error message regarding the WiFi detach if the installation is not successful.
  
+- **Docker non-privileged**: If the current unix user is not in the `docker` group, the `ERROR: Couldn't connect to Docker daemon at http+docker://localhost - is it running?` message will appear on installing the agent.
+    - run `sudo usermod -aG docker your-user` and replace `your-user` with your unix user. More info [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
+    - reboot the system to apply changes and try to install again.
+    - another way is to execute the `install.sh` or `docker-compose` with **root** privileges.
