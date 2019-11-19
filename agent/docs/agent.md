@@ -5,6 +5,7 @@
 ## Prerequisites
 
 - Ubuntu/Debian based distribution (Others may work as well).
+- More than `8GB` of RAM and `20GB` of available disk.
 - `docker` and `docker-compose` installed.
     - How to install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce).
     - How to install [docker-compose](https://docs.docker.com/compose/install/).
@@ -14,6 +15,7 @@
     - `git`: Version control system. More info [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - An Internet connection.
 - Ports `80`, `443`, `1034`, `46000`, `46300`, `46040`, `46020`, `8086`, `8181`, `7474`, and `9001` must be free.
+- Disable the `network-manager` service or tag the wireless NIC as unmanaged. More info [here](https://github.com/mF2C/ResourceManagement/tree/master/Discovery#prerequisites-1).
 
 ## mF2C Agent installation
 
