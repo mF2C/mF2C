@@ -73,6 +73,25 @@ services:
       - "traefik.frontend.rule=Path:/,/webui/,/{a:webui.*},/{b:css.*},/{c:images.*},/{d:js.*}"
     logging: *logging_params
       
+  ################### GUI dashboard main page ###################
+  gui-dashboard:
+    image: mf2c/trunk:gui-dashboard-1.0.0
+    depends_on:
+      - cimi
+    restart: on-failure
+    expose:
+      - "80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=PathPrefixStrip:/dashboard"
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "curl", "http://localhost/"]
+    logging: *logging_params
+
+      
   #################### Dataclay  #######################
   dcproxy:
     image: mf2c/dataclay-proxy:2.27
@@ -201,6 +220,23 @@ services:
       test: ["CMD", "wget", "--spider", "http://localhost:46000/api/v2/lm/isumalive"]
     logging: *logging_params
       
+  lm-um-gui:
+    image:  mf2c/trunk:lm-um-gui-1.0.2
+    restart: on-failure
+    depends_on:
+      - lm-um
+    environment:
+      - REACT_APP_MF2C_HOST_IP=lm-um
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=PathPrefixStrip:/lmui"
+    logging: *logging_params
+
   ######################################################
 
   #################### SLA Manager #####################
