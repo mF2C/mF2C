@@ -164,6 +164,11 @@ Be careful, IPs must be numerical and valid. If a wrong IP is specified, the top
 ## Troubleshooting
 
 - **Unhealthy components**: Some components may be unhealthy due to issues during the installation, bad configuration, or other issues. This can happen at any time and provides an easy mechanism to detect uncontrolled behaviours. Please check the documentation for the affected component to see possible causes and solutions.
+    - To check the healthcheck output from a specific component run this command:
+    ```bash
+    docker inspect <container_name> | jq -e ".[0].State.Health"
+    ```
+    *replace `<container_name>` with the container name or ID of the desired component (e.g. `mf2c_policies_1`).*
 
 - **Uninstall failure**: Sometimes, docker-compose deprovision fails due to containers attached to the mf2c docker network that are not stopped automatically.
     - run `./install.sh -s`, `docker-compose -p mf2c ps`, or `docker ps` and for each container displayed, run `docker stop <id>`, where `<id>` is the container ID.
