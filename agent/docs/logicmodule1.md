@@ -44,6 +44,12 @@ SSL_CLIENT_KEY=/ssl/agent.pem #in PEM format
 
 ### Troubleshooting
 
+### 2.28 (21.11.2019)
+
+#### Changed
+
+ - Removed control to check if an IP in Agent resource children IPs field is reachable
+
 ## CHANGELOG
 
 ### 2.27 (21.10.2019)
