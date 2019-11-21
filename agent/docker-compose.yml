@@ -235,7 +235,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.11
+     image: mf2c/policies:2.0.12
      restart: on-failure
      depends_on:
        - cimi
@@ -257,7 +257,7 @@ services:
      healthcheck:
        start_period: 60s
        retries: 5
-       test: ["CMD", "wget", "--spider", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
+       test: ["CMD", "wget", "-O", "-", "-nv", "--content-on-error", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
      logging: *logging_params
 
   discovery:
