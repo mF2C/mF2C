@@ -69,6 +69,7 @@ docker run -d --network="host" \
 
 docker run -d --hostname=IRILD039 --privileged \
         -e LEADER_ENDPOINT="https://dashboard.mf2c-project.eu" \
+        -e agentType="micro" \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v /etc/hostname:/etc/hostname \
         -v vpninfo:/vpninfo \
