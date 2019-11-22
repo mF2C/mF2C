@@ -75,7 +75,7 @@ services:
       
   ################### GUI dashboard main page ###################
   gui-dashboard:
-    image: mf2c/trunk:gui-dashboard-1.0.0
+    image: mf2c/gui-dashboard:1.0.0
     depends_on:
       - cimi
     restart: on-failure
