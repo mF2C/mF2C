@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # mF2C Installation Script
-# version: 1.3
+# version: 1.4
 
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
@@ -138,6 +138,9 @@ if [[ ${IS_CLOUD} != "True" ]]; then
     else
         log "IF" "mF2C Cloud provider ${MF2C_CLOUD_AGENT} detected as env variable"
     fi
+    AGENT_TYPE="1"
+else
+    AGENT_TYPE="2"
 fi
 
 progress "5" "Checking OS compatibility"
@@ -220,6 +223,7 @@ PHY=${PHY}
 WIFI_DEV_FLAG=${WIFI_DEV}
 usr=${MF2C_USER}
 pwd=${MF2C_PASS}
+agentType=${AGENT_TYPE}
 EOF
     log "OK" "New .env file created"
 else
