@@ -31,18 +31,18 @@ This step can be omitted if you are already registered. One user can have multip
     git clone https://github.com/mF2C/mF2C
     cd mF2C/agent    
     ```
-2. Execute the `install.sh` script:
+2. Execute the `mf2c.sh` script:
    
    ```bash
-   ./install.sh
+   ./mf2c.sh
    ```
     
-    *type `install.sh -L` if you want to deploy a Leader Agent or `install.sh -C` to deploy a Cloud Agent*
+    *type `mf2c.sh -L` if you want to deploy a Leader Agent or `mf2c.sh -C` to deploy a Cloud Agent*
 
     - Follow the instructions inside the script.
 3. Once installation is completed, wait until all components are healthy
     ```bash
-    ./install.sh -s
+    ./mf2c.sh -s
     ```
     
     **NOTE: Running an Agent with an unhealthy component may cause unexpected errors in the whole stack.**
@@ -104,15 +104,15 @@ This step can be omitted if you are already registered. One user can have multip
 
 ### Installation script
 
-1. Inside the `mF2C/agent` directory, run the `install.sh` script with the following arguments:
+1. Inside the `mF2C/agent` directory, run the `mf2c.sh` script with the following arguments:
  
     ```bash
-    ./install.sh -S
+    ./mf2c.sh -S
     ```  
 2. Check if the `.env` file has been removed, the script finished without errors, and all the component containers are stopped
 
     ```bash
-    ./install.sh -s
+    ./mf2c.sh -s
     ```
     
 ### Manual uninstall
@@ -171,14 +171,14 @@ Be careful, IPs must be numerical and valid. If a wrong IP is specified, the top
     *replace `<container_name>` with the container name or ID of the desired component (e.g. `mf2c_policies_1`).*
 
 - **Uninstall failure**: Sometimes, docker-compose deprovision fails due to containers attached to the mf2c docker network that are not stopped automatically.
-    - run `./install.sh -s`, `docker-compose -p mf2c ps`, or `docker ps` and for each container displayed, run `docker stop <id>`, where `<id>` is the container ID.
+    - run `./mf2c.sh -s`, `docker-compose -p mf2c ps`, or `docker ps` and for each container displayed, run `docker stop <id>`, where `<id>` is the container ID.
     - When no container is displayed, try again to uninstall the agent.
     - Disregard the warning or error message regarding the WiFi detach if the installation is not successful.
  
 - **Docker non-privileged**: If the current unix user is not in the `docker` group, the `ERROR: Couldn't connect to Docker daemon at http+docker://localhost - is it running?` message will appear on installing the agent.
     - run `sudo usermod -aG docker your-user` and replace `your-user` with your unix user. More info [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
     - reboot the system to apply changes and try to install again.
-    - another way is to execute the `install.sh` or `docker-compose` with **root** privileges.
+    - another way is to execute the `mf2c.sh` or `docker-compose` with **root** privileges.
     
 - **Validation email not received**: Some email servers filter the validation email as spam or even block the message.
     - normally it takes from 1 to 3 minutes to receive the email.
