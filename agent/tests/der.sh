@@ -1,7 +1,6 @@
 #!/bin/bash -e
-AGENT_IP=$(ip route get 1.2.3.4 | awk '{print $7}' | head -n 1)
 SERVICE_NAME="COMPSs-test"
-SERVICE_IMAGE="mf2c/compss-test:it2.8"
+SERVICE_IMAGE="mf2c/compss-test:it2.10"
 
 BASE_API_URL=`echo ${BASE_API_URL:="https://localhost/api"} | tr -d '"'`
 LM_API_URL="http://localhost:46000/api/v2/lm"
@@ -102,10 +101,10 @@ SERVICE_ID=$(curl -XPOST "${BASE_API_URL}/service" -ksS -H 'content-type: applic
 log INFO "Deploying service ..."
 LM_OUTPUT=$(curl -XPOST "${LM_API_URL}/service" -ksS -H 'content-type: application/json' -d '{
      "service_id": "'"$SERVICE_ID"'",
-     "sla_template": "'"$SLA_TEMPLATE_ID"'",
-     "agents_list": [{"agent_ip": "'"${AGENT_IP}"'"}]
+     "sla_template": "'"$SLA_TEMPLATE_ID"'"
 }') >/dev/null 2>&1 
-if [[ $(echo "${LM_OUTPUT}" | jq -r ".error" 2>/dev/null) == "true" ]]; then
+
+if [[ ! $(echo "${LM_OUTPUT}" | jq -r ".error" 2>/dev/null) == "false" ]]; then
     log "NO" 'Failed to create new deployment 
 '"${LM_OUTPUT}"
     shutdown
@@ -164,11 +163,12 @@ log OK "Operation successfully launched."
 
 
 
-
+REPORT_CREATED="false"
 FINISHED_OPERATION="false"
-while [ ! ${FINISHED_OPERATION} == "true" ]; do
+count=0
+while [ ! ${FINISHED_OPERATION} == "true" ] && [ "${count}" -lt "40" ]; do
     sleep 1
-
+    count=$((count + 1))
     # CHECK OPERATION REPORT
     LM_OUTPUT=$(curl -XGET "${LM_API_URL}/service-instances/${SHORT_SERVICE_INSTANCE_ID}/report" -ksS -H 'content-type: application/json')
     if [[ ! $(echo "${LM_OUTPUT}" | jq -r ".error" 2>/dev/null) == "false" ]]; then
@@ -177,15 +177,35 @@ while [ ! ${FINISHED_OPERATION} == "true" ]; do
     fi
 
     EXECUTION_LENGTH=$(echo "${LM_OUTPUT}" | jq -r ".report.execution_length" 2>/dev/null || echo "0")
-    if [ "${EXECUTION_LENGTH}" == "0" ]; then
+    if [ "${EXECUTION_LENGTH}" == "0" ]; then 
+        if [ "${REPORT_CREATED}" == "false" ]; then 
+            REPORT_CREATED="true"
+            log OK "Service Operation Report created properly"
+        fi
         EXPECTED_END=$(echo "${LM_OUTPUT}" | jq -r ".report.expected_end_time" 2>/dev/null)
         echo ${EXPECTED_END}
+    elif [ "${EXECUTION_LENGTH}" == "null" ]; then
+        echo "Service Operation report not generated yet."
     else
+        if [ "${REPORT_CREATED}" == "false" ]; then 
+            REPORT_CREATED="true"
+            log OK "Service Operation Report created properly"
+        fi
+        log OK "Service Operation Report registers operation end properly"
         FINISHED_OPERATION="true"
         END_TIME=$(echo "${LM_OUTPUT}" | jq -r ".report.expected_end_time" 2>/dev/null)
         echo ${END_TIME}
     fi
 done
+
+if [ "${count}" == "40" ]; then
+    if [ "${REPORT_CREATED}" == "false" ]; then 
+        log ERROR 'Service Operation Report was never created'
+    else
+        log ERROR 'Application took to long to finish or operation end is not properly registered on the Service Operation Report'
+    fi
+    shutdown
+fi
 
 
 
