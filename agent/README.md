@@ -31,13 +31,13 @@ Set of all modules composing the mF2C agent
 
 2. deploy the agent by running:
     
-    `install.sh`
+    `mf2c.sh`
     
-    *use `install.sh -L` if the node is a leader or `install.sh -C` if the node is a Cloud Agent*
+    *use `mf2c.sh -L` if the node is a leader or `mf2c.sh -C` if the node is a Cloud Agent*
     
 3. wait until all components are healthy
 
-    `install.sh -s`
+    `mf2c.sh -s`
     
     **NOTE: Running an Agent with an unhealthy component may cause unexpected errors in the whole stack.** 
 
@@ -47,7 +47,7 @@ Set of all modules composing the mF2C agent
 
 6. to shutdown the agent:
 
-    `./install.sh -S`
+    `./mf2c.sh -S`
 
 # Docs
 
