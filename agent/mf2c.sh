@@ -138,9 +138,9 @@ if [[ ${IS_CLOUD} != "True" ]]; then
     else
         log "IF" "mF2C Cloud provider ${MF2C_CLOUD_AGENT} detected as env variable"
     fi
-    AGENT_TYPE="1"
-else
     AGENT_TYPE="2"
+else
+    AGENT_TYPE="1"
 fi
 
 progress "5" "Checking OS compatibility"
