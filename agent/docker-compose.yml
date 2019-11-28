@@ -261,7 +261,7 @@ services:
      logging: *logging_params
 
   discovery:
-     image: mf2c/discovery:1.5
+     image: mf2c/discovery:1.6
      restart: on-failure
      depends_on:
        - cimi
