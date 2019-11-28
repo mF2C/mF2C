@@ -48,6 +48,12 @@ The discovery component provides the following endpoints:
 
 ## CHANGELOG
 
+### 1.6 (28/11/2019)
+
+#### Added
+
+ - Disabled pushing of default gateway from the leader side.
+
 ### 1.5 (23/9/2019)
 
 #### Added
