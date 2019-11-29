@@ -75,8 +75,10 @@ This step can be omitted if you are already registered. One user can have multip
     WIFI_DEV_FLAG=
     usr="<username>"
     pwd="<password>"
+    agentType="<type>"
     ``` 
     - Replace `<username>` and `<password>` with your mF2C credentials (from step 2).
+    - Replace `<type>` with `"2"` for a Normal or Leader Agent, or with `"1"` for the Cloud Agent.
     - Set `isLeader=True` to deploy a Leader or `isCloud=True` to deploy a Cloud Agent.
 3. Launch the agent.
 
