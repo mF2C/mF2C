@@ -43,6 +43,10 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.10.1 (15.11.19)
+
+ - Added the SLA template id when launching a service through the GUI
+ 
 ### 1.10.0 (13.11.19)
 
  - Updated QoS enforcement to consider different guarantees for every service operation

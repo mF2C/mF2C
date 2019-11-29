@@ -75,7 +75,7 @@ services:
       
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.27
+    image: mf2c/dataclay-proxy:2.28
     depends_on:
       - logicmodule1
       - ds1java1
@@ -88,7 +88,7 @@ services:
     logging: *logging_params
        
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.27
+    image: mf2c/dataclay-logicmodule:2.28
     ports:
        - "1034:1034"
     environment:
@@ -112,7 +112,7 @@ services:
     logging: *logging_params
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.27
+    image: mf2c/dataclay-dsjava:2.28
     depends_on:
       - logicmodule1
     environment:
@@ -150,7 +150,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/trunk:service-manager-1.10.0
+    image: mf2c/service-manager:1.10.1
     restart: unless-stopped
     depends_on:
       - cimi
@@ -235,7 +235,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.11
+     image: mf2c/policies:2.0.12
      restart: on-failure
      depends_on:
        - cimi
@@ -257,11 +257,11 @@ services:
      healthcheck:
        start_period: 60s
        retries: 5
-       test: ["CMD", "wget", "--spider", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
+       test: ["CMD", "wget", "-O", "-", "-nv", "--content-on-error", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
      logging: *logging_params
 
   discovery:
-     image: mf2c/discovery:1.5
+     image: mf2c/discovery:1.6
      restart: on-failure
      depends_on:
        - cimi
@@ -332,7 +332,7 @@ services:
      logging: *logging_params
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.29
+     image: mf2c/resource-categorization:resCatlatest-V2.0.30
      hostname: IRILD039
      restart: on-failure
      depends_on:

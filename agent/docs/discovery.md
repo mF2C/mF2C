@@ -42,7 +42,17 @@ The discovery component provides the following endpoints:
 
 ### Troubleshooting
 
+## Known issues
+
+- The Join operation (performed using wpa_supplicant) always outputs the following message: `Failed to connect to non-global ctrl_ifname: wlan0  error: No such file or directory` . This does not indicate an error. 
+
 ## CHANGELOG
+
+### 1.6 (28/11/2019)
+
+#### Added
+
+ - Disabled pushing of default gateway from the leader side.
 
 ### 1.5 (23/9/2019)
 
