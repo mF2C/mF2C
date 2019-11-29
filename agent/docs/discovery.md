@@ -48,6 +48,12 @@ The discovery component provides the following endpoints:
 
 ## CHANGELOG
 
+### 1.7 (29/11/2019)
+
+#### Added
+
+ - Added retrieval of interface name from env variable for get_ip REST call.
+
 ### 1.6 (28/11/2019)
 
 #### Added
