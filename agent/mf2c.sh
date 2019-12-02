@@ -161,14 +161,12 @@ if [[ "${IS_CLOUD}" != "True" ]]; then
     then
         WIFI_DEV=$(/sbin/iw dev | awk '$1=="Interface"{print $2}')
         IN_USE=$(ip r | grep default | cut -d " " -f5)
-        #find corresponding phy name
-        if [[ $WIFI_DEV != "" ]]; then
-            PHY=$(cat /sys/class/net/"$WIFI_DEV"/phy80211/name)
-        elif [[ ${IS_CLOUD} != "True" ]]; then
+
+        if [[ $WIFI_DEV == "" && ${IS_CLOUD} != "True" ]]; then
             log "IF" "WiFi interface not detected. VPN connection to cloud will be used."
         fi
 
-        log "IF" "WIFI_DEV=${WIFI_DEV}, IN_USE=${IN_USE}, PHY=${PHY}"
+        log "IF" "WIFI_DEV=${WIFI_DEV}, IN_USE=${IN_USE}"
     else
         echo "ERR: the mF2C system is not compatible with your OS: $machine. Exit..."
         exit 1
@@ -219,7 +217,6 @@ if [[ ! -f .env ]]; then
 isLeader=${IS_LEADER}
 isCloud=${IS_CLOUD}
 MF2C_CLOUD_AGENT=${MF2C_CLOUD_AGENT}
-PHY=${PHY}
 WIFI_DEV_FLAG=${WIFI_DEV}
 usr=${MF2C_USER}
 pwd=${MF2C_PASS}
@@ -274,12 +271,8 @@ do
   fi
 done
 
-progress "90" "Binding wireless interface with discovery container"
-
-#Bind inet to discovery
-
 pid=$(docker inspect -f '{{.State.Pid}}' $container_name)
-# Assign phy wireless interface to the container
+
 if [[ ("$machine" != "Mac") && (${WIFI_DEV} != "") ]]
 then
     #Bring the wireless interface up
