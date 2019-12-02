@@ -31,6 +31,12 @@ dataClay API can be found at
 
 ## CHANGELOG
 
+### 2.29 (02.12.2019)
+
+#### Changed
+
+ - Modified exception checking during propagation of updates
+
 ### 2.28 (21.11.2019)
 
 #### Changed
