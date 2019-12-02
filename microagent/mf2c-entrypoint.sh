@@ -10,7 +10,7 @@ set -x
 
 containers=''
 
-containers_to_clean='mf2c_micro_lifecycle mf2c_micro_resource-categorization mf2c_micro_discovery mf2c_micro_cau-client mf2c_micro_identification'
+containers_to_clean='mf2c_micro_lifecycle mf2c_micro_resource-categorization mf2c_micro_discovery mf2c_micro_vpnclient mf2c_micro_cau-client mf2c_micro_identification'
 
 docker run -d --rm --name mf2c_micro_cleaner \
         -v /var/run/docker.sock:/var/run/docker.sock \
