@@ -16,7 +16,7 @@ docker run -d --rm --name mf2c_micro_cleaner \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -e PARENT=$(hostname) \
         -e CHILD="${containers_to_clean}" \
-        sixsq/wrapper-cleaner
+        sixsq/wrapper-cleaner:master
 
 docker run -d --restart=on-failure \
         -e mF2C_User=${MF2C_USER} \
