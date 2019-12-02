@@ -10,6 +10,14 @@ set -x
 
 containers=''
 
+containers_to_clean='mf2c_micro_lifecycle mf2c_micro_resource-categorization mf2c_micro_discovery mf2c_micro_cau-client mf2c_micro_identification'
+
+docker run -d --rm --name mf2c_micro_cleaner \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -e PARENT=$(hostname) \
+        -e CHILD="${containers_to_clean}" \
+        sixsq/wrapper-cleaner
+
 docker run -d --restart=on-failure \
         -e mF2C_User=${MF2C_USER} \
         -e mF2C_Pass=${MF2C_PWD} \
