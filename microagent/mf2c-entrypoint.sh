@@ -75,7 +75,7 @@ docker run -d --hostname=IRILD039 --privileged \
         -v vpninfo:/vpninfo \
         --name mf2c_micro_resource-categorization \
         --label "PRODUCT=MF2C" \
-        mf2c/resource-categorization:resCatlatest-V2.0.27-arm
+        mf2c/resource-categorization:resCatlatest-V2.0.28-arm
 
 trigger_cat_payload='{
 "deviceID":"'${deviceID}'",
