@@ -15,6 +15,12 @@ Browse to https://\<agent>/dahsboard/
 
 ## CHANGELOG
 
+### 1.0.1 (29/11/2019)
+#### Changed
+
+* LM/UM user interface included in the main page
+* Minor changes in menu labels 
+
 ### 1.0.0
 
 #### Changed
