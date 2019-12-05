@@ -11,6 +11,12 @@ No action necessary, the container performs actions without user intervention.
 
 ## CHANGELOG
 
+### 2.7.3 (2019-12-05)
+
+#### Added
+
+ - Bootstrap the video analysis service for the microagent.
+
 ### 1.4.1 (2019-10-24)
 
 #### Added
