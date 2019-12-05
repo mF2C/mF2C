@@ -75,7 +75,7 @@ services:
       
   ################### GUI dashboard main page ###################
   gui-dashboard:
-    image: mf2c/gui-dashboard:1.0.0
+    image: mf2c/gui-dashboard:1.0.1
     depends_on:
       - cimi
     restart: on-failure
@@ -94,7 +94,7 @@ services:
       
   #################### Dataclay  #######################
   dcproxy:
-    image: mf2c/dataclay-proxy:2.27
+    image: mf2c/dataclay-proxy:2.29
     depends_on:
       - logicmodule1
       - ds1java1
@@ -107,7 +107,7 @@ services:
     logging: *logging_params
        
   logicmodule1:
-    image: mf2c/dataclay-logicmodule:2.27
+    image: mf2c/dataclay-logicmodule:2.29
     ports:
        - "1034:1034"
     environment:
@@ -131,7 +131,7 @@ services:
     logging: *logging_params
 
   ds1java1:
-    image: mf2c/dataclay-dsjava:2.27
+    image: mf2c/dataclay-dsjava:2.29
     depends_on:
       - logicmodule1
     environment:
@@ -169,7 +169,7 @@ services:
 
   ################## Service Manager ###################
   service-manager:
-    image: mf2c/trunk:service-manager-1.10.1
+    image: mf2c/service-manager:1.10.1
     restart: unless-stopped
     depends_on:
       - cimi
@@ -214,6 +214,12 @@ services:
       - /tmp/mf2c/um:/tmp/mf2c/um
       - /tmp/mf2c/lm:/tmp/mf2c/lm
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.lm.frontend.rule=PathPrefixStrip:/lm"
+      - "traefik.lm.port=46000"
+      - "traefik.um.frontend.rule=PathPrefixStrip:/um"
+      - "traefik.um.port=46300"
     healthcheck:
       start_period: 60s
       retries: 5
@@ -221,20 +227,21 @@ services:
     logging: *logging_params
       
   lm-um-gui:
-    image:  mf2c/trunk:lm-um-gui-1.0.2
+    image: mf2c/lm-um-gui:1.0.4
     restart: on-failure
     depends_on:
       - lm-um
-    environment:
-      - REACT_APP_MF2C_HOST_IP=lm-um
     expose:
-      - "5000"
-    ports:
-      - "5000:5000"
+      - "8001"
     labels:
       - "traefik.enable=true"
-      - "traefik.port=5000"
+      - "traefik.backend=lm-um-gui"
+      - "traefik.port=8001"
       - "traefik.frontend.rule=PathPrefixStrip:/lmui"
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "wget", "--spider", "http://localhost:8001/lmui"]
     logging: *logging_params
 
   ######################################################
@@ -252,7 +259,7 @@ services:
     logging: *logging_params
 
   slalite-ui:
-    image: mf2c/sla-ui:0.1.3
+    image: mf2c/sla-ui:0.1.4
     restart: on-failure
     expose:
       - "8000"
@@ -271,7 +278,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.11
+     image: mf2c/policies:2.0.12
      restart: on-failure
      depends_on:
        - cimi
@@ -293,11 +300,11 @@ services:
      healthcheck:
        start_period: 60s
        retries: 5
-       test: ["CMD", "wget", "--spider", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
+       test: ["CMD", "wget", "-O", "-", "-nv", "--content-on-error", "http://localhost:46050/api/v2/resource-management/policies/healthcheck"]
      logging: *logging_params
 
   discovery:
-     image: mf2c/discovery:1.5
+     image: mf2c/discovery:1.6
      restart: on-failure
      depends_on:
        - cimi
@@ -368,7 +375,7 @@ services:
      logging: *logging_params
 
   resource-categorization:
-     image: mf2c/resource-categorization:latest-V2.0.29
+     image: mf2c/resource-categorization:resCatlatest-V2.0.30
      hostname: IRILD039
      restart: on-failure
      depends_on:
@@ -411,7 +418,7 @@ services:
     logging: *logging_params
 
   resource-bootstrap:
-    image: mf2c/resource-bootstrap:1.4.1
+    image: mf2c/resource-bootstrap:2.7.3
     restart: "no"
     environment:
       - CIMI_HOST=proxy
