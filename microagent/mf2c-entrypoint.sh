@@ -12,9 +12,12 @@ containers=''
 
 containers_to_clean='mf2c_micro_lifecycle mf2c_micro_resource-categorization mf2c_micro_discovery mf2c_micro_vpnclient mf2c_micro_cau-client mf2c_micro_identification'
 
+volumes_to_clean='pkidata'
+
 docker run -d --rm --name mf2c_micro_cleaner \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -e PARENT=$(hostname) \
+        -e VOLUMES="${volumes_to_clean}" \
         -e CHILD="${containers_to_clean}" \
         sixsq/wrapper-cleaner:master
 
@@ -84,7 +87,7 @@ docker run -d --hostname=IRILD039 --privileged \
         -v vpninfo:/vpninfo \
         --name mf2c_micro_resource-categorization \
         --label "PRODUCT=MF2C" \
-        mf2c/resource-categorization:resCatlatest-V2.0.28-arm
+        mf2c/resource-categorization:resCatlatest-V2.0.29-arm
 
 trigger_cat_payload='{
 "deviceID":"'${deviceID}'",
