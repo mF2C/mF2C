@@ -73,6 +73,25 @@ services:
       - "traefik.frontend.rule=Path:/,/webui/,/{a:webui.*},/{b:css.*},/{c:images.*},/{d:js.*}"
     logging: *logging_params
       
+  ################### GUI dashboard main page ###################
+  gui-dashboard:
+    image: mf2c/gui-dashboard:1.0.1
+    depends_on:
+      - cimi
+    restart: on-failure
+    expose:
+      - "80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=PathPrefixStrip:/dashboard"
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "curl", "http://localhost/"]
+    logging: *logging_params
+
+      
   #################### Dataclay  #######################
   dcproxy:
     image: mf2c/dataclay-proxy:2.29
@@ -195,12 +214,36 @@ services:
       - /tmp/mf2c/um:/tmp/mf2c/um
       - /tmp/mf2c/lm:/tmp/mf2c/lm
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.lm.frontend.rule=PathPrefixStrip:/lm"
+      - "traefik.lm.port=46000"
+      - "traefik.um.frontend.rule=PathPrefixStrip:/um"
+      - "traefik.um.port=46300"
     healthcheck:
       start_period: 60s
       retries: 5
       test: ["CMD", "wget", "--spider", "http://localhost:46000/api/v2/lm/isumalive"]
     logging: *logging_params
       
+  lm-um-gui:
+    image: mf2c/lm-um-gui:1.0.4
+    restart: on-failure
+    depends_on:
+      - lm-um
+    expose:
+      - "8001"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=lm-um-gui"
+      - "traefik.port=8001"
+      - "traefik.frontend.rule=PathPrefixStrip:/lmui"
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: ["CMD", "wget", "--spider", "http://localhost:8001/lmui"]
+    logging: *logging_params
+
   ######################################################
 
   #################### SLA Manager #####################
@@ -216,7 +259,7 @@ services:
     logging: *logging_params
 
   slalite-ui:
-    image: mf2c/sla-ui:0.1.3
+    image: mf2c/sla-ui:0.1.4
     restart: on-failure
     expose:
       - "8000"
