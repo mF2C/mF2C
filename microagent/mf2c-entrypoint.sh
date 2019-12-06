@@ -70,10 +70,10 @@ done
 
 cau_registration="echo detectedLeaderID=${detectedLeaderID},deviceID=${deviceID} | nc localhost 46065"
 
-timeout 10 docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
+timeout -t 10 docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
 while [ $? -ne 0 ]
 do
-  timeout 10 docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
+  timeout -t 10 docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
 done
 
 docker run -d --network="host" \
