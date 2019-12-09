@@ -43,6 +43,10 @@ submitting a new service:
 
 ## CHANGELOG
 
+### 1.10.2 (06.12.19)
+
+ - Added initial values for cpu, memory, disk, network when a service is registered
+ 
 ### 1.10.1 (15.11.19)
 
  - Added the SLA template id when launching a service through the GUI
