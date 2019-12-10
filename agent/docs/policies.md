@@ -287,6 +287,12 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
 
 ## CHANGELOG
 
+### 2.0.13 (10/12/2019)
+
+#### Added
+    
+    + CAU-client trigger added.
+
 ### 2.0.12 (22/10/2019)
 
 #### Added
