@@ -11,6 +11,19 @@ No action necessary, the container performs actions without user intervention.
 
 ## CHANGELOG
 
+### 2.7.5 (2019-12-10)
+
+#### Added
+
+ - Add a default SLA template to all services.
+
+
+### 2.7.4 (2019-12-10)
+
+#### Added
+
+ - Add the `isCloud` environment variable to allow toggling bootstrapping operations.
+
 ### 2.7.3 (2019-12-05)
 
 #### Added
