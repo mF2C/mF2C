@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- Ubuntu/Debian based distribution (Others may work as well).
+- `Ubuntu 16.04` / `Debian 9` based distribution (Others may work as well).
 - More than `8GB` of RAM and `20GB` of available disk.
 - `docker` and `docker-compose` installed.
     - How to install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce).
