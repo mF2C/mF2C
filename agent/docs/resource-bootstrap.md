@@ -11,12 +11,17 @@ No action necessary, the container performs actions without user intervention.
 
 ## CHANGELOG
 
+### 2.8.5 (2019-12-11)
+
+#### Added
+
+ - Submit SLA templates instead of agreements when bootstrapping.
+
 ### 2.7.5 (2019-12-10)
 
 #### Added
 
  - Add a default SLA template to all services.
-
 
 ### 2.7.4 (2019-12-10)
 

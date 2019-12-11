@@ -418,7 +418,7 @@ services:
     logging: *logging_params
 
   resource-bootstrap:
-    image: mf2c/resource-bootstrap:2.7.5
+    image: mf2c/resource-bootstrap:2.8.5
     restart: "no"
     environment:
       - CIMI_HOST=proxy
