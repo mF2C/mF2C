@@ -30,8 +30,8 @@ docker run -d --restart=on-failure \
 
 docker run -d --restart=on-failure \
         -v pkidata:/pkidata \
-        -e CCAU_URL=213.205.14.13:55443 \
-        -e CAU_URL=213.205.14.13:55443 \
+        -e CCAU_URL=${CAU} \
+        -e CAU_URL=${CAU} \
         --name mf2c_micro_cau-client \
         --label "PRODUCT=MF2C" \
         mf2c/cau-client-it2-arm
