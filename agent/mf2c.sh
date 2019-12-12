@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # mF2C Installation Script
-# version: 1.5
+# version: 1.6
 
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
@@ -213,6 +213,12 @@ fi
 
 progress "25" "Setup environment"
 
+# Load configuration form setup.json if exists
+if [[ -f setup.json ]]; then
+    DEVICE_ACTUATORS=$(cat setup.json | tr "\'" "\"" | jq -e ".Actuators")
+    DEVICE_SENSORS=$(cat setup.json | tr "\'" "\"" | jq -e ".Sensors")
+fi
+
 # Write env file to be used by docker-compose
 if [[ ! -f .env ]]; then
     cp mF2C/agent/.env .env 2>/dev/null || cat > .env <<EOF
@@ -224,6 +230,8 @@ WIFI_DEV_FLAG=${WIFI_DEV}
 usr=${MF2C_USER}
 pwd=${MF2C_PASS}
 agentType=${AGENT_TYPE}
+targetDeviceActuator=${DEVICE_ACTUATORS}
+targetDeviceSensor=${DEVICE_SENSORS}
 EOF
     log "OK" "New .env file created"
 else
