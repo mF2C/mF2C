@@ -345,8 +345,8 @@ services:
        - 46065
      #using the cloud cau for the moment
      environment:
-       - CCAU_URL=213.205.14.23:55443
-       - CAU_URL=213.205.14.23:55443
+       - CCAU_URL=213.205.14.20:55443
+       - CAU_URL=213.205.14.20:55443
      healthcheck:
        start_period: 60s
        interval: 60s
