@@ -189,7 +189,7 @@ services:
 
   ########## Lifecycle Manager + User Manager ##########
   lm-um:
-    image: mf2c/lifecycle-usermngt:1.3.9
+    image: mf2c/lifecycle-usermngt:1.3.11
     restart: on-failure
     depends_on:
       - cimi
@@ -435,7 +435,7 @@ services:
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
-    image: mf2c/analytics-engine:0.5.7
+    image: mf2c/recommender-test:2.0
     restart: on-failure
     expose:
       - "46020"
