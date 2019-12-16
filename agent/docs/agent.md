@@ -25,12 +25,21 @@ This step can be omitted if you are already registered. One user can have multip
 
 ### Installation script
 
-1. Clone the main mF2C repository and enter into the directory
+1. Clone the main mF2C repository and enter into the directory or download the `.zip` file from the registration dashboard.
 
     ```bash
     git clone https://github.com/mF2C/mF2C
-    cd mF2C/agent    
+    cd mF2C/agent
     ```
+    
+    If the agent is downloaded using the registration dashboard, unzip the file that contains the agent configuration files and a `.json` setup file with the sensors/actuators information.
+    
+    ```bash
+    unzip mF2C.zip && unzip agent.zip && rm agent.zip && mv mF2C-master/ mF2C
+    mv setup.json mF2C/agent/
+    cd mF2C/agent
+    ```
+
 2. Execute the `mf2c.sh` script:
    
    ```bash
@@ -40,7 +49,7 @@ This step can be omitted if you are already registered. One user can have multip
     *type `mf2c.sh -L` if you want to deploy a Leader Agent or `mf2c.sh -C` to deploy a Cloud Agent*
 
     - Follow the instructions inside the script.
-3. Once installation is completed, wait until all components are healthy
+3. Once installation is completed, wait until all components are healthy. To get more information about the meaning of the healthcheck, check the documentation for each component.
     ```bash
     ./mf2c.sh -s
     ```
@@ -59,11 +68,19 @@ This step can be omitted if you are already registered. One user can have multip
 ### Manual install
 **NOTE:** Manual installation does not configure the wireless interface. 
 
-1. Clone the main mF2C repository and enter into the directory
+1. Clone the main mF2C repository and enter into the directory or download the `.zip` file from the registration dashboard.
 
     ```bash
     git clone https://github.com/mF2C/mF2C
-    cd mF2C/agent    
+    cd mF2C/agent
+    ```
+    
+    If the agent is downloaded using the registration dashboard, unzip the file that contains the agent configuration files and a `.json` setup file with the sensors/actuators information.
+    
+    ```bash
+    unzip mF2C.zip && unzip agent.zip && rm agent.zip && mv mF2C-master/ mF2C
+    mv setup.json mF2C/agent/
+    cd mF2C/agent
     ```
 2. Create a new `.env` file:
 
@@ -76,17 +93,19 @@ This step can be omitted if you are already registered. One user can have multip
     usr="<username>"
     pwd="<password>"
     agentType="<type>"
+    targetDeviceActuator="<actuators>"
+    targetDeviceSensor="<sensors>" 
     ``` 
     - Replace `<username>` and `<password>` with your mF2C credentials (from step 2).
     - Replace `<type>` with `"2"` for a Normal or Leader Agent, or with `"1"` for the Cloud Agent.
     - Set `isLeader=True` to deploy a Leader or `isCloud=True` to deploy a Cloud Agent.
+    - Replace `<actuators>` and `<sensors>` with the ones from the `setup.json` if the file exists.
 3. Launch the agent.
 
     ```bash
-    docker-compose pull    # To get the updated version of the mF2C components.
     docker-compose -p mf2c up -d
     ```
-4. Wait until all components are healthy.
+4. Wait until all components are healthy. To get more information about the meaning of the healthcheck, check the documentation for each component.
 
     ```bash
     docker-compose -p mf2c ps
@@ -144,11 +163,11 @@ The mF2C agent automatically build the topology (connect to the Leader/Cloud Age
 
 However, if the device does not have a Wireless NIC or a Leader is not detected, a secondary mechanism is used to connect the agent to the Cloud Agent. This connection is done by joining to the mF2C [VPN](https://github.com/mF2C/vpn#establishing-credentials-for-authentication) using the mF2C user credentials.
 
-Both mechanisms are automatically triggered at the agent installation, except for the Cloud Agent.
+Both mechanisms are automatically triggered at the agent installation, except for the Cloud Agent that does not have any connection to the upper layer (as it is the agent deployed in layer 0)..
 
 ### Manual topology
 
-Additionally, the mF2C agent also allow to introduce an static topology, by specifying the IPs in each agent.
+Additionally, the mF2C agent also allows a static topology, by specifying the IPs in each agent.
 
 To create the static topology, in each device modify the `docker-compose.yml` file as follows:
 
@@ -159,9 +178,9 @@ To create the static topology, in each device modify the `docker-compose.yml` fi
     ``` 
     - Replace both IPs with the Leader IP and the device own IP for the Agent. The Leader will automatically connect to the specified Cloud IP at the installation (if VPN is available).
 
-Static variables will only be active if `Discovery` has failed or Leader is not detected. If static variables are not set, VPN is used.
+Static variables will only be active if `Discovery` has failed or a Leader is not detected. If static variables are not set, VPN is used.
 
-Be careful, IPs must be numerical and valid. If a wrong IP is specified, the topology may fail as well.
+It should be noted that, IPs must be numerical and valid. If a wrong IP is specified, the topology may fail as well.
 
 ## Troubleshooting
 
