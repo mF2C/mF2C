@@ -180,7 +180,7 @@ fi
 progress "10" "Cloning mF2C"
 
 [ ! -f docker-compose.yml ] && git clone https://github.com/mF2C/mF2C.git
-[ -f docker-compose.yml ] && git pull
+[ -f docker-compose.yml ] && [ -d ../.git ] && git pull
 
 progress "15" "Checking networking conflicts"
 
