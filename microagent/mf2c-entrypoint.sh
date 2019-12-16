@@ -10,6 +10,17 @@ set -x
 
 containers=''
 
+containers_to_clean='mf2c_micro_lifecycle mf2c_micro_resource-categorization mf2c_micro_discovery mf2c_micro_vpnclient mf2c_micro_cau-client mf2c_micro_identification'
+
+volumes_to_clean='pkidata vpninfo'
+
+docker run -d --rm --name mf2c_micro_cleaner \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -e PARENT=$(hostname) \
+        -e VOLUMES="${volumes_to_clean}" \
+        -e CHILD="${containers_to_clean}" \
+        sixsq/wrapper-cleaner:master
+
 docker run -d --restart=on-failure \
         -e mF2C_User=${MF2C_USER} \
         -e mF2C_Pass=${MF2C_PWD} \
@@ -19,8 +30,8 @@ docker run -d --restart=on-failure \
 
 docker run -d --restart=on-failure \
         -v pkidata:/pkidata \
-        -e CCAU_URL=213.205.14.13:55443 \
-        -e CAU_URL=213.205.14.13:55443 \
+        -e CCAU_URL=${CAU} \
+        -e CAU_URL=${CAU} \
         --name mf2c_micro_cau-client \
         --label "PRODUCT=MF2C" \
         mf2c/cau-client-it2-arm
@@ -58,7 +69,12 @@ do
 done
 
 cau_registration="echo detectedLeaderID=${detectedLeaderID},deviceID=${deviceID} | nc localhost 46065"
-docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
+
+timeout -t 10 docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
+while [ $? -ne 0 ]
+do
+  timeout -t 10 docker exec mf2c_micro_cau-client sh -c "${cau_registration}"
+done
 
 docker run -d --network="host" \
         --cap-add=NET_ADMIN \
@@ -70,12 +86,13 @@ docker run -d --network="host" \
 docker run -d --hostname=IRILD039 --privileged \
         -e LEADER_ENDPOINT="https://dashboard.mf2c-project.eu" \
         -e agentType=3 \
+        -e targetDeviceSensor=${targetDeviceSensor} \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v /etc/hostname:/etc/hostname \
         -v vpninfo:/vpninfo \
         --name mf2c_micro_resource-categorization \
         --label "PRODUCT=MF2C" \
-        mf2c/resource-categorization:resCatlatest-V2.0.27-arm
+        mf2c/resource-categorization:resCatlatest-V2.0.29-arm
 
 trigger_cat_payload='{
 "deviceID":"'${deviceID}'",

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # mF2C Installation Script
-# version: 1.4
+# version: 1.5
 
 # Credits: https://github.com/fgg89/docker-ap/blob/master/docker_ap
 
@@ -255,9 +255,6 @@ if [[ $(docker-compose -p $PROJECT ps | wc -l) -gt 2 ]]; then
     done
     docker-compose -p $PROJECT down -v || exit 0
 fi
-
-progress "40" "Pulling mF2C agent modules"
-docker-compose pull
 
 progress "50" "Deploy mF2C agent"
 docker-compose -p $PROJECT up -d

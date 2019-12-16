@@ -43,12 +43,7 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
     "exec_type": "compss",
     "sla_templates": ["'"$SLA_TEMPLATE_ID"'"],
     "agent_type": "normal",
-    "num_agents": 1,
-    "cpu_arch": "x86-64",
-    "os": "linux",
-    "storage_min": 0,
-    "req_resource": ["sensor_1"],
-    "opt_resource": ["sensor_2"]
+    "num_agents": 1
 }' | jq -es 'if . == [] then null else .[] | .["resource-id"] end') &&
   log "OK" "service $SERVICE_ID created successfully" [ServiceManager] ||
   log "NO" "failed to create new service $SERVICE_ID" [ServiceManager]

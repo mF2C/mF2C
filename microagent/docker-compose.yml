@@ -2,9 +2,11 @@ version: '3.4'
 
 services:
   installer:
-    image: mf2c/microagent:1.0.4
+    image: mf2c/microagent:1.0.10
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - MF2C_USER=${MF2C_USER}
       - MF2C_PWD=${MF2C_PWD}
+      - targetDeviceSensor=${sensorType}
+      - CAU=${CAU}

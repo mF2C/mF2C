@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
 
+agent_type_arg="normal"
+exec_arg="mf2c/compss-test:it2.9"
+exec_type_arg="compss"
+
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
   --num-agents)
     num_agents_arg="$2"
+    shift # past argument
+    shift # past value
+    ;;
+  --micro)
+    agent_type_arg="micro"
+    exec_arg="hello-world"
+    exec_type_arg="docker"
     shift # past argument
     shift # past value
     ;;
@@ -77,18 +88,13 @@ SLA_TEMPLATE_ID=$(curl -XPOST "https://localhost/api/sla-template" -ksS -H 'cont
 
 # 3. submit hello-world service
 SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: application/json' -H 'slipstream-authn-info: super ADMIN' -d '{
-    "name": "compss-hello-world",
-    "description": "hello world example",
-    "exec": "mf2c/compss-test:it2.9",
-    "exec_type": "compss",
+    "name": "hello-world",
+    "description": "hello world test",
+    "exec": "'"$exec_arg"'",
+    "exec_type": "'"$exec_type_arg"'",
     "sla_templates": ["'"$SLA_TEMPLATE_ID"'"],
-    "agent_type": "normal",
-    "num_agents": "'"$num_agents_arg"'",
-    "cpu_arch": "x86-64",
-    "os": "linux",
-    "storage_min": 0,
-    "req_resource": ["sensor_1"],
-    "opt_resource": ["sensor_2"]
+    "agent_type": "'"$agent_type_arg"'",
+    "num_agents": "'"$num_agents_arg"'"
 }' | jq -es 'if . == [] then null else .[] | .["resource-id"] end') &&
   log "OK" "service $SERVICE_ID created successfully" [ServiceManager] ||
   log "NO" "failed to create new service $SERVICE_ID" [ServiceManager]

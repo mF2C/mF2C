@@ -1,5 +1,9 @@
 # Changelog (Lifecycle Manager)
 
+## [1.3.11] - 2019-12-13
+### Fixed
+- dependecy with recommender for affinity
+
 ## [1.3.9] - 2019-10-08
 ### Changed
 - Service deployment - Agent selection: workflow updated; the LM calls the UM before calling the QoS Provider

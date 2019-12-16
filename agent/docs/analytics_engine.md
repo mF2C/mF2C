@@ -18,6 +18,26 @@ If incorrect telemetry data is returned or errors, please check and make sure th
 
 ## CHANGELOG
 
+### Version 0.6
+
+### 3.12.2019
+
+#### Added
+
+ - Filtering and ordering nodes for required sensors and agent type field described in the service specification.  
+
+#### Tests done
+
+ [HelloWorldTest]  Starting...
+ [ResourceCategorization]  SUCCESS: device dynamic "device-dynamic/967c9c8a-2cb2-42b4-893a-be7ad1b43621" was created successfully
+ [SLAManager]             SUCCESS: sla-template sla-template/27186a06-beb3-4739-b398-7b77b1a913fd created successfully
+ [ServiceManager]         SUCCESS: service "service/c26bdb90-0bbe-4f43-bc35-8951ae010919" created successfully
+ [Analytics]              SUCCESS: ip ip "192.168.255.121" "192.168.7.110" returned successfully
+ [LifecycleManager]       SUCCESS: service-instance launched in "192.168.255.121" "192.168.7.110" successfully
+ [LifecycleManager]       INFO:    service instance status = started...
+ [SlaManagement]          SUCCESS: agreement created successfully
+ 
+
 ### Version 0.5.7
 
 ### 25.10.2019
