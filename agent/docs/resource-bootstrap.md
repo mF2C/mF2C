@@ -13,6 +13,13 @@ No action necessary, the container performs actions without user intervention.
 
 ### 2.8.5 (2019-12-11)
 
+#### Fixed
+
+ - Version 2.8.5 contained temporary files, not ignored by .dockerignore, which contained invalid data and were
+   submitted automatically. This version removes those files by ignoring them at build time.
+
+### 2.8.5 (2019-12-11)
+
 #### Added
 
  - Submit SLA templates instead of agreements when bootstrapping.
