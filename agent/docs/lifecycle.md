@@ -1,5 +1,9 @@
 # Changelog (Lifecycle Manager)
 
+## [1.3.12] - 2019-12-18
+### Fixed
+- use name=service_name with recommender for affinity
+
 ## [1.3.11] - 2019-12-13
 ### Fixed
 - dependecy with recommender for affinity
