@@ -100,7 +100,7 @@ SERVICE_ID=$(curl -XPOST "https://localhost/api/service" -ksS -H 'content-type: 
   log "NO" "failed to create new service $SERVICE_ID" [ServiceManager]
 
 # 4. ask analytics for the list of agents
-ANALYTICS_IP_ADDRESS=$(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H 'content-type: application/json' -d '{"name": "compss-hello-world"}' |
+ANALYTICS_IP_ADDRESS=$(curl -XPOST "http://localhost:46020/mf2c/optimal" -ksS -H 'content-type: application/json' -d '{"name": "hello-world"}' |
   jq -e 'if . == [] then null else .[].ipaddress end') >/dev/null 2>&1
 ANALYTICS_IP_ADDRESS=$(echo $ANALYTICS_IP_ADDRESS | tr -d '\n')
 if [[ ($ANALYTICS_IP_ADDRESS != null) && ($ANALYTICS_IP_ADDRESS != "") ]]; then

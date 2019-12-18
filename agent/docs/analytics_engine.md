@@ -18,6 +18,49 @@ If incorrect telemetry data is returned or errors, please check and make sure th
 
 ## CHANGELOG
 
+### Version 0.61
+
+### 18.12.2019
+
+#### Changed
+
+ -  Fixed agent and platform type affinity.
+
+#### Tests done
+
+Agents "192.168.255.121" "192.168.7.110" are type normal. A service template named "hello-world" is created without agent type affinity. The output from analytics will contain both agents' IPs. 
+
+ [HelloWorldTest]  Starting...
+ [ResourceCategorization]  SUCCESS: device dynamic "device-dynamic/967c9c8a-2cb2-42b4-893a-be7ad1b43621" was created successfully
+ [SLAManager]             SUCCESS: sla-template sla-template/27186a06-beb3-4739-b398-7b77b1a913fd created successfully
+ [ServiceManager]         SUCCESS: service "service/c26bdb90-0bbe-4f43-bc35-8951ae010919" created successfully
+ [Analytics]              SUCCESS: ip "192.168.255.121" "192.168.7.110" returned successfully
+ [LifecycleManager]       SUCCESS: service-instance launched in "192.168.255.121" "192.168.7.110" successfully
+ [LifecycleManager]       INFO:    service instance status = started...
+ [SlaManagement]          SUCCESS: agreement created successfully
+
+Agents "192.168.255.121" are of type micro and "192.168.7.110" is of type normal. A service template named "hello-world" is created with agent type affinity set to miro. The output from analytics will contain only IP "192.168.7.121".
+
+ [HelloWorldTest]  Starting...
+ [ResourceCategorization]  SUCCESS: device dynamic "device-dynamic/967c9c8a-2cb2-42b4-893a-be7ad1b43621" was created successfully
+ [SLAManager]             SUCCESS: sla-template sla-template/27186a06-beb3-4739-b398-7b77b1a913fd created successfully
+ [ServiceManager]         SUCCESS: service "service/c26bdb90-0bbe-4f43-bc35-8951ae010919" created successfully
+ [Analytics]              SUCCESS: ip "192.168.255.121" returned successfully
+ [LifecycleManager]       SUCCESS: service-instance launched in "192.168.255.121" "192.168.7.110" successfully
+ [LifecycleManager]       INFO:    service instance status = started...
+ [SlaManagement]          SUCCESS: agreement created successfully
+
+Agents "192.168.255.121" "192.168.7.110" are type micro. A service template named "hello-world" is created with agent type affinity set to normal. The output from analytics will return the empty list. 
+
+ [HelloWorldTest]  Starting...
+ [ResourceCategorization]  SUCCESS: device dynamic "device-dynamic/967c9c8a-2cb2-42b4-893a-be7ad1b43621" was created successfully
+ [SLAManager]             SUCCESS: sla-template sla-template/27186a06-beb3-4739-b398-7b77b1a913fd created successfully
+ [ServiceManager]         SUCCESS: service "service/c26bdb90-0bbe-4f43-bc35-8951ae010919" created successfully
+ [Analytics]              FAILED:  failed to return list of ip addresses
+ [LifecycleManager]       SUCCESS: service-instance launched in "192.168.255.121" "192.168.7.110" successfully
+ [LifecycleManager]       INFO:    service instance status = started...
+ [SlaManagement]          SUCCESS: agreement created successfully
+
 ### Version 0.6
 
 ### 3.12.2019
