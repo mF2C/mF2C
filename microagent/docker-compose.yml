@@ -9,4 +9,4 @@ services:
       - MF2C_USER=${MF2C_USER}
       - MF2C_PWD=${MF2C_PWD}
       - targetDeviceSensor=${sensorType}
-      - CAU=${CAU}
+      - CAU=${CAU:-"213.205.14.20:55443"}
