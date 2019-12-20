@@ -445,6 +445,11 @@ mf2c-curl-post https://localhost/api/fog-area -d
 
 ## Change LOG 
 
+### `resCatlatest-V2.0.32` (date 12/December/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.29 +later]
+
+#### Changed
+
+ - removed the `unavailable` agent IPs from `childrenIPs` field of `agent` resource
 
 ### `resCatlatest-V2.0.31` (date 03/December/2019) [in complience with CIMI-server - 2.28 +later & DataClay version - 2.29 +later]
 
