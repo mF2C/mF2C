@@ -305,11 +305,13 @@ services:
      logging: *logging_params
 
   discovery:
-     image: mf2c/discovery:1.6
+     image: mf2c/discovery:1.7
      restart: on-failure
      depends_on:
        - cimi
      network_mode: "host"
+     environment:
+       - "WIFI_DEV_FLAG=${WIFI_DEV_FLAG}"     
      ports:
      - "46040:46040"
      cap_add:
