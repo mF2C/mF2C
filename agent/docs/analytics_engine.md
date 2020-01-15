@@ -18,6 +18,14 @@ If incorrect telemetry data is returned or errors, please check and make sure th
 
 ## CHANGELOG
 
+### Version 0.62
+
+### 15.01.2020
+
+#### Changed
+
+ -  Added more robust error handling for Device Dynamics.
+
 ### Version 0.61
 
 ### 18.12.2019
