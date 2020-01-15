@@ -438,7 +438,7 @@ services:
 
   ##### Analytics Engine + Recomender + Landscaper #####
   analytics-engine:
-    image: mf2c/trunk:analytics-engine-0.61
+    image: mf2c/trunk:analytics-engine-0.62
     restart: on-failure
     expose:
       - "46020"
