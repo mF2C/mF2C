@@ -85,6 +85,16 @@ check the [hello-world script](https://github.com/mF2C/mF2C/blob/master/docker-c
 
 ## CHANGELOG
 
+### v0.9.1 - 2020-01-14
+
+#### Added
+
+* Add availability calculation for COMPSs services
+
+#### Changed
+
+* Fix service operation reports being ignored
+
 ### v0.8.1 - 2019-08-09
 
 #### Changed
