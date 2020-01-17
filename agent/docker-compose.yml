@@ -249,7 +249,7 @@ services:
 
   #################### SLA Manager #####################
   slalite:
-    image: mf2c/sla-management:0.8.1
+    image: mf2c/sla-management:0.9.1
     restart: on-failure
     expose:
       - "46030"
