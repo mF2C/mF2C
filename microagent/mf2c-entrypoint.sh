@@ -126,7 +126,7 @@ docker run --rm -p 46300:46300 -p 46000:46000 --env-file env.list \
         -v /var/run/docker.sock:/var/run/docker.sock \
         --name mf2c_micro_lifecycle \
         --label "PRODUCT=MF2C" \
-        mf2c/lifecycle:1.0.7-arm
+        mf2c/trunk:lifecycle-1.0.10-arm
 
 containers='mf2c_micro_lifecycle mf2c_micro_resource-categorization mf2c_micro_discovery mf2c_micro_cau-client mf2c_micro_identification'
 self=`hostname`
