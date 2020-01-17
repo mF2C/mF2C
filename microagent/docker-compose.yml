@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   installer:
-    image: mf2c/microagent:1.0.13
+    image: mf2c/microagent:1.0.14
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
