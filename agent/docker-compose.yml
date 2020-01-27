@@ -279,7 +279,7 @@ services:
 
   ############ Resource Manager + Security #############
   policies:
-     image: mf2c/policies:2.0.13
+     image: mf2c/policies:2.0.13b
      restart: on-failure
      depends_on:
        - cimi

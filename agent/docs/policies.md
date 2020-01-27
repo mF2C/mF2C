@@ -79,6 +79,18 @@ To run policies module along other mF2C components, is necessary to specify the 
 - "REGISTRATION_MAX_RETRY=20"
 ```
 
+#### To specify the amount of retry attempts to check the leader before takeover
+
+```yaml
+- "MAX_RETRY_ATTEMPTS=20"
+```
+
+#### To specify the amount of time (seconds) before a backup is considered down
+
+```yaml
+- "MAX_TTL=10"
+```
+
 ### API
 
 All the API calls are made via REST. The endpoints and required parameters can be consulted on [http://{policies_address}:46050/](http://localhost:46050/)
@@ -286,6 +298,17 @@ curl -X GET "http://localhost/api/v2/resource-management/policies/roleChange/lea
     * If discovery and VPN fail to provide a valid IP of the agent and leader, Policies module will fail to create CIMI agent resource.
 
 ## CHANGELOG
+
+### 2.0.13b (27/01/2019)
+
+#### Added
+
+    + MAX_RETRY_ATTEMPTS and MAX_TTL env variables added
+    
+#### Changed
+
+    * MAX_RETRY_ATTEMPTS and MAX_TTL default values increased (20 attempts and 10 MAX_TTL)
+    * Time between attempts increased (2 seconds)
 
 ### 2.0.13 (10/12/2019)
 
